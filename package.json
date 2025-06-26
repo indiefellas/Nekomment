@@ -1,0 +1,7 @@
+{
+	"name": "nekomment",
+	"private": true,
+	"workspaces": [
+	  "src/*"
+	]
+}
