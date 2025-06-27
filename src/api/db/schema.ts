@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { blob, int, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { blob, int, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
 	id: int().primaryKey({ autoIncrement: true }),
@@ -28,6 +28,27 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 	})
 }))
 
+export const pages = sqliteTable("pages", {
+	name: text().primaryKey(),
+	userId: int().notNull(),
+	hostName: text().notNull(),
+	template: text().notNull(),
+	pagePath: text().default(''),
+	useReferer: integer<"boolean">().default(false)
+})
+
+export const pagesRelations = relations(pages, ({ one, many }) => ({
+	user: one(users, {
+		fields: [pages.userId],
+		references: [users.id]
+	}),
+	host: one(hosts, {
+		fields: [pages.hostName],
+		references: [hosts.host]
+	}),
+	comments: many(comments)
+}))
+
 export const hosts = sqliteTable("hosts", {
 	host: text().primaryKey(),
 	ownerId: int().notNull(),
@@ -54,11 +75,12 @@ export const comments = sqliteTable("comments", {
 	createdAt: int(),
 	address: text().notNull(),
 	host: text().notNull(),
-	parentId: int()
+	parentId: int(),
+	pagePath: text().notNull()
 })
 
 export const commentsRelations = relations(comments, ({ one, many }) => ({
-	page: one(hosts, {
+	host: one(hosts, {
 		fields: [comments.host],
 		references: [hosts.host]
 	}),

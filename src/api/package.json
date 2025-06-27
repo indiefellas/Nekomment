@@ -10,6 +10,7 @@
 		"crypto": "^1.0.1",
 		"dotenv": "^16.5.0",
 		"drizzle-orm": "^0.44.2",
+		"handlebars": "^4.7.8",
 		"hono": "^4.8.3",
 		"hono-sessions": "^0.7.3"
 	},

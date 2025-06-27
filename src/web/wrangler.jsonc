@@ -4,59 +4,56 @@
  */
 {
 	"$schema": "../../node_modules/wrangler/config-schema.json",
-	"name": "nekomment-api",
+	"name": "nekomment-web",
 	"account_id": "cc3f652dd32e6db594ac14944e95d94c",
-	"main": "src/index.ts",
-	"compatibility_date": "2025-06-20",
+	"main": "./dist/_worker.js/index.js",
+	"compatibility_date": "2025-06-27",
 	"compatibility_flags": [
-		"nodejs_compat"
+		"nodejs_compat",
+		"global_fetch_strictly_public"
+	],
+	"assets": {
+		"binding": "ASSETS",
+		"directory": "./dist"
+	},
+	"services": [
+		{
+			"binding": "NEKOMMENT_API",
+			"service": "nekomment-api"
+		}
 	],
 	"observability": {
 		"enabled": true
-	},
-	"d1_databases": [
-		{
-			"binding": "NKM_TEST",
-			"database_name": "nekomment-testdb",
-			"database_id": "75a85495-1c6a-4e1b-b234-764ea9b682b3",
-            "migrations_dir": "drizzle"
-		}
-	],
-	"unsafe": {
-    	"bindings": [
-			{
-				"binding": "COMMENT_RATE_LIMIT",
-				"name": "COMMENT_RATE_LIMIT",
-				"type": "ratelimit",
-				"namespace_id": "1001",
-				"simple": {
-				  "limit": 3,
-				  "period": 10
-				}
-			}
-		]
-	},
+	}
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
 	 */
-	"placement": { "mode": "smart" },
+	// "placement": { "mode": "smart" },
+
 	/**
 	 * Bindings
 	 * Bindings allow your Worker to interact with resources on the Cloudflare Developer Platform, including
 	 * databases, object storage, AI inference, real-time communication and more.
 	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
 	 */
-	"vars": { "SESSION": "ABl4EwbeYzppi2ETEywpZB5Hz6LX25xX", "ENV": "PROD" }
+
+	/**
+	 * Environment Variables
+	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
+	 */
+	// "vars": { "MY_VARIABLE": "production_value" },
 	/**
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
 	 */
+
 	/**
 	 * Static Assets
 	 * https://developers.cloudflare.com/workers/static-assets/binding/
 	 */
 	// "assets": { "directory": "./public/", "binding": "ASSETS" },
+
 	/**
 	 * Service Bindings (communicate between multiple Workers)
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings

@@ -12,8 +12,6 @@ import {
   CookieStore 
 } from 'hono-sessions';
 
-const SESSION = env.SESSION;
-
 type SessionDataTypes = {
   'token': string,
   'host-token': string
@@ -27,22 +25,6 @@ const app = new Hono<{
   }
  }>();
 const db = createDb(env);
-
-const store = new CookieStore()
-
-app.use(
-  sessionMiddleware({
-    store,
-    encryptionKey: SESSION,
-    cookieOptions: {
-      httpOnly: true,
-      secure: env.ENV === 'PROD',
-      sameSite: 'Lax',
-      domain: '.cmt.nkko.link',
-      path: '/',
-    },
-  })
-);
 
 app.post("/user", async (c) => {
   const { name, password, email } = await c.req.parseBody();

@@ -1,0 +1,21 @@
+{
+	"name": "web",
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "astro dev",
+		"build": "astro build",
+		"preview": "astro build && wrangler dev",
+		"astro": "astro",
+		"deploy": "astro build && wrangler deploy",
+		"cf-typegen": "wrangler types"
+	},
+	"dependencies": {
+		"@astrojs/cloudflare": "^12.6.0",
+		"astro": "^5.10.1"
+	},
+	"devDependencies": {
+		"@types/node": "^24.0.4",
+		"wrangler": "^4.22.0"
+	}
+}
