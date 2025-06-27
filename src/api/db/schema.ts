@@ -18,10 +18,7 @@ export const sessions = sqliteTable("sessions", {
 	sessionToken: text().primaryKey(),
 	userId: int().notNull(),
 	userAgent: text().notNull(),
-	address: text().notNull(),
-	data: text().notNull(),
-	createdAt: int().notNull(),
-	expiresAt: int().notNull()
+	address: text().notNull()
 })
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
@@ -34,7 +31,7 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 export const hosts = sqliteTable("hosts", {
 	host: text().primaryKey(),
 	ownerId: int().notNull(),
-	settingsId: int().notNull()
+	settingsId: int()
 });
 
 export const hostsRelations = relations(hosts, ({ one, many }) => ({
@@ -42,23 +39,9 @@ export const hostsRelations = relations(hosts, ({ one, many }) => ({
 		fields: [hosts.ownerId],
 		references: [users.id]
 	}),
-	hostPages: many(hostPages),
 	settings: one(hostSettings, {
 		fields: [hosts.settingsId],
 		references: [hostSettings.id]
-	})
-}))
-
-export const hostPages = sqliteTable("host_pages", {
-	path: text().primaryKey(),
-	title: text().notNull(),
-	hostUri: text().notNull()
-})
-
-export const hostPagesRelations = relations(hostPages, ({ one, many }) => ({
-	host: one(hosts, {
-		fields: [hostPages.hostUri],
-		references: [hosts.host]
 	}),
 	comments: many(comments)
 }))
@@ -68,16 +51,16 @@ export const comments = sqliteTable("comments", {
 	author: text().notNull().default("Anonymous"),
 	content: text().notNull(),
 	website: text(),
-	createdAt: blob({ mode: 'bigint' }),
+	createdAt: int(),
 	address: text().notNull(),
-	pagePath: text().notNull(),
+	host: text().notNull(),
 	parentId: int()
 })
 
 export const commentsRelations = relations(comments, ({ one, many }) => ({
-	page: one(hostPages, {
-		fields: [comments.pagePath],
-		references: [hostPages.path]
+	page: one(hosts, {
+		fields: [comments.host],
+		references: [hosts.host]
 	}),
 	replies: many(comments, {
 		relationName: 'comment_replies',

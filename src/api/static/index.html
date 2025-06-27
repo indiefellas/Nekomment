@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body, * {
+            background: #333;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <p>signup</p>
+    <form method="post" action="/v1/internals/user">
+        <input type="text" name="name" placeholder="username">
+        <input type="text" name="email" placeholder="email">
+        <input type="password" name="password" placeholder="password">
+        <input type="submit">
+    </form>
+    <p>login</p>
+    <form method="post" action="/v1/internals/login">
+        <input type="text" name="name" placeholder="username">
+        <input type="password" name="password" placeholder="password">
+        <input type="submit">
+    </form>
+    <p>add domain button</p>
+    <form method="post" action="/v1/internals/initAddHostToken">
+        <input type="submit">
+    </form>
+    <p>add domain</p>
+    <form method="post" action="/v1/internals/addHost">
+        <input type="text" name="host" placeholder="host">
+        <input type="text" name="method" placeholder="method">
+        <input type="submit">
+    </form>
+</body>
+</html>

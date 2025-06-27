@@ -4,7 +4,8 @@
  */
 {
 	"$schema": "../../node_modules/wrangler/config-schema.json",
-	"name": "api",
+	"name": "nekomment-api",
+	"account_id": "cc3f652dd32e6db594ac14944e95d94c",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-06-20",
 	"compatibility_flags": [
@@ -17,10 +18,24 @@
 		{
 			"binding": "NKM_TEST",
 			"database_name": "nekomment-testdb",
-			"database_id": "144fd619-a5e1-431e-be27-0c790d83a081",
+			"database_id": "75a85495-1c6a-4e1b-b234-764ea9b682b3",
             "migrations_dir": "drizzle"
 		}
 	],
+	"unsafe": {
+    	"bindings": [
+			{
+				"binding": "COMMENT_RATE_LIMIT",
+				"name": "COMMENT_RATE_LIMIT",
+				"type": "ratelimit",
+				"namespace_id": "1001",
+				"simple": {
+				  "limit": 3,
+				  "period": 10
+				}
+			}
+		]
+	},
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
