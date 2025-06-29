@@ -1,0 +1,45 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+export const prerender = false; 
+const { env } = Astro.locals.runtime;
+
+let err = '';
+if (Astro.request.method === 'POST') {
+    try {
+        const data = await Astro.request.formData();
+        const username = data.get('username')?.toString() || '';
+        const password = data.get('password')?.toString() || '';
+
+        let session = await env.NEKOMMENT_API.loginUser(username, password);
+
+        if (session.success && session.data) {
+            Astro.cookies.set('token', session.data.token);
+            return Astro.redirect(Astro.url.searchParams.get('redirect') || '/', 302);
+        } else {
+            err = 'Invalid username or password';
+        }
+    }
+    catch {
+
+    }
+}
+---
+
+<MainLayout>
+	<h1>Login into Nekomment</h1>
+    <div class="login-form">
+        <p>{err}</p>
+        <form method="post">
+            <label>
+                Username:
+                <input type="text" name="username" required />
+            </label>
+            <label>
+                Password:
+                <input type="password" name="password" required minlength="8" />
+            </label>
+
+            <button type="submit">Login!</button>
+        </form>
+    </div>
+</MainLayout>

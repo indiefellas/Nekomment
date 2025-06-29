@@ -36,8 +36,12 @@ app.get("/:host/:path", async (c) => {
 
 app.post("/:host/:path", async (c) => {
     const { host, path } = c.req.param();
-    const { name, content, website, parentId } = await c.req.parseBody();
-    let pId: number | undefined = parentId ? parseInt(parentId?.toString()) : undefined;
+    const { name, content, website, parentId, backPath } = await c.req.parseBody();
+    let b = c.req.header('Referer') || `https://${host}${path}`;
+    if (backPath) {
+        b = backPath.toString();
+    }
+    let pId: string | undefined = parentId ? parentId?.toString() : undefined;
     let hostPage = await db.select().from(schema.hosts).where(eq(schema.hosts.host, host));
     if (hostPage.length < 1) {
         return c.text('host not found', 404)
@@ -66,7 +70,7 @@ app.post("/:host/:path", async (c) => {
         pagePath: path,
         parentId: pId
     })
-    return c.redirect(c.req.header('Referer') || `https://${host}${path}`, 303)
+    return c.redirect(backPath.toString(), 303)
 });
 
 app.delete("/:host/:path/:id", async (c) => {

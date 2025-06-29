@@ -1,5 +1,6 @@
-import { relations, sql } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel, relations, sql } from "drizzle-orm";
 import { blob, int, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { genId } from "./utils";
 
 export const users = sqliteTable("users", {
 	id: int().primaryKey({ autoIncrement: true }),
@@ -68,14 +69,14 @@ export const hostsRelations = relations(hosts, ({ one, many }) => ({
 }))
 
 export const comments = sqliteTable("comments", {
-	id: int().primaryKey({ autoIncrement: true }),
+	id: text().primaryKey().$defaultFn(() => genId(6)),
 	author: text().notNull().default("Anonymous"),
 	content: text().notNull(),
 	website: text(),
 	createdAt: int(),
 	address: text().notNull(),
 	host: text().notNull(),
-	parentId: int(),
+	parentId: text(),
 	pagePath: text().notNull()
 })
 
@@ -137,3 +138,20 @@ export const autoModRulesRelations = relations(autoModRules, ({ one }) => ({
 		references: [hostSettings.id]
 	})
 }))
+
+export type User = InferSelectModel<typeof users>;
+export type NewUser = InferInsertModel<typeof users>;
+export type Session = InferSelectModel<typeof sessions>;
+export type NewSession = InferInsertModel<typeof sessions>;
+export type Page = InferSelectModel<typeof pages>;
+export type NewPage = InferInsertModel<typeof pages>;
+export type Host = InferSelectModel<typeof hosts>;
+export type NewHost = InferInsertModel<typeof hosts>;
+export type Comment = InferSelectModel<typeof comments>;
+export type NewComment = InferInsertModel<typeof comments>;
+export type HostSettings = InferSelectModel<typeof hostSettings>;
+export type NewHostSettings = InferInsertModel<typeof hostSettings>;
+export type BlockedAddress = InferSelectModel<typeof blockedAddresses>;
+export type NewBlockedAddress = InferInsertModel<typeof blockedAddresses>;
+export type AutoModRule = InferSelectModel<typeof autoModRules>;
+export type NewAutoModRule = InferInsertModel<typeof autoModRules>;

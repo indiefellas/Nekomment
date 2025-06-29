@@ -1,5 +1,4 @@
 import { Hono } from 'hono';
-import internals from './routes/internals';
 import comments from './routes/comments';
 import { createDb } from "../db";
 import * as schema from '../db/schema';
@@ -7,6 +6,7 @@ import { html, raw } from 'hono/html';
 import { env } from 'cloudflare:workers';
 import { and, eq, isNull } from "drizzle-orm";
 import { CookieStore, Session, sessionMiddleware } from 'hono-sessions';
+import { InternalService } from './services/internals';
 
 const SESSION = env.SESSION;
 
@@ -45,7 +45,6 @@ app.use(
   })
 );
 
-app.route('/v1/internals', internals);
 app.route('/v1/comments', comments);
 
 app.post("/c/:name", async (c) => {
@@ -233,3 +232,4 @@ app.get("/", (c) => {
 })
 
 export default app;
+export { InternalService };

@@ -19,7 +19,8 @@
 	"services": [
 		{
 			"binding": "NEKOMMENT_API",
-			"service": "nekomment-api"
+			"service": "nekomment-api",
+			"entrypoint": "InternalService"
 		}
 	],
 	"observability": {
