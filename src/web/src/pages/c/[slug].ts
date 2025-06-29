@@ -76,7 +76,7 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
         return (/*html*/`<form method="POST" action="https://api.beta.cmt.nkko.link/v1/comments/${value[0].host}/${encodeURIComponent(value[0].path)}" referrerpolicy="unsafe-url">
                 <div>
                     <input type="text" name="name" placeholder="Display name" aria-label="Display name" required />
-                    <input type="url" name="website" placeholder="Website" aria-label="Website" />
+                    <input type="url" name="website" placeholder="Website (optional)" aria-label="Website (optional)" />
                 </div>
                 <textarea name="content" placeholder="Your comment..." aria-label="Your comment"></textarea>
                 <button>Comment</button>
