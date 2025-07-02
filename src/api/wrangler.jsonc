@@ -30,8 +30,8 @@
 				"type": "ratelimit",
 				"namespace_id": "1001",
 				"simple": {
-				  "limit": 3,
-				  "period": 10
+				  "limit": 10,
+				  "period": 60
 				}
 			}
 		]

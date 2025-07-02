@@ -13,5 +13,10 @@ export default defineConfig({
     },
 
     imageService: "cloudflare"
-  })
+  }),
+  vite: {
+    build: {
+      minify: false
+    }
+  }
 });

@@ -27,7 +27,6 @@ const commentList = commentChunks[page];
 
 <MainLayout>
     <Fragment slot="nav">
-        <i>{shost.data?.host}</i>
         <a href="/dash">Switch hosts</a>
         <a href="/addhost">Add new host</a>
     </Fragment>
@@ -77,7 +76,7 @@ const commentList = commentChunks[page];
                             {c.replies.reverse().map((r) => (
                                 <blockquote>
                                     <div class="reply-content">
-                                        <p class="small">{c.address}</p>
+                                        <p class="small">{r.address}</p>
                                         <h3>
                                             <a href={r.website}>{r.author}</a>
                                         </h3>

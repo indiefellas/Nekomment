@@ -36,7 +36,8 @@ app.get("/:host/:path", async (c) => {
 
 app.post("/:host/:path", async (c) => {
     const { host, path } = c.req.param();
-    const { name, content, website, parentId, backPath } = await c.req.parseBody();
+    const { name, content, website, parentId, backPath, cfTurnstileKey } = await c.req.parseBody();
+    const ip = c.req.header('CF-Connecting-IP') || '0.0.0.0';
     let b = c.req.header('Referer') || `https://${host}${path}`;
     if (backPath) {
         b = backPath.toString();
@@ -46,31 +47,57 @@ app.post("/:host/:path", async (c) => {
     if (hostPage.length < 1) {
         return c.text('host not found', 404)
     }
-    if (pId) {
-        let parentComment = await db.select().from(schema.comments).where(
-            and(
-                eq(schema.comments.host, host),
-                eq(schema.comments.id, pId)
-            )
-        )
-        pId = parentComment[0].id;
-        if (parentComment.length < 1) {
-            pId = undefined;
-        } else if (parentComment[0].parentId) {
-            pId = parentComment[0].parentId
+    let outcome: { success: boolean } = {
+        success: false
+    }
+    
+    if (cfTurnstileKey || backPath.toString().includes('cmt.nkko.link')) {
+        let formData = new FormData();
+        formData.append("secret", env.TURNSTILE_KEY);
+        formData.append("response", cfTurnstileKey.toString());
+        formData.append("remoteip", ip);
+
+        const url = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+        const result = await fetch(url, {
+            body: formData,
+            method: "POST",
+        });
+        outcome = await result.json();
+    } else {
+        outcome = { 
+            success: true
         }
     }
-    await db.insert(schema.comments).values({
-        host: host,
-        author: name.toString(),
-        content: content.toString(),
-        website: website.toString(),
-        createdAt: Date.now(),
-        address: c.req.header('CF-Connecting-IP') || '0.0.0.0',
-        pagePath: path,
-        parentId: pId
-    })
-    return c.redirect(backPath.toString(), 303)
+
+    if (outcome.success) {
+        if (pId) {
+            let parentComment = await db.select().from(schema.comments).where(
+                and(
+                    eq(schema.comments.host, host),
+                    eq(schema.comments.id, pId)
+                )
+            )
+            pId = parentComment[0].id;
+            if (parentComment.length < 1) {
+                pId = undefined;
+            } else if (parentComment[0].parentId) {
+                pId = parentComment[0].parentId
+            }
+        }
+        await db.insert(schema.comments).values({
+            host: host,
+            author: name.toString(),
+            content: content.toString(),
+            website: website.toString(),
+            createdAt: Date.now(),
+            address: ip,
+            pagePath: path,
+            parentId: pId
+        })
+        return c.redirect(backPath.toString(), 303)
+    } else {
+        return c.text('verification failed', 403)
+    }
 });
 
 app.delete("/:host/:path/:id", async (c) => {

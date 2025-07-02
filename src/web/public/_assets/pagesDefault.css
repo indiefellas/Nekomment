@@ -45,11 +45,11 @@ a {
 }
 
 input, button, textarea {
-    padding: 2px 4px;
+    padding: 6px 8px;
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-size: 1rem;
     background-color: var(--btnbg);
-    border: 1px solid var(--sec);
+    border: 0;
     color: var(--main);
     width: fit-content;
 }
@@ -66,7 +66,7 @@ h1:first-of-type {
     margin-top: 0;
 }
 
-form {
+.nkm-editor, .nkm-error {
     display: flex;
     gap: 12px;
     flex-direction: column;
@@ -76,10 +76,23 @@ form {
     background-color: var(--bg2);
 }
 
-form > div {
+.nkm-editor > div {
     display: flex;
     flex-direction: row;
     gap: 12px;
+}
+
+.nkm-editor .nkm-buttons {
+    justify-content: space-between;
+}
+
+.nkm-editor .nkm-button {
+    height: fit-content;
+}
+
+.nkm-button[disabled] {
+    cursor: not-allowed;
+    opacity: 0.75;
 }
 
 section {
@@ -88,7 +101,7 @@ section {
     gap: 12px;
 }
 
-section article, section blockquote {
+section .nkm-content, section blockquote {
     &>* {
         margin: 0;
     }
@@ -96,7 +109,7 @@ section article, section blockquote {
 
 section {
     margin-left: 0px;
-    gap: 6px;
+    gap: 12px;
     padding-top: 6px;
     display: flex;
     flex-direction: column;
@@ -106,7 +119,7 @@ section blockquote {
     margin-left: 9px;
     padding-left: 6px;
     padding-block: 3px;
-    border-left: 3px solid var(--green);
+    border-left: 2px solid var(--green);
     background-color: var(--bg5);
     width: calc(100% - 6px);
 }
@@ -116,7 +129,7 @@ section article {
     padding: 12px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 12px;
 }
 
 section .reply-content {
@@ -125,4 +138,21 @@ section .reply-content {
 
 .small {
     font-size: 0.75em;
+}
+
+.nkm-pages {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 6px;
+}
+
+.nkm-pages .nkm-link {
+    width: 100%;
+    flex-basis: 0;
+    flex-grow: 1;
+}
+
+.nkm-pages .nkm-link:last-child {
+    text-align: right;
 }

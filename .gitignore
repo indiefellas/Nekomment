@@ -34,3 +34,6 @@ lerna-debug.log*
 
 # drizzle
 drizzle
+src/web/src/pages/c/\[slug].ts
+
+*.sql
