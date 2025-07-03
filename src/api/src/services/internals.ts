@@ -180,7 +180,7 @@ export class InternalService extends WorkerEntrypoint {
     }
   }
 
-  async initializeAddHostToken(sessionToken: string): Promise<RpcResponse> {
+  async initializeAddHostToken(sessionToken: string): Promise<RpcResponse<string>> {
     if (!sessionToken) {
       return { success: false, message: 'authentication required', status: 401 };
     }
@@ -197,8 +197,7 @@ export class InternalService extends WorkerEntrypoint {
 
       const hostToken = crypto.randomUUID();
 
-
-      return { success: true, data: { hostToken } };
+      return { success: true, data: hostToken };
     } catch (error: any) {
       console.error("Error initializing add host token:", error);
       return { success: false, message: `Failed to initialize host token: ${error.message}`, status: 500 };
@@ -256,7 +255,22 @@ export class InternalService extends WorkerEntrypoint {
     }
   }
 
-  async getHosts(sessionToken: string): Promise<RpcResponse<schema.Host[]>> {
+  async getHosts(sessionToken: string): Promise<RpcResponse<{
+    host: string;
+    ownerId: number;
+    settingsId: number | null;
+    comments: {
+      id: string;
+      host: string;
+      address: string;
+      pagePath: string;
+      author: string;
+      content: string;
+      website: string | null;
+      createdAt: number | null;
+      parentId: string | null;
+    }[];
+  }[]>> {
     if (!sessionToken) {
       return {
         success: false,
@@ -275,9 +289,12 @@ export class InternalService extends WorkerEntrypoint {
         status: 401
       }
     }
-    let hosts = await db.select()
-      .from(schema.hosts)
-      .where(eq(schema.hosts.ownerId, userSession[0].users.id));
+    let hosts = await db.query.hosts.findMany({
+      with: {
+        comments: true
+      },
+      where: eq(schema.hosts.ownerId, userSession[0].users.id)
+    })
     return {
       success: true,
       data: hosts
@@ -321,6 +338,41 @@ export class InternalService extends WorkerEntrypoint {
     return {
       success: true,
       data: hosts[0]
+    }
+  }
+
+  async getPages(sessionToken: string): Promise<RpcResponse<{
+    name: string;
+    userId: number;
+    hostName: string;
+    template: string;
+    pagePath: string | null;
+    useReferer: boolean | null;
+  }[]>> {
+    if (!sessionToken) {
+      return {
+        success: false,
+        message: 'User not logged in or session expired',
+        status: 401
+      }
+    }
+    let userSession = await db.select()
+      .from(schema.sessions)
+      .leftJoin(schema.users, eq(schema.users.id, schema.sessions.userId))
+      .where(eq(schema.sessions.sessionToken, sessionToken));
+    if (userSession.length < 1 || !userSession[0].users) {
+      return {
+        success: false,
+        message: 'User not logged in or session expired',
+        status: 401
+      }
+    }
+    let pages = await db.query.pages.findMany({
+      where: eq(schema.pages.userId, userSession[0].users.id)
+    })
+    return {
+      success: true,
+      data: pages
     }
   }
 

@@ -8,28 +8,24 @@ if (Astro.request.method === 'POST') {
     try {
         const data = await Astro.request.formData();
         const username = data.get('username')?.toString() || '';
+        const email = data.get('email')?.toString() || '';
         const password = data.get('password')?.toString() || '';
-
+        await env.NEKOMMENT_API.createUser(username, password, email);
         let session = await env.NEKOMMENT_API.loginUser(username, password);
-
-        if (session.success && session.data) {
-            Astro.cookies.set('token', session.data.token, {
-                httpOnly: true,
-                sameSite: 'lax'
-            });
-            return Astro.redirect(Astro.url.searchParams.get('redirect') || '/', 302);
-        } else {
-            err = 'Invalid username or password';
-        }
+        Astro.cookies.set('token', session.data.token, {
+            httpOnly: true,
+            sameSite: 'lax'
+        });
+        return Astro.redirect(Astro.url.searchParams.get('redirect') || '/', 302);
     }
     catch {
-
+        err = 'An error occured. Please try again.';
     }
 }
 ---
 
 <MainLayout>
-	<h1>Login into Nekomment</h1>
+	<h1>Register to Nekomment</h1>
     <div class="login-form">
         <p>{err}</p>
         <form method="post">
@@ -38,11 +34,15 @@ if (Astro.request.method === 'POST') {
                 <input type="text" name="username" required />
             </label>
             <label>
+                Email:
+                <input type="email" name="email" required />
+            </label>
+            <label>
                 Password:
                 <input type="password" name="password" required minlength="8" />
             </label>
 
-            <button type="submit">Login!</button>
+            <button type="submit">Register!</button>
         </form>
     </div>
 </MainLayout>

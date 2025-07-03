@@ -3,10 +3,13 @@ import { defineConfig } from 'astro/config';
 
 import cloudflare from '@astrojs/cloudflare';
 
+import expressiveCode from 'astro-expressive-code';
+
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
   site: 'https://beta.cmt.nkko.link',
+
   adapter: cloudflare({
     platformProxy: {
       enabled: true
@@ -14,9 +17,14 @@ export default defineConfig({
 
     imageService: "cloudflare"
   }),
+
   vite: {
     build: {
       minify: false
     }
-  }
+  },
+
+  integrations: [expressiveCode({
+    themes: ['catppuccin-macchiato']
+  })]
 });

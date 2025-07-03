@@ -6,8 +6,13 @@ const { env } = Astro.locals.runtime;
 const hosts = await env.NEKOMMENT_API.getHosts(Astro.cookies.get('token')?.value ?? '');
 if (!hosts.success) return Astro.redirect('/login?redirect=' + Astro.url.pathname, 302);
 
+const pages = await env.NEKOMMENT_API.getPages(Astro.cookies.get('token')?.value ?? '');
+if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathname, 302);
+
 if (hosts.data?.length === 1) {
     return Astro.redirect('/dash/' + hosts.data[0].host)
+} else if (hosts.data?.length === 0) {
+    return Astro.redirect('/dash/add-host/')
 }
 ---
 
@@ -17,5 +22,22 @@ if (hosts.data?.length === 1) {
     </Fragment> 
 
     <h1>Hosts</h1>
-    {hosts.data?.map(h => <p>{h.host}</p>)}
+    <div class="hosts-list">
+        {hosts.data?.map(h => 
+            <a href={"/dash/" + h.host}>
+                <h2>{h.host}</h2>
+                <p>{h.comments?.length || 0} total comments</p>
+            </a>
+        )}
+    </div>
+
+    <h1>Pages</h1>
+    <div class="hosts-list">
+        {pages.data?.map(h => 
+            <a href={"/pages/" + h.name}>
+                <h2>{h.name}</h2>
+                <p>Host: {h.hostName}</p>
+            </a>
+        )}
+    </div>
 </MainLayout>
