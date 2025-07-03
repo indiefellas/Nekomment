@@ -75,7 +75,7 @@ export const GET: APIRoute = async ({ params, request, locals, url }) => {
     const pathUrl = path ? new URL(path) : new URL('https://beta.cmt.nkko.link/');
     const pageNum = parseInt(url.searchParams.get('page') || "1", 10);
 
-    const cache = await locals.runtime.caches.open(`nkm-cache:${params.slug}:${pageNum}`);
+    const cache = await locals.runtime.caches.open(`nkm-cache:pages`);
     const cacheRes = await cache.match(request);
     if (cacheRes) {
         return cacheRes
@@ -170,6 +170,6 @@ export const GET: APIRoute = async ({ params, request, locals, url }) => {
             }
         }
     );
-    await cache.put(request, res)
+    await cache.put(request, res.clone())
     return res;
 }

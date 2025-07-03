@@ -20,6 +20,7 @@
     font-smooth: none;
     margin-block: 0;
     box-sizing: border-box;
+    overflow-wrap: anywhere;
 }
 
 body {
