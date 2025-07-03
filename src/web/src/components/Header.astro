@@ -1,0 +1,14 @@
+---
+import { undefined } from "astro:schema";
+import { sanitizeUser } from "../lib/sanitize";
+import HeaderSvelte from "./Header.svelte";
+import Signature from "./Signature.svelte";
+
+export const prerender = false;
+
+const { env } = Astro.locals.runtime;
+
+const user = await env.NEKOMMENT_API.checkUser(Astro.cookies.get('token')?.value ?? '');
+---
+
+<HeaderSvelte user={user.data ? sanitizeUser(user.data) : undefined} client:load />

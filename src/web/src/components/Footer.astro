@@ -1,0 +1,105 @@
+---
+import Signature from "./Signature.svelte";
+
+
+---
+
+<footer>
+    <div class="container">
+        <div class="info">
+            <Signature />
+            <p>
+                &copy; Indiefellas, 2025.<br/>
+                Nekomment is under the MIT License.
+            </p>
+        </div>
+        <nav class="links">
+            <li>
+                <h5>Site navigation</h5>
+                <nav>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/faqs">FAQs</a></li>
+                    <li><a href="/docs">API Docs</a></li>
+                </nav>
+            </li>
+            <li>
+                <h5>Obligatory legal stuff</h5>
+                <nav>
+                    <li><a href="/terms">Terms of Use</a></li>
+                    <li><a href="/privacy">Privacy Policy</a></li>
+                </nav>
+            </li>
+            <li>
+                <h5>Contribute!</h5>
+                <nav>
+                    <li><a href="/gold">Nekomment Gold&trade;</a></li>
+                    <li><a href="https://github.com/indiefellas/Nekomment/">Source Code</a></li>
+                </nav>
+            </li>
+        </nav>
+    </div>
+</footer>
+
+<style scoped>
+
+    footer .info :global(.signature) {
+        font-size: 1.125em;
+    }
+
+    footer {
+        background-color: var(--background-1);
+        padding-block: 20px;
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            gap: 4em;
+            justify-content: space-between;
+        }
+
+        .info {
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .links {
+            display: flex;
+            flex-flow: row wrap;
+            gap: 2em;
+            align-items: start;
+            text-align: end;
+            justify-content: end;
+            list-style: none;
+
+            li {
+                margin-block: 0;
+            }
+
+            h5 {
+                margin: 0;
+                color: var(--color-1);
+                font-size: 0.6em;
+                text-transform: uppercase;
+            }
+
+            nav {
+                margin: 0;
+            }
+
+            nav li {
+                margin-block: 0.25em;
+            }
+        }
+    }
+
+    @media (max-width: 960px) {
+        footer .container {
+            flex-direction: column;
+            gap: 20px;
+        }
+        footer .links {
+            gap: 20px 2em;
+        }
+    }
+</style>

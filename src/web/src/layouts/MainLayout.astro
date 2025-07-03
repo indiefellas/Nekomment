@@ -1,19 +1,9 @@
 ---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
 import "../styles/main.css";
-export const prerender = false;
 
-const { env } = Astro.locals.runtime;
 const { title = "Nekomment" } = Astro.props;
-
-const user = await env.NEKOMMENT_API.checkUser(Astro.cookies.get('token')?.value ?? '');
-
-const type = (()=>{
-    switch (user.data?.type || 0) {
-        case 0: return 'Free';
-        case 1: return 'Plus';
-        case 99: return 'Admin';
-    }
-})();
 ---
 
 <!doctype html>
@@ -27,45 +17,10 @@ const type = (()=>{
         <slot name="head" />
     </head>
     <body>
-        <header>
-            <nav>
-                <slot name="nav">
-                    <a href="/">Home</a>
-                    <a href="/faqs">FAQs</a>
-                </slot>
-            </nav>
-            <div>
-                {
-                    user.data ?
-                        <Fragment>
-                            <p>{user.data.name} ({type})</p>
-                            <a href="/dash">Dashboard</a>
-                            <a href="/logout">Logout</a>
-                        </Fragment> :
-                        <Fragment>
-                            <a href="/login">Login</a>
-                            <a href="/register">Register <i>(it's free!)</i></a>
-                        </Fragment>
-                }
-            </div>
-        </header>
+        <Header />
         <main>
             <slot />
         </main>
-        <footer>
-            <div>
-                <h2><img src="/favicon.svg" width="16" alt="" /> Nekomment</h2>
-                <p>A comments system.</p>
-            </div>
-            <div class="links">
-                <div>
-                    <a href="/">Home</a>
-                    <a href="/docs">API Docs</a>
-                </div>
-                <div>
-                    (c) Indiefellas, 2025. Nekomment is under MIT License.
-                </div>
-            </div>
-        </footer>
+        <Footer />
     </body>
 </html>

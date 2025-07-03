@@ -1,0 +1,72 @@
+---
+import Signature from "./Signature.svelte";
+
+
+---
+
+<div class="landing-hero fill-screen">
+    <div class="introduction fill-screen">
+        <h1>
+            <Signature /><span aria-label=" - "></span>
+            a <i>quirky</i> comment host<br/>
+            for your <i>quirky</i> website.
+        </h1>
+        <p>Nekomment is a free comment host that adapts to your website's design.</p>
+        <p class="actions">
+            <a class="button primary" href="/register">
+                Sign me up<i>!</i>
+            </a>
+            <a class="button" href="/login">I already registered</a>
+        </p>
+    </div>
+</div>
+
+<style scoped>
+    .landing-hero {
+        --hero-margin: max(calc(50dvw - 960px), calc(var(--main-margin) / 2 + 15px));
+        position: relative;
+
+        & > .introduction {
+            margin-inline: var(--hero-margin);
+            padding-block: 35px;
+            display: flex;
+            flex-flow: column;
+            justify-content: center;
+
+            & > h1 {
+                font-size: min(calc(2vw + 2em), 6em);
+                line-height: 0.85;
+                letter-spacing: -0.06ch;
+                transform: skewY(-6deg);
+                transform-origin: bottom left;
+                width: fit-content;
+                margin-block: 20px 0.5em;
+                text-shadow: 
+                    1px 1px var(--background-4), 2px 2px var(--background-4), 
+                    3px 3px var(--background-4), 4px 4px var(--background-4), 
+                    5px 5px var(--background-4), 6px 6px var(--background-4), 
+                    7px 7px var(--background-4), 8px 8px var(--background-4), 
+                    9px 9px var(--background-4);
+            }
+
+            & > .actions {
+                margin-top: 10px;
+            }
+        }
+    }
+
+    /* couldn't unscope the .signature selector on nested css above :sob: */
+    .landing-hero h1 :global(.signature) {
+        display: block;
+        font-size: 2rem;
+        text-shadow: none;
+        letter-spacing: 0;
+        margin-left: 10px;
+    }
+
+    @media (max-width: 640px) {
+        .landing-hero > .introduction {
+            justify-content: end;
+        }
+    }
+</style>

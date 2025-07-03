@@ -5,6 +5,8 @@ import cloudflare from '@astrojs/cloudflare';
 
 import expressiveCode from 'astro-expressive-code';
 
+import svelte from '@astrojs/svelte';
+
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
@@ -26,5 +28,5 @@ export default defineConfig({
 
   integrations: [expressiveCode({
     themes: ['catppuccin-macchiato']
-  })]
+  }), svelte()]
 });

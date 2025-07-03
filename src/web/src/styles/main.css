@@ -1,19 +1,42 @@
 @font-face {
     font-family: Inter;
-    src: url(/fonts/Inter-Variable.ttf);
+    src: url(/fonts/InterVariable.woff2);
+}
+
+@font-face {
+    font-family: Inter;
+    font-style: italic;
+    src: url(/fonts/InterVariable-Italic.woff2);
 }
 
 :root {
-    --bg: #10101a;
-    --bg2: #2c2c3c;
-    --bg3: #323247;
-    --bg4: #2a2a36;
-    --bg5: #414156;
-    --btnbg: #535365;
-    --main: #fffffe;
-    --sec: #b5b5dd;
+    --background-0: #10101a;
+    --background-1: #2c2c3c;
+    --background-2: #323247;
+    --background-3: #2a2a36;
+    --background-4: #414156;
+
+    --color-0: #fffffe;
+    --color-1: #b5b5dd;
+
+    --btn-base-bg: #535365;
+    --btn-base-hover-bg: #79798d;
+    --btn-base-color: #fffffe;
+    --btn-primary-bg: #f1f1ff;
+    --btn-primary-hover-bg: #d8d8ee;
+    --btn-primary-color: #10101a;
+
     --blue: #96b4ff;
     --green: #A6FFB0;
+
+    --shadow-0: 0 1px 2px #0007;
+    --shadow-1: 0 2px 4px #0007;
+    --shadow-2: 0 3px 6px #0007;
+    --shadow-3: 0 4px 8px #0007;
+
+    --content-font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+    --main-margin: max(calc(50dvw - 640px), 20px);
 }
 
 * {
@@ -23,56 +46,119 @@
 }
 
 body {
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    color: var(--main);
-    background: var(--bg);
-    max-width: 800px;
-    margin: 24px;
+    font-family: var(--content-font);
+    color: var(--color-0);
+    background: var(--background-0);
     margin-inline: auto;
     display: flex;
     flex-direction: column;
     font-size: 1.125em;
+    line-height: 1.3;
 }
 
-main {
-    border: 2px solid var(--bg2);
-    background-color: var(--bg3);
-    padding: 6px;
-
-    h1, h2, h3 {
-        margin-block: 24px 9px;
-    }
+.container {
+    margin-inline: var(--main-margin);
 }
 
 a {
     color: var(--blue);
 }
 
-input, button, textarea, select {
+input, textarea, select {
     padding: 6px 8px;
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    font-size: 1rem;
-    background-color: var(--btnbg);
+    font: inherit;
+    background-color: var(--btn-base-bg);
     border: 0;
-    color: var(--main);
+    color: var(--color-0);
     width: fit-content;
+    border-radius: 5px;
+    min-width: none;
+}
+
+button, .button {
+    --btn-bg: var(--btn-base-bg);
+    --btn-hover-bg: var(--btn-base-hover-bg);
+    --btn-color: var(--btn-base-color);
+    display: inline-block;
+    text-decoration: none;
+    padding: 0.35em 1.2ch;
+    font: inherit;
+    background: var(--btn-bg);
+    color: var(--btn-color);
+    border: none;
+    border-radius: 5px;
+    box-shadow: var(--shadow-0);
+    cursor: pointer;
+
+    &:hover {
+        background: var(--btn-hover-bg);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-1);
+    }
+    &:active {
+        background: var(--btn-bg);
+        transform: translateY(1px);
+        box-shadow: none;
+    }
+
+    &.primary {
+        --btn-bg: var(--btn-primary-bg);
+        --btn-hover-bg: var(--btn-primary-hover-bg);
+        --btn-color: var(--btn-primary-color);
+    }
+}
+
+.fill-screen {
+    min-height: calc(100dvh - 2em - 20px);
+}
+
+.center-child {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 h1:first-of-type {
     margin-top: 0;
 }
 
-.login-form form {
-    display: flex;
-    gap: 12px;
-    flex-direction: column;
-    margin-block: 12px;
-    padding: 12px;
-    border: 1px solid var(--green);
-    width: fit-content;
+.center-form {
+    background: var(--background-1);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px;
+    box-shadow: var(--shadow-3);
+    width: 400px;
+    max-width: calc(100dvw - 20px);
+}
 
-    &>* {
-        width: fit-content;
+form {
+    display: flex;
+    flex-flow: column;
+    gap: 10px;
+
+    hr {
+        border: none;
+        border-top: 1px solid var(--color-1);
+        width: 100%;
+        margin-block: 10px;
+    }
+
+    .field-group {
+        display: flex;
+        flex-flow: column;
+        gap: 5px;
+
+        & > * {
+            width: 100%;
+        }
+    }
+
+    .field-actions {
+        display: flex;
+        flex-flow: row wrap;
+        gap: 5px;
+        justify-content: end;
     }
 }
 
@@ -97,17 +183,15 @@ h1:first-of-type {
 }
 
 blockquote {
-    margin-left: 9px;
-    margin-block: 6px;
-    padding-left: 6px;
-    padding-block: 3px;
-    border-left: 3px solid var(--green);
-    background-color: var(--bg5);
-    width: calc(100% - 9px);
+    margin: 0;
+    padding: 0.5em 1.2ch;
+    border-left: 5px solid var(--green);
+    background-color: var(--background-4);
+    border-radius: 5px;
 }
 
 .comments-list article {
-    background-color: var(--bg4);
+    background-color: var(--background-3);
     padding: 12px;
 }
 
@@ -132,8 +216,8 @@ blockquote {
     gap: 6px;
 
     button {
-        background-color: var(--btnbg);
-        border: 1px solid var(--sec);
+        background-color: var(--btn-bg);
+        border: 1px solid var(--color-1);
         padding: 2px 4px;
         height: fit-content;
         width: max-content;
@@ -162,14 +246,14 @@ blockquote {
 .hosts-list a {
     width: 100%;
     padding: 6px;
-    background-color: var(--bg5);
+    background-color: var(--background-4);
     &>* {
         overflow: hidden;
         text-overflow: ellipsis;
         margin: 0;
     }
     &:hover {
-        background-color: var(--bg2);
+        background-color: var(--background-1);
     }
 }
 
@@ -196,47 +280,6 @@ li {
     margin-block: 9px;
 }
 
-header, footer {
-    display: flex;
-    flex-direction: row;
-    gap: 6px;
-    justify-content: space-between;
-
-    * {
-        margin: 0;
-    }
-
-    &>* {
-        display: flex;
-        flex-direction: row;
-        gap: 12px;
-        background: var(--bg2);
-        padding: 6px;
-    }
-}
-
-footer {
-    background-color: var(--bg2);
-    padding: 6px;
-
-    &>* {
-        display: flex;
-        flex-direction: column;
-        gap: 0px;
-        justify-content: end;
-        background: var(--bg2);
-        padding: 6px;
-    }
-
-    .links > * {
-        display: flex;
-        flex-direction: row;
-        gap: 6px;
-        align-items: end;
-        text-align: end;
-        justify-content: end;
-    }
-}
 
 @media screen and (width <= 640px) {
     body {

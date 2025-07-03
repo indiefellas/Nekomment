@@ -237,7 +237,7 @@ export class InternalService extends WorkerEntrypoint {
         default: {
           const response = await fetch(`https://${host}/.well-known/nekomment`);
           const text = await response.text();
-          if (!text || text !== hostToken) {
+          if (!text || text !== 'nekomment-token=' + hostToken) {
             return { success: false, message: 'host token does not match (well-known file)', status: 403 };
           }
           break;

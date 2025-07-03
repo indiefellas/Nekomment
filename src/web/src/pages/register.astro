@@ -1,9 +1,12 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
+import LoginForm from "../components/LoginForm.svelte";
+
 export const prerender = false; 
 const { env } = Astro.locals.runtime;
 
-let err = '';
+let err: string = "";
+
 if (Astro.request.method === 'POST') {
     try {
         const data = await Astro.request.formData();
@@ -12,7 +15,7 @@ if (Astro.request.method === 'POST') {
         const password = data.get('password')?.toString() || '';
         await env.NEKOMMENT_API.createUser(username, password, email);
         let session = await env.NEKOMMENT_API.loginUser(username, password);
-        Astro.cookies.set('token', session.data.token, {
+        Astro.cookies.set('token', session.data!.token, {
             httpOnly: true,
             sameSite: 'lax'
         });
@@ -25,24 +28,5 @@ if (Astro.request.method === 'POST') {
 ---
 
 <MainLayout>
-	<h1>Register to Nekomment</h1>
-    <div class="login-form">
-        <p>{err}</p>
-        <form method="post">
-            <label>
-                Username:
-                <input type="text" name="username" required />
-            </label>
-            <label>
-                Email:
-                <input type="email" name="email" required />
-            </label>
-            <label>
-                Password:
-                <input type="password" name="password" required minlength="8" />
-            </label>
-
-            <button type="submit">Register!</button>
-        </form>
-    </div>
+    <LoginForm {err} isRegister client:load />
 </MainLayout>

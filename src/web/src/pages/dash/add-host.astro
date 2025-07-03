@@ -1,8 +1,8 @@
 ---
+import AddDomainForm from "../../components/AddDomainForm.svelte";
 import MainLayout from "../../layouts/MainLayout.astro";
 export const prerender = false;
 const { env } = Astro.locals.runtime;
-import { Code } from 'astro-expressive-code/components';
 
 let token = Astro.cookies.get("host-token")?.value;
 if (!token) {
@@ -37,70 +37,5 @@ if (Astro.request.method === "POST") {
 ---
 
 <MainLayout>
-    <h1>Add domain to Nekomment</h1>
-    <div class="login-form">
-        <p>{err}</p>
-        <form method="post">
-            <label>
-                Domain:
-                <input type="text" name="domain" required />
-            </label>
-
-            <label>
-                Verification Method:
-                <select name="method">
-                    <option value="default">Without DNS Panel</option>
-                    <option value="1">With DNS Panel</option>
-                </select>
-            </label>
-
-            <button type="submit">Add domain!</button>
-        </form>
-    </div>
-    <p>To add your domain, follow the instructions below:</p>
-    <h2>With DNS Panel (if you own your own domain)</h2>
-    <ol>
-        <li>
-            In your DNS panel, create a <b>TXT</b> record for the name <b
-                >_nekomment</b
-            >
-            <blockquote>
-                If your domain host requires your domain to be specified, put
-                <b>_nekomment</b>.example.com! (replace example.com to your actual
-                domain)
-            </blockquote>
-        </li>
-        <li>
-            Inside of it, put this and click save!
-            <Code code={'nekomment-token=' + token} />
-        </li>
-        <li>
-            Wait a bit, and then put your domain in the domain field, select
-            'With DNS Panel' and press Add that domain!
-        </li>
-    </ol>
-    <blockquote>
-        Please note that it can take a while for the record to propagate!
-    </blockquote>
-    <h2>Without DNS Panel (if you're using a web host)</h2>
-    <ol>
-        <li>
-            In your web host dashboard, create a <b>.well-known</b> directory and a
-            <b>nekomment</b> file inside of it.
-            <blockquote>
-                If you are using Neocities; make a <b>nekomment</b> folder and put
-                <b>index.html</b> inside of it. This will circumvent Neocities file
-                limitations for newer accounts. Inside your index.html file, remove
-                everything within it and add the specified value.
-            </blockquote>
-        </li>
-        <li>
-            Inside of it, put this and click save!
-            <Code code={token} />
-        </li>
-        <li>
-            Wait a bit, and then put your (sub)domain in the domain field,
-            select 'Without DNS Panel' and press Add that domain!
-        </li>
-    </ol>
+    <AddDomainForm verificationToken={token} client:load />
 </MainLayout>

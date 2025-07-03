@@ -1,5 +1,7 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
+import LoginForm from "../components/LoginForm.svelte";
+
 export const prerender = false; 
 const { env } = Astro.locals.runtime;
 
@@ -29,20 +31,5 @@ if (Astro.request.method === 'POST') {
 ---
 
 <MainLayout>
-	<h1>Login into Nekomment</h1>
-    <div class="login-form">
-        <p>{err}</p>
-        <form method="post">
-            <label>
-                Username:
-                <input type="text" name="username" required />
-            </label>
-            <label>
-                Password:
-                <input type="password" name="password" required minlength="8" />
-            </label>
-
-            <button type="submit">Login!</button>
-        </form>
-    </div>
+    <LoginForm {err} client:load />
 </MainLayout>
