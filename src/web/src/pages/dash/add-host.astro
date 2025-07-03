@@ -20,7 +20,7 @@ if (Astro.request.method === "POST") {
         const method = data.get("method")?.toString() || "";
         let session = await env.NEKOMMENT_API.addHost(
             Astro.cookies.get("token")?.value || "",
-            token,
+            token || '',
             domain,
             method,
         );

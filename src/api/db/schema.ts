@@ -1,6 +1,6 @@
 import { InferInsertModel, InferSelectModel, relations, sql } from "drizzle-orm";
 import { blob, int, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { genId } from "./utils";
+import { genId } from "../src/utils";
 
 export const users = sqliteTable("users", {
 	id: int().primaryKey({ autoIncrement: true }),
@@ -68,12 +68,26 @@ export const hostsRelations = relations(hosts, ({ one, many }) => ({
 	comments: many(comments)
 }))
 
+export const paths = sqliteTable("paths", {
+	path: text().primaryKey(),
+	host: text().notNull(),
+	locked: integer({ mode: 'boolean' })
+})
+
+export const pathsRelations = relations(paths, ({ one, many }) => ({
+	host: one(hosts, {
+		fields: [paths.host],
+		references: [hosts.host]
+	}),
+	comments: many(comments)
+}))
+
 export const comments = sqliteTable("comments", {
 	id: text().primaryKey().$defaultFn(() => genId(6)),
 	author: text().notNull().default("Anonymous"),
 	content: text().notNull(),
 	website: text(),
-	createdAt: int(),
+	createdAt: integer({ mode: 'timestamp' }),
 	address: text().notNull(),
 	host: text().notNull(),
 	parentId: text(),
@@ -84,6 +98,10 @@ export const commentsRelations = relations(comments, ({ one, many }) => ({
 	host: one(hosts, {
 		fields: [comments.host],
 		references: [hosts.host]
+	}),
+	path: one(paths, {
+		fields: [comments.pagePath, comments.host],
+		references: [paths.path, paths.host]
 	}),
 	replies: many(comments, {
 		relationName: 'comment_replies',
@@ -147,6 +165,8 @@ export type Page = InferSelectModel<typeof pages>;
 export type NewPage = InferInsertModel<typeof pages>;
 export type Host = InferSelectModel<typeof hosts>;
 export type NewHost = InferInsertModel<typeof hosts>;
+export type Path = InferSelectModel<typeof paths>;
+export type NewPath = InferInsertModel<typeof paths>;
 export type Comment = InferSelectModel<typeof comments>;
 export type NewComment = InferInsertModel<typeof comments>;
 export type HostSettings = InferSelectModel<typeof hostSettings>;

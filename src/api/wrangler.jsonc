@@ -47,7 +47,11 @@
 	 * databases, object storage, AI inference, real-time communication and more.
 	 * https://developers.cloudflare.com/workers/runtime-apis/bindings/
 	 */
-	"vars": { "SESSION": "ABl4EwbeYzppi2ETEywpZB5Hz6LX25xX", "ENV": "PROD" }
+	"vars": { 
+		"SESSION": "ABl4EwbeYzppi2ETEywpZB5Hz6LX25xX", 
+		"ENV": "PROD",
+		"WEB": "https://beta.cmt.nkko.link/"
+	}
 	/**
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/

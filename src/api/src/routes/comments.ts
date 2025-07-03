@@ -3,6 +3,7 @@ import { env } from "cloudflare:workers";
 import { createDb } from "../../db";
 import * as schema from '../../db/schema';
 import { eq, and } from "drizzle-orm";
+import { chunk } from "lodash";
 
 const app = new Hono<{
     Bindings: Cloudflare
@@ -37,6 +38,7 @@ app.get("/:host/:path", async (c) => {
 app.post("/:host/:path", async (c) => {
     const { host, path } = c.req.param();
     const { name, content, website, parentId, backPath, cfTurnstileKey } = await c.req.parseBody();
+    const cache = await caches.open('nkm-cache:pages');
     const ip = c.req.header('CF-Connecting-IP') || '0.0.0.0';
     let b = c.req.header('Referer') || `https://${host}${path}`;
     if (backPath) {
@@ -52,6 +54,9 @@ app.post("/:host/:path", async (c) => {
     }
     
     if (cfTurnstileKey || backPath.toString().includes('cmt.nkko.link')) {
+        if (!cfTurnstileKey) {
+            return c.text('security error, please close the tab', 403)
+        }
         let formData = new FormData();
         formData.append("secret", env.TURNSTILE_KEY);
         formData.append("response", cfTurnstileKey.toString());
@@ -84,19 +89,41 @@ app.post("/:host/:path", async (c) => {
                 pId = parentComment[0].parentId
             }
         }
+        let page = await db.query.pages.findFirst({
+            where: (page, { eq }) => eq(page.hostName, host)
+        })
+        let comments = await db.query.comments.findMany({
+            where: (cmt, { eq }) => eq(cmt.host, host)
+        })
+        if (page) {
+            await cache.delete(backPath?.toString() || env.WEB + `/c/${page.name}`, {
+                ignoreMethod: true
+            })
+            let commentChunks = chunk(comments);
+            if (commentChunks.length > 1) {
+                try {
+                    for (let i = 0; i < commentChunks.length; i++) {
+                        await cache.delete(backPath?.toString() || env.WEB + `/c/${page.name}?page=${i+1}`, {
+                            ignoreMethod: true
+                        })
+                    }
+                } catch {}
+            }
+            c.header("X-Nekomment-Page", page.name);
+        }
         await db.insert(schema.comments).values({
             host: host,
             author: name.toString(),
             content: content.toString(),
             website: website.toString(),
-            createdAt: Date.now(),
+            createdAt: new Date(Date.now()),
             address: ip,
             pagePath: path,
             parentId: pId
         })
-        return c.redirect(backPath.toString(), 303)
+        return c.redirect(backPath.toString(), 303);
     } else {
-        return c.text('verification failed', 403)
+        return c.text('security error, please close the tab', 403)
     }
 });
 

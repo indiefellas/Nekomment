@@ -8,8 +8,10 @@ export function genId(length: number) {
     return result;
 }
 
-export function genDefaultTemplate(page: string) {
-    return `{{!--
+export function genDefaultTemplate(theme: string) {
+    switch (theme) {
+        default:
+            return `<!--
     Welcome to Nekomment Pages!
 
     This file serves as your template to be able to use Pages,
@@ -37,20 +39,21 @@ export function genDefaultTemplate(page: string) {
     Want more customization? Check out either the Nekomment JS Widget at
     https://beta.cmt.nkko.link/dash/widgets#js or the Nekomment API docs at
     https://api.beta.cmt.nkko.link/docs
---}}
-
+-->
 
 <h1>{{name}}'s Comment Page</h1>
 <p>This is the default Nekomment Pages layout and styling! Edit it in your dashboard!</p>
 
-{{ Editor context }}
+{{{Editor context}}}
 
 <section>
     {{#each comments}}
         <article>
-            <h2><a href={{this.website}}>{{this.author}}</a></h2>
-            <p>{{this.content}}</p>
-            {{ ReplyButton this }}
+            <div class="nkm-content">
+                <h2><a href={{this.website}}>{{this.author}}</a></h2>
+                <p>{{this.content}}</p>
+            </div>
+            {{{ReplyButton this}}}
             {{#each replies}}
                 <blockquote>
                     <h3><a href={{this.website}}>{{this.author}}</a></h3>
@@ -61,8 +64,10 @@ export function genDefaultTemplate(page: string) {
     {{/each}}
 </section>
 
+{{{PageButtons context}}}
+
 <style>
     /* See https://docs.beta.cmt.nkko.link/Pages/Styling for more info */
-    @import url(/_assets/pagesDefault.css)
 </style>`
+    }
 }
