@@ -20,7 +20,7 @@ if (Astro.request.method === "POST") {
         const method = data.get("method")?.toString() || "";
         let session = await env.NEKOMMENT_API.addHost(
             Astro.cookies.get("token")?.value || "",
-            token,
+            token || '',
             domain,
             method,
         );
@@ -49,8 +49,8 @@ if (Astro.request.method === "POST") {
             <label>
                 Verification Method:
                 <select name="method">
-                    <option value="default">Without DNS Panel</option>
-                    <option value="1">With DNS Panel</option>
+                    <option value="no-dns">Without DNS Panel</option>
+                    <option value="dns">With DNS Panel</option>
                 </select>
             </label>
 
@@ -90,8 +90,9 @@ if (Astro.request.method === "POST") {
             <blockquote>
                 If you are using Neocities; make a <b>nekomment</b> folder and put
                 <b>index.html</b> inside of it. This will circumvent Neocities file
-                limitations for newer accounts. Inside your index.html file, remove
-                everything within it and add the specified value.
+                type limitations for newer accounts. Inside your index.html file, 
+                remove everything within it and add the specified value. For Nekoweb 
+                users, you don't need to do this.
             </blockquote>
         </li>
         <li>

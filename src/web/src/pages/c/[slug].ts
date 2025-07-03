@@ -15,37 +15,6 @@ export function genId(length: number) {
     return result;
 }
 
-export function genDefaultTemplate() {
-    return `<h1>{{name}}'s Comment Page</h1>
-<p>This is the default Nekomment Pages layout and styling! Edit it in your dashboard!</p>
-
-{{{Editor context}}}
-
-<section>
-    {{#each comments}}
-        <article>
-            <div class="nkm-content">
-                <h2><a href={{this.website}}>{{this.author}}</a></h2>
-                <p>{{this.content}}</p>
-            </div>
-            {{{ReplyButton this}}}
-            {{#each replies}}
-                <blockquote>
-                    <h3><a href={{this.website}}>{{this.author}}</a></h3>
-                    <p>{{this.content}}</p>
-                </blockquote>
-            {{/each}}
-        </article>
-    {{/each}}
-</section>
-
-{{{PageButtons context}}}
-
-<style>
-    /* See https://docs.beta.cmt.nkko.link/Pages/Styling for more info */
-</style>`
-}
-
 function genBoilerplate(output: string, name: string, id: string, turnstileKey: string) {
     return /*html*/`
 <!DOCTYPE html>
@@ -101,6 +70,17 @@ function genBoilerplate(output: string, name: string, id: string, turnstileKey: 
 export const GET: APIRoute = async ({ params, request, locals, url }) => {
     let id = genId(24);
 
+    if (!params.slug) return new Response('Page not found', { status: 404 });
+    const path = request.headers.get('Referer') || '';
+    const pathUrl = path ? new URL(path) : new URL('https://beta.cmt.nkko.link/');
+    const pageNum = parseInt(url.searchParams.get('page') || "1", 10);
+
+    const cache = await locals.runtime.caches.open(`nkm-cache:${params.slug}:${pageNum}`);
+    const cacheRes = await cache.match(request);
+    if (cacheRes) {
+        return cacheRes
+    }
+
     const hbs = new Handlebars({ interpreted: true });
     hbs.engine.addMethod('Editor', function (value) {
         return (/*html*/`
@@ -148,15 +128,12 @@ export const GET: APIRoute = async ({ params, request, locals, url }) => {
         `)
     })
 
-    if (!params.slug) return new Response('Page not found', { status: 404 });
-    const path = request.headers.get('Referer') || '';
-    const pathUrl = path ? new URL(path) : new URL('https://beta.cmt.nkko.link/');
     const pageRes = await locals.runtime.env.NEKOMMENT_API.getPage(params.slug, pathUrl.pathname);
     const page = pageRes.data;
     if (!page || !pageRes.success) {
         return new Response(pageRes.message, { status: 404 });
     }
-    const sanitized = sanitizeHTML(genDefaultTemplate(), {
+    const sanitized = sanitizeHTML(page.template, {
         allowVulnerableTags: true,
         allowedTags: sanitizeHTML.defaults.allowedTags.concat(['img', 'style']),
         allowedAttributes: {
@@ -165,7 +142,6 @@ export const GET: APIRoute = async ({ params, request, locals, url }) => {
         },
     })
     const template = hbs.compile(sanitized);
-    const pageNum = parseInt(url.searchParams.get('page') || "1", 10);
     const comments = chunk(page.comments.reverse().map(c => ({
         ...c,
         replies: c.replies.reverse()
@@ -180,11 +156,12 @@ export const GET: APIRoute = async ({ params, request, locals, url }) => {
             page: pageNum,
             totalPages: comments.length,
             totalComments: page.comments.length,
-            apiUrl: locals.runtime.env.API_URL
+            apiUrl: locals.runtime.env.API_URL,
+            turnstileSiteKey: locals.runtime.env.TURNSTILE_KEY
         }
     };
     let out = genBoilerplate(template(context), params.slug || 'Nekomment Pages', id, locals.runtime.env.TURNSTILE_KEY);
-    return new Response(
+    let res = new Response(
         out,
         {
             headers: {
@@ -192,5 +169,7 @@ export const GET: APIRoute = async ({ params, request, locals, url }) => {
                 'Content-Security-Policy': `script-src 'self' 'nonce-nkm-${id}' https://challenges.cloudflare.com; object-src 'none'; frame-ancestors 'self' https://${page.hostName}; base-uri 'self'; style-src 'self' 'unsafe-inline';`
             }
         }
-    )
+    );
+    await cache.put(request, res)
+    return res;
 }

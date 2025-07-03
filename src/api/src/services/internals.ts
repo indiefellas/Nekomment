@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import { eq, and } from "drizzle-orm";
 // @ts-ignore
 import { resolveTxt } from "node:dns/promises";
+import { genDefaultTemplate } from "../utils";
 
 const db = createDb(env);
 
@@ -38,7 +39,7 @@ export class InternalService extends WorkerEntrypoint {
       author: string;
       content: string;
       website: string | null;
-      createdAt: number | null;
+      createdAt: Date | null;
       parentId: string | null;
       replies: {
         id: string;
@@ -48,7 +49,7 @@ export class InternalService extends WorkerEntrypoint {
         author: string;
         content: string;
         website: string | null;
-        createdAt: number | null;
+        createdAt: Date | null;
         parentId: string | null;
       }[];
     }[]
@@ -138,8 +139,7 @@ export class InternalService extends WorkerEntrypoint {
         return { success: false, message: 'incorrect username or password', status: 401 };
       }
 
-      const token = btoa(crypto.randomUUID());
-
+      const token = btoa(crypto.randomUUID() + Date.now());
 
       await db.insert(schema.sessions).values({
         sessionToken: token,
@@ -205,7 +205,7 @@ export class InternalService extends WorkerEntrypoint {
   }
 
 
-  async addHost(sessionToken: string, hostToken: string, host: string, method: '1' | 'default'): Promise<RpcResponse> {
+  async addHost(sessionToken: string, hostToken: string, host: string, method: string): Promise<RpcResponse> {
     if (!sessionToken) {
       return { success: false, message: 'authentication required', status: 401 };
     }
@@ -227,7 +227,7 @@ export class InternalService extends WorkerEntrypoint {
       }
 
       switch (method) {
-        case '1': {
+        case 'dns': {
           const content = await resolveTxt(`_nekomment.${host}`);
           if (!content[0] || content[0][0] !== 'nekomment-token=' + hostToken) {
             return { success: false, message: 'host token does not match (TXT record)', status: 403 };
@@ -267,7 +267,7 @@ export class InternalService extends WorkerEntrypoint {
       author: string;
       content: string;
       website: string | null;
-      createdAt: number | null;
+      createdAt: Date | null;
       parentId: string | null;
     }[];
   }[]>> {
@@ -293,7 +293,7 @@ export class InternalService extends WorkerEntrypoint {
       with: {
         comments: true
       },
-      where: eq(schema.hosts.ownerId, userSession[0].users.id)
+      where: (host, {eq}) => eq(host.ownerId, userSession[0].users?.id || 0)
     })
     return {
       success: true,
@@ -341,6 +341,49 @@ export class InternalService extends WorkerEntrypoint {
     }
   }
 
+  async createPage(sessionToken: string, name: string, host: string, theme: string, pagePath?: string): Promise<RpcResponse> {
+    if (!sessionToken) {
+      return {
+        success: false,
+        message: 'User not logged in or session expired',
+        status: 401
+      }
+    }
+    let userSession = await db.select()
+      .from(schema.sessions)
+      .leftJoin(schema.users, eq(schema.users.id, schema.sessions.userId))
+      .where(eq(schema.sessions.sessionToken, sessionToken));
+    if (userSession.length < 1 || !userSession[0].users) {
+      return {
+        success: false,
+        message: 'User not logged in or session expired',
+        status: 401
+      }
+    }
+    let hostName = await db.query.hosts.findFirst({
+      where: (sHost, {eq}) => eq(sHost.host, host)
+    })
+    if (!hostName) {
+      return {
+        success: false,
+        message: 'host not found',
+        status: 404
+      }
+    }
+    await db.insert(schema.pages).values({
+      name: name,
+      hostName: host,
+      userId: userSession[0].users.id,
+      useReferer: !!pagePath,
+      pagePath: pagePath,
+      template: genDefaultTemplate(theme)
+    })
+    return {
+      success: true,
+      message: 'Page successfully created'
+    }
+  }
+
   async getPages(sessionToken: string): Promise<RpcResponse<{
     name: string;
     userId: number;
@@ -384,7 +427,7 @@ export class InternalService extends WorkerEntrypoint {
     author: string;
     content: string;
     website: string | null;
-    createdAt: number | null;
+    createdAt: Date | null;
     parentId: string | null;
     replies: {
       id: string;
@@ -394,7 +437,7 @@ export class InternalService extends WorkerEntrypoint {
       author: string;
       content: string;
       website: string | null;
-      createdAt: number | null;
+      createdAt: Date | null;
       parentId: string | null;
     }[];
   }[]>> {

@@ -52,6 +52,9 @@ app.post("/:host/:path", async (c) => {
     }
     
     if (cfTurnstileKey || backPath.toString().includes('cmt.nkko.link')) {
+        if (!cfTurnstileKey) {
+            return c.text('security error, please close the tab', 403)
+        }
         let formData = new FormData();
         formData.append("secret", env.TURNSTILE_KEY);
         formData.append("response", cfTurnstileKey.toString());
@@ -89,14 +92,14 @@ app.post("/:host/:path", async (c) => {
             author: name.toString(),
             content: content.toString(),
             website: website.toString(),
-            createdAt: Date.now(),
+            createdAt: new Date(Date.now()),
             address: ip,
             pagePath: path,
             parentId: pId
         })
         return c.redirect(backPath.toString(), 303)
     } else {
-        return c.text('verification failed', 403)
+        return c.text('security error, please close the tab', 403)
     }
 });
 
