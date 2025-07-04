@@ -4,19 +4,22 @@
 
     export let verificationToken: string;
 
-    let step = 0;
-    let domain = "";
-    let withDns = false;
+    export let step = 0;
+    export let domain = "";
+    export let method = "";
 
     function setDomain() {
         if (step == 0) {
             step++;
         }
     }
-    function setDNSMode(dnsType: string) {
+    function setMethod(value: string) {
         if (step == 1) {
-            if (dnsType == "?") alert("I'd take that as a no");
-            withDns = dnsType == "yes";
+            if (value == "?") {
+                alert("I'd take that as a no");
+                value = "no-dns";
+            }
+            method = value;
             step++;
         }
     }
@@ -28,6 +31,8 @@
 <div class="fill-screen center-child">
     <div class="center-form">
         <form method="post" on:submit={handleSubmit}>
+            <input type="hidden" name="domain" bind:value={domain} />
+            <input type="hidden" name="method" bind:value={method} />
             {#if step == 0}
                 <h2>Add domain to Nekomment</h2>
                 <div class="field-group">
@@ -43,15 +48,15 @@
             {:else if step == 1}
                 <h2>Trivia question:</h2>
                 <p>Can you change your domain's DNS records?</p>
-                <button class="big-button" type="button" on:click={() => setDNSMode("yes")}>
+                <button class="big-button" type="button" on:click={() => setMethod("dns")}>
                     <h3>Yes</h3>
                     I own my domain name
                 </button>
-                <button class="big-button" type="button" on:click={() => setDNSMode("no")}>
+                <button class="big-button" type="button" on:click={() => setMethod("no-dns")}>
                     <h3>No</h3>
                     My domain comes with my web host
                 </button>
-                <button class="big-button" type="button" on:click={() => setDNSMode("?")}>
+                <button class="big-button" type="button" on:click={() => setMethod("?")}>
                     <h3>What's DNS?</h3>
                     Is it edible?
                 </button>
@@ -65,7 +70,7 @@
             {:else if step == 2}
                 <h2>Here's the important part:</h2>
                 <p>Verify that you have access to your domain by doing the following:</p>
-                {#if withDns}
+                {#if method == "dns"}
                     <p>Create a <b>TXT</b> record for the host <br/><b>_nekomment.{domain}</b><br/>with the following content:</p>
                     <CodeBlock language={plaintext} code={`nekomment-token=${verificationToken}`} />
                 {:else}
@@ -74,7 +79,7 @@
                     {#if domain.endsWith(".neocities.org")}
                         <blockquote>
                             <b>Note:</b> If you're using a free Neocities account, you can create your file at <b>/.well_known/nekomment/index.html</b>
-                            instead to circumvent the file type limit.
+                            instead to circumvent the file type limit. <strong>Remember to remove all of the HTML template and only put in the specified text.</strong>
                         </blockquote>
                     {/if}
                 {/if}
