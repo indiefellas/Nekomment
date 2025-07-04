@@ -1,0 +1,54 @@
+---
+import { effect } from "astro:schema";
+import MainLayout from "../layouts/MainLayout.astro";
+export const prerender = false; 
+const { env } = Astro.locals.runtime;
+
+// todo: refactor
+let err = '';
+if (Astro.request.method === 'POST') {
+    try {
+        const data = await Astro.request.formData();
+
+        const currentPassword = data.get('password')?.toString() || '';
+        const newPassword = data.get('newPassword')?.toString() || '';
+        const samePassword = data.get('retypePassword')?.toString() || '';
+        const token = Astro.cookies.get('token')?.value || '';
+
+        if (samePassword == newPassword) {
+            await env.NEKOMMENT_API.changePassword(token, currentPassword, newPassword);
+            // mission failed.. successfully?
+            err = 'Successfully changed password!';
+        } else {
+            err = 'The password does not match';
+        }
+    }
+    catch {
+        err = 'An error occured. Please try again';
+    }
+}
+---
+
+<MainLayout>
+    <h1>Settings</h1>
+    <div class="login-form">
+        <h2>Change your password</h2>
+        <form method="post">
+            <p>{err}</p>
+            <label>
+                Current Password:
+                <input type="password" name="password" required minlength="8" />
+            </label>
+            <label>
+                New Password:
+                <input type="password" name="newPassword" required minlength="8" />
+            </label>
+            <label>
+                Retype Password:
+                <input type="password" name="retypePassword" required minlength="8" />
+            </label>
+
+            <button type="submit">Change Password!</button>
+        </form>
+    </div>
+</MainLayout>
