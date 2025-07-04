@@ -52,6 +52,17 @@ export class InternalService extends WorkerEntrypoint {
         createdAt: Date | null;
         parentId: string | null;
       }[];
+    }[],
+    flattenedComments: {
+      id: string;
+      host: string;
+      address: string;
+      pagePath: string;
+      author: string;
+      content: string;
+      website: string | null;
+      createdAt: Date | null;
+      parentId: string | null;
     }[]
   }>> {
     const page = await db.query.pages.findFirst({
@@ -85,11 +96,21 @@ export class InternalService extends WorkerEntrypoint {
         isNull(comments.parentId)
       )
     })
+    const flattenedComments = await db.query.comments.findMany({
+      where: (comments, { and, eq, isNull }) =>
+        path && page.useReferer ?
+          and(
+            eq(comments.host, page.hostName || ''),
+            eq(comments.pagePath, path)
+          ) :
+          eq(comments.host, page.hostName || ''),
+    })
     return {
       success: true,
       data: {
         ...page,
-        comments: comments
+        comments: comments,
+        flattenedComments: flattenedComments
       }
     }
   }

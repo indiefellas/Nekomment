@@ -4,11 +4,32 @@ import { createDb } from "../../db";
 import * as schema from '../../db/schema';
 import { eq, and } from "drizzle-orm";
 import { chunk } from "lodash";
+import { cors } from "hono/cors";
 
 const app = new Hono<{
     Bindings: Cloudflare
 }>();
 const db = createDb(env);
+
+app.use('/:host/:path', cors({
+    origin: (origin, c) => {
+        if (/^https:\/\/.*\.cmt\.nkko\.link/.test(origin)) return origin;
+        const { host } = c.req.param();
+        if (host) {
+            return `https://${host}`
+        } else {
+            return origin
+        }
+    },
+    allowMethods: (origin, c) => {
+        if (/^https:\/\/.*\.cmt\.nkko\.link/.test(origin)) return ['GET', 'POST']; // same-host (api.cmt.nkko.link and cmt.nkko.link)
+        const { host } = c.req.param();
+        if (host) {
+            return ['GET', 'POST'];
+        }
+        return ['GET'];
+    }
+}))
 
 app.use(async (c, next) => {
     const { success } = await env.COMMENT_RATE_LIMIT.limit({ key: c.req.header('CF-Connecting-IP') || '0.0.0.0' });
@@ -38,6 +59,9 @@ app.get("/:host/:path", async (c) => {
 app.post("/:host/:path", async (c) => {
     const { host, path } = c.req.param();
     const { name, content, website, parentId, backPath, cfTurnstileKey } = await c.req.parseBody();
+    if (!name || !content) {
+        return c.text('name and content are required', 400)
+    }
     const cache = await caches.open('nkm-cache:pages');
     const ip = c.req.header('CF-Connecting-IP') || '0.0.0.0';
     let b = c.req.header('Referer') || `https://${host}${path}`;
@@ -53,7 +77,7 @@ app.post("/:host/:path", async (c) => {
         success: false
     }
     
-    if (cfTurnstileKey || backPath.toString().includes('cmt.nkko.link')) {
+    if (cfTurnstileKey || (backPath && backPath.toString().includes('cmt.nkko.link'))) {
         if (!cfTurnstileKey) {
             return c.text('security error, please close the tab', 403)
         }
@@ -89,28 +113,6 @@ app.post("/:host/:path", async (c) => {
                 pId = parentComment[0].parentId
             }
         }
-        let page = await db.query.pages.findFirst({
-            where: (page, { eq }) => eq(page.hostName, host)
-        })
-        let comments = await db.query.comments.findMany({
-            where: (cmt, { eq }) => eq(cmt.host, host)
-        })
-        if (page) {
-            await cache.delete(backPath?.toString() || env.WEB + `/c/${page.name}`, {
-                ignoreMethod: true
-            })
-            let commentChunks = chunk(comments);
-            if (commentChunks.length > 1) {
-                try {
-                    for (let i = 0; i < commentChunks.length; i++) {
-                        await cache.delete(backPath?.toString() || env.WEB + `/c/${page.name}?page=${i+1}`, {
-                            ignoreMethod: true
-                        })
-                    }
-                } catch {}
-            }
-            c.header("X-Nekomment-Page", page.name);
-        }
         await db.insert(schema.comments).values({
             host: host,
             author: name.toString(),
@@ -121,6 +123,7 @@ app.post("/:host/:path", async (c) => {
             pagePath: path,
             parentId: pId
         })
+        if (!backPath) return c.text('done')
         return c.redirect(backPath.toString(), 303);
     } else {
         return c.text('security error, please close the tab', 403)

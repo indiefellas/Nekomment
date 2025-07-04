@@ -68,17 +68,29 @@ function genBoilerplate(output: string, name: string, id: string, turnstileKey: 
 }
 
 export const GET: APIRoute = async ({ params, request, locals, url }) => {
-    let id = genId(24);
+    try {
+        let id = genId(24);
 
     if (!params.slug) return new Response('Page not found', { status: 404 });
     const path = request.headers.get('Referer') || '';
     const pathUrl = path ? new URL(path) : new URL('https://beta.cmt.nkko.link/');
     const pageNum = parseInt(url.searchParams.get('page') || "1", 10);
 
+    const pageRes = await locals.runtime.env.NEKOMMENT_API.getPage(params.slug, pathUrl.pathname);
+    const page = pageRes.data;
+    if (!page || !pageRes.success) {
+        return new Response(pageRes.message, { status: 404 });
+    }
+    
     const cache = await locals.runtime.caches.open(`nkm-cache:pages`);
     const cacheRes = await cache.match(request);
-    if (cacheRes) {
-        return cacheRes
+    const latestComment = page.flattenedComments[page.flattenedComments.length - 1] || {
+        id: ''
+    };
+    if (cacheRes && latestComment.id === cacheRes.headers.get('X-Nekomment-Latest-Id')) {
+        let res = new Response(cacheRes.body, cacheRes)
+        res.headers.append('Cache-Control', 'no-cache');
+        return res;
     }
 
     const hbs = new Handlebars({ interpreted: true });
@@ -128,11 +140,6 @@ export const GET: APIRoute = async ({ params, request, locals, url }) => {
         `)
     })
 
-    const pageRes = await locals.runtime.env.NEKOMMENT_API.getPage(params.slug, pathUrl.pathname);
-    const page = pageRes.data;
-    if (!page || !pageRes.success) {
-        return new Response(pageRes.message, { status: 404 });
-    }
     const sanitized = sanitizeHTML(page.template, {
         allowVulnerableTags: true,
         allowedTags: sanitizeHTML.defaults.allowedTags.concat(['img', 'style']),
@@ -170,6 +177,11 @@ export const GET: APIRoute = async ({ params, request, locals, url }) => {
             }
         }
     );
-    await cache.put(request, res.clone())
+    res.headers.set('X-Nekomment-Latest-Id', latestComment.id);
+    await cache.put(request, res.clone());
+    res.headers.set('Cache-Control', 'no-cache');
     return res;
+    } catch (e) {
+        return new Response(`${e}`, { status: 500 })
+    }
 }

@@ -19,7 +19,7 @@
       "devDependencies": {
         "@types/node": "^24.0.4",
         "drizzle-kit": "^0.31.4",
-        "wrangler": "^4.22.0",
+        "wrangler": "^4.23.0",
       },
     },
     "src/web": {
@@ -46,7 +46,7 @@
       "devDependencies": {
         "@iconify/svelte": "^5.0.0",
         "@types/node": "^24.0.4",
-        "wrangler": "^4.22.0",
+        "wrangler": "^4.23.0",
       },
     },
   },
