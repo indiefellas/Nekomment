@@ -15,11 +15,13 @@ if (Astro.request.method === 'POST') {
         const password = data.get('password')?.toString() || '';
         await env.NEKOMMENT_API.createUser(username, password, email);
         let session = await env.NEKOMMENT_API.loginUser(username, password);
-        Astro.cookies.set('token', session.data!.token, {
-            httpOnly: true,
-            sameSite: 'lax'
-        });
-        return Astro.redirect(Astro.url.searchParams.get('redirect') || '/', 302);
+        if (session.success && session.data) {
+            Astro.cookies.set('token', session.data.token, {
+                httpOnly: true,
+                sameSite: 'lax'
+            });
+            return Astro.redirect(Astro.url.searchParams.get('redirect') || '/', 302);
+        }
     }
     catch {
         err = 'An error occured. Please try again.';
