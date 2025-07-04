@@ -201,6 +201,46 @@ export class InternalService extends WorkerEntrypoint {
     }
   }
 
+  async changePassword(sessionToken: string, currentPassword: string, newPassword: string): Promise<RpcResponse<string>> {
+    if (!sessionToken) {
+      return { success: false, message: 'authentication required', status: 401 };
+    }
+    if (!currentPassword || !newPassword) {
+      return { success: false, message: 'old password and new password are required', status: 400 };
+    }
+    if (newPassword.length < 8) {
+      return { success: false, message: 'new password must be 8 characters or longer', status: 400 };
+    }
+
+    try {
+      let userSession = await db.select()
+        .from(schema.sessions)
+        .leftJoin(schema.users, eq(schema.users.id, schema.sessions.userId))
+        .where(eq(schema.sessions.sessionToken, sessionToken));
+
+      if (userSession.length < 1 || !userSession[0].users) {
+        return { success: false, message: 'authentication required', status: 401 };
+      }
+
+      const user = userSession[0].users;
+
+      const isCurrentValid = await bcrypt.compare(currentPassword, user.passwordHash);
+      if (!isCurrentValid) {
+        return { success: false, message: 'current password is incorrect', status: 400 }
+      }
+
+      await db.update(schema.users)
+        .set({ passwordHash: await bcrypt.hash(newPassword, await bcrypt.genSalt(12))})
+        .where(eq(schema.users.id, user.id));
+      
+      console.log(`successfully changed password for user: ${user.name}`);
+      return { success: true, message: 'password changed successfully' }
+    } catch (err: any) {
+      console.log(`error changing password:`, err);
+      return { success: false, message: `failed to change password: ${err.message}`, status: 500}
+    }
+  }
+
   async initializeAddHostToken(sessionToken: string): Promise<RpcResponse<string>> {
     if (!sessionToken) {
       return { success: false, message: 'authentication required', status: 401 };
