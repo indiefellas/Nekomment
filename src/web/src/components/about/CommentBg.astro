@@ -42,7 +42,7 @@
         bg.appendChild(commentContainer);
 
         setTimeout(() => commentContainer.remove(), delay + 100);
-        setTimeout(() => bgLoop(bg), mobileMode ? random(1500, 3000) : random(500, 1000));
+        setTimeout(() => bgLoop(bg), mobileMode.matches ? random(1500, 3000) : random(500, 1000));
     }
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -122,11 +122,13 @@
             left: var(--x);
             top: var(--y);
             opacity: 1;
+            transform: skewY(-6deg) scale(0.75);
         }
         to {
             left: -500px;
-            top: -250px;
+            top: calc(var(--y) - 250px);
             opacity: 0;
+            transform: skewY(-6deg) scale(1);
         }
     }
 
