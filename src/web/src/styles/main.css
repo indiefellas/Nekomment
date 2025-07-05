@@ -56,6 +56,7 @@ body {
     flex-direction: column;
     font-size: 1.125em;
     line-height: 1.3;
+    overflow-x: hidden;
 }
 
 .container {
@@ -289,7 +290,6 @@ ul, ol {
 li {
     margin-block: 9px;
 }
-
 
 @media screen and (width <= 640px) {
     body {

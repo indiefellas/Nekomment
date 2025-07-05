@@ -1,6 +1,7 @@
 <script>
-    import { genRandomComment } from "../lib/randomComment";
+    import { genRandomComment } from "../../lib/randomComment";
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+    const mobileMode = matchMedia("(width <= 640px)");
 
     function random(min: number, max: number) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -41,7 +42,7 @@
         bg.appendChild(commentContainer);
 
         setTimeout(() => commentContainer.remove(), delay + 100);
-        setTimeout(() => bgLoop(bg), random(500, 1000));
+        setTimeout(() => bgLoop(bg), mobileMode ? random(1500, 3000) : random(500, 1000));
     }
 
     document.addEventListener("DOMContentLoaded", () => {
