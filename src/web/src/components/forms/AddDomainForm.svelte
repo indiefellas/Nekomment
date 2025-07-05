@@ -75,11 +75,11 @@
                     <p>Create a <b>TXT</b> record for the host <br/><b>_nekomment.{domain}</b><br/>with the following content:</p>
                     <CodeBlock language={plaintext} code={`nekomment-token=${verificationToken}`} />
                 {:else}
-                    <p>Create a text file accessible on<br/><b>https://{domain}/.well_known/nekomment</b><br/>with the following content:</p>
+                    <p>Create a text file accessible on<br/><b>https://{domain}/.well-known/nekomment</b><br/>with the following content:</p>
                     <CodeBlock language={plaintext} code={`nekomment-token=${verificationToken}`} />
                     {#if domain.endsWith(".neocities.org")}
                         <blockquote>
-                            <b>Note:</b> If you're using a free Neocities account, you can create your file at <b>/.well_known/nekomment/index.html</b>
+                            <b>Note:</b> If you're using a free Neocities account, you can create your file at <b>/.well-known/nekomment/index.html</b>
                             instead to circumvent the file type limit. <strong>Remember to remove all of the HTML template and only put in the specified text.</strong>
                         </blockquote>
                     {/if}
