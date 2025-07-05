@@ -62,7 +62,6 @@ app.post("/:host/:path", async (c) => {
     if (!name || !content) {
         return c.text('name and content are required', 400)
     }
-    const cache = await caches.open('nkm-cache:pages');
     const ip = c.req.header('CF-Connecting-IP') || '0.0.0.0';
     let b = c.req.header('Referer') || `https://${host}${path}`;
     if (backPath) {
@@ -76,6 +75,77 @@ app.post("/:host/:path", async (c) => {
     let outcome: { success: boolean } = {
         success: false
     }
+
+    let pathCfg = await db.query.paths.findFirst({
+        where: (p, { eq }) => eq(p.host, hostPage[0].host)
+    })
+    let hostCfg = await db.query.hostSettings.findFirst({
+        with: {
+            autoModRules: true
+        },
+        where: (p, { eq }) => eq(p.id, hostPage[0].settingsId ?? 0)
+    })
+
+    if (!pathCfg) {
+        await db.insert(schema.paths).values({
+            path: path,
+            host: hostPage[0].host
+        });
+        pathCfg = await db.query.paths.findFirst({
+            where: (p, { eq }) => eq(p.host, hostPage[0].host)
+        })
+    }
+    if (!hostCfg) {
+        await db.insert(schema.hostSettings).values({
+            hostUri: hostPage[0].host
+        });
+        hostCfg = await db.query.hostSettings.findFirst({
+            with: {
+                autoModRules: true
+            },
+            where: (p, { eq }) => eq(p.id, hostPage[0].settingsId ?? 0)
+        });
+    }
+
+    const ifReviewRequired = 
+        pathCfg?.moderationMode == 1 ||
+        hostCfg?.moderationMode == 1;
+    
+    let reviewReason = 
+        pathCfg?.moderationMode == 1 ? 'Required by path rules' :
+        hostCfg?.moderationMode == 1 ? 'Required by host rules' :
+        ''
+
+    let ifReview = false;
+
+    hostCfg?.autoModRules.filter(v => v.enabled).forEach((v) => {
+        if (ifReview) return;
+        let isMatched = false;
+        switch (v.type) {
+            case 1: {
+                let ruleSplit = v.rule.split('/');
+                let re = new RegExp(ruleSplit[1], ruleSplit[2] ?? '');
+                if (name.toString().match(re) || content.toString().match(re)) {
+                    ifReview = true;
+                    isMatched = true;
+                    reviewReason = `Flagged by AutoMod rule '${v.name}'`;
+                }
+                break;
+            }
+            default: {
+                let valueSplit = v.rule.split(',').map(v => v.trim());
+                if (valueSplit.filter(s => name.toString().includes(s) || content.toString().includes(s)).length > 0) {
+                    ifReview = true;
+                    isMatched = true;
+                    reviewReason = `Flagged by AutoMod rule '${v.name}'`;
+                }
+                break;
+            }
+        }
+        if (v.actionType === 0 && ifReview && isMatched) {
+            return c.text('Comment blocked by AutoMod rule', 422)
+        }
+    })
     
     if (cfTurnstileKey || (backPath && backPath.toString().includes('cmt.nkko.link'))) {
         if (!cfTurnstileKey) {
@@ -121,9 +191,11 @@ app.post("/:host/:path", async (c) => {
             createdAt: new Date(Date.now()),
             address: ip,
             pagePath: path,
-            parentId: pId
+            parentId: pId,
+            approved: !ifReview || !ifReviewRequired,
+            moderatedBy: reviewReason
         })
-        if (!backPath) return c.text('done')
+        if (!backPath) return c.text('done', (!ifReview || !ifReviewRequired) ? 202 : 200)
         return c.redirect(backPath.toString(), 303);
     } else {
         return c.text('security error, please close the tab', 403)

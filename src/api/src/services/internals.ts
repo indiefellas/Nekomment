@@ -305,10 +305,19 @@ export class InternalService extends WorkerEntrypoint {
         }
       }
 
+      await db.insert(schema.hostSettings).values({
+        hostUri: host,
+        moderationMode: 0
+      });
+      let hostSettings = await db.query.hostSettings.findFirst({
+        where: (s, { eq }) => eq(s.hostUri, host)
+      })
       await db.insert(schema.hosts).values({
         host: host,
-        ownerId: userSession[0].users?.id || 0
+        ownerId: userSession[0].users?.id || 0,
+        settingsId: hostSettings?.id
       });
+      
       return { success: true, message: `host '${host}' added to account '${userSession[0].users?.name}'` };
     } catch (error: any) {
       console.error("Error adding host:", error);
@@ -521,6 +530,62 @@ export class InternalService extends WorkerEntrypoint {
     return {
       success: true,
       data: comments
+    }
+  }
+
+  async createRule(sessionToken: string, host: string, name: string, rule: string, type: 0 | 1): Promise<RpcResponse> {
+    if (!sessionToken) {
+      return {
+        success: false,
+        message: 'User not logged in or session expired',
+        status: 401
+      }
+    }
+    const userSession = await db.select()
+      .from(schema.sessions)
+      .leftJoin(schema.users, eq(schema.users.id, schema.sessions.userId))
+      .where(eq(schema.sessions.sessionToken, sessionToken));
+    if (userSession.length < 1 || !userSession[0].users) {
+      return {
+        success: false,
+        message: 'User not logged in or session expired',
+        status: 401
+      }
+    }
+    const hostData = await db.query.hosts.findFirst({
+      where: (h, {eq, and}) => and(
+        eq(h.ownerId, userSession[0].users?.id || 0),
+        eq(h.host, host)
+      ),
+      with: {
+        settings: true
+      }
+    });
+    if (!hostData) {
+      return {
+        success: false,
+        message: 'Host not found',
+        status: 404
+      }
+    }
+    let hostSettings = hostData.settings;
+    if (!hostSettings) {
+      await db.insert(schema.hostSettings).values({
+        hostUri: host,
+        moderationMode: 0
+      });
+      hostSettings = await db.query.hostSettings.findFirst({
+        where: (s, { eq }) => eq(s.hostUri, host)
+      }) as schema.HostSettings
+    }
+    await db.insert(schema.autoModRules).values({
+      name: name,
+      rule: rule,
+      type: type,
+      settingsId: hostSettings.id
+    })
+    return {
+      success: true
     }
   }
 }

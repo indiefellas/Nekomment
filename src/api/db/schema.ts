@@ -71,7 +71,10 @@ export const hostsRelations = relations(hosts, ({ one, many }) => ({
 export const paths = sqliteTable("paths", {
 	path: text().primaryKey(),
 	host: text().notNull(),
-	locked: integer({ mode: 'boolean' })
+	locked: integer({ mode: 'boolean' }).default(false),
+	// 0: publish comments
+	// 1: mark them as review by default
+	moderationMode: int().notNull().default(0)
 })
 
 export const pathsRelations = relations(paths, ({ one, many }) => ({
@@ -91,7 +94,9 @@ export const comments = sqliteTable("comments", {
 	address: text().notNull(),
 	host: text().notNull(),
 	parentId: text(),
-	pagePath: text().notNull()
+	pagePath: text().notNull(),
+	approved: integer({ mode: 'boolean' }).default(false),
+	moderatedBy: text()
 })
 
 export const commentsRelations = relations(comments, ({ one, many }) => ({
@@ -116,6 +121,8 @@ export const commentsRelations = relations(comments, ({ one, many }) => ({
 export const hostSettings = sqliteTable("host_settings", {
 	id: int().primaryKey({ autoIncrement: true }),
 	hostUri: text().notNull(),
+	// 0: publish comments
+	// 1: mark them as review by default
 	moderationMode: int().notNull().default(0)
 })
 
@@ -146,8 +153,14 @@ export const autoModRules = sqliteTable("automod_rules", {
 	id: int().primaryKey({ autoIncrement: true }),
 	name: text().notNull(),
 	rule: text().notNull(),
+	// 0: strings, delimited with a comma
+	// 1: regex
 	type: int().notNull().default(0),
-	settingsId: int().notNull()
+	// 0: block comment
+	// 1: mark comment to review
+	actionType: int().notNull().default(0),
+	settingsId: int().notNull(),
+	enabled: integer({ mode: 'boolean' }).default(true)
 })
 
 export const autoModRulesRelations = relations(autoModRules, ({ one }) => ({
