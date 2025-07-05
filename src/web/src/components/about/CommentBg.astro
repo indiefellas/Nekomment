@@ -37,7 +37,7 @@
         });
         if (comment.replies.length > 0)
             commentContainer.appendChild(repliesContainer);
-        const delay = random(vw > 1000 ? 4000 : 7000, 10000);
+        const delay = random(vw > 1000 ? 5500 : 7000, 10000);
         commentContainer.style = `--x: ${x + commentContainer.offsetWidth / 2}px; --y: ${y + commentContainer.offsetHeight / 2}px; --speed: ${delay}ms`;
         bg.appendChild(commentContainer);
 
@@ -63,7 +63,7 @@
         z-index: -1;
         width: 100dvw;
         height: 100dvh;
-        opacity: 0.25;
+        opacity: 0.35;
         overflow: hidden;
         
         .bg-gradient {
@@ -75,7 +75,7 @@
             background-image: linear-gradient(
                 to left,
                 transparent,
-                var(--background-1)
+                var(--background-0)
             );
         }
     }
