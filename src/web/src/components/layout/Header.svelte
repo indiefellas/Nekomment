@@ -23,8 +23,8 @@
 </script>
 <header data-menu-mode={menuMode || undefined}>
     <div class="container">
-        <a class="main-logo" href="/"><Signature noText /></a>
-        <button class="menu-btn" aria-label="Site navigation" on:click={() => setMenuMode("nav")}>
+        <a class="main-logo" href="/" aria-label="Nekomment home page"><Signature noText /></a>
+        <button class="menu-btn" aria-hidden={true} on:click={() => setMenuMode("nav")}>
             <Icon icon="lucide:map" inline />
         </button>
         <div class="menu">

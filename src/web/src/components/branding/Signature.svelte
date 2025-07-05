@@ -3,7 +3,7 @@
 </script>
 
 <span class="signature">
-    <img src="/favicon.svg" alt="Nekomment logo" aria-hidden="true" /> 
+    <img src="/favicon.svg" alt="Nekomment" aria-hidden={true} /> 
     {noText ? "" : "Nekomment"}
 </span>
 
