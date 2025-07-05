@@ -13,6 +13,11 @@ if (!token) {
 }
 
 let err = "";
+
+let args = {}
+if (err) {
+}
+
 if (Astro.request.method === "POST") {
     try {
         const data = await Astro.request.formData();
@@ -30,6 +35,13 @@ if (Astro.request.method === "POST") {
         } else {
             err = "An error occurred. Please try again. " + session.message;
         }
+
+        args = {
+            step: 2,
+            domain,
+            method,
+            err,
+        }
     } catch {
         err = "An error occurred. Please try again.";
     }
@@ -37,5 +49,5 @@ if (Astro.request.method === "POST") {
 ---
 
 <MainLayout>
-    <AddDomainForm verificationToken={token} client:load />
+    <AddDomainForm verificationToken={token} {...args} client:load />
 </MainLayout>

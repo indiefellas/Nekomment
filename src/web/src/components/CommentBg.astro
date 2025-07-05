@@ -64,22 +64,22 @@
         height: 100dvh;
         opacity: 0.25;
         overflow: hidden;
+        
+        .bg-gradient {
+            position: relative;
+            top: 0;
+            left: 0;
+            width: 50dvw;
+            height: 100dvh;
+            background-image: linear-gradient(
+                to left,
+                transparent,
+                var(--background-1)
+            );
+        }
     }
 
-    .background .bg-gradient {
-        position: relative;
-        top: 0;
-        left: 0;
-        width: 50dvw;
-        height: 100dvh;
-        background-image: linear-gradient(
-            to left,
-            transparent,
-            var(--background-1)
-        );
-    }
-
-    :global(.bg-comment) {
+    .background :global(.bg-comment) {
         width: 100%;
         display: flex;
         flex-direction: column;
@@ -96,11 +96,11 @@
         animation: scroll-to-left var(--speed) forwards ease-in-out;
         transform: skewY(-6deg);
         box-shadow: 
-            1px 1px var(--background-4), 2px 2px var(--background-4), 
-            3px 3px var(--background-4), 4px 4px var(--background-4), 
-            5px 5px var(--background-4), 6px 6px var(--background-4), 
-            7px 7px var(--background-4), 8px 8px var(--background-4), 
-            9px 9px var(--background-4);
+            1px 1px var(--background-1), 2px 2px var(--background-1), 
+            3px 3px var(--background-1), 4px 4px var(--background-1), 
+            5px 5px var(--background-1), 6px 6px var(--background-1), 
+            7px 7px var(--background-1), 8px 8px var(--background-1), 
+            9px 9px var(--background-1);
 
         .bg-replies {
             display: flex;
@@ -114,6 +114,7 @@
             text-overflow: clip;
         }
     }
+
 
     @keyframes scroll-to-left {
         from {

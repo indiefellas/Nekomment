@@ -15,9 +15,11 @@
     --background-2: #323247;
     --background-3: #2a2a36;
     --background-4: #414156;
+    --background-red: #473232;
 
     --color-0: #fffffe;
     --color-1: #b5b5dd;
+    --color-red: #ddb5b5;
 
     --btn-base-bg: #535365;
     --btn-base-hover-bg: #79798d;
@@ -159,6 +161,14 @@ form {
         flex-flow: row wrap;
         gap: 5px;
         justify-content: end;
+    }
+
+    .field-error {
+        background: var(--background-red);
+        border: 1px solid var(--color-red);
+        padding: 0.35em 1.2ch;
+        border-left-width: 5px;
+        border-radius: 5px;
     }
 }
 

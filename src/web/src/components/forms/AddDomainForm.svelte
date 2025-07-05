@@ -7,6 +7,7 @@
     export let step = 0;
     export let domain = "";
     export let method = "";
+    export let err = "";
 
     function setDomain() {
         if (step == 0) {
@@ -84,6 +85,9 @@
                     {/if}
                 {/if}
                 <p>When you're done, click <b>Verify</b> and your domain will be added to your account.</p>
+                {#if err}
+                    <div class="field-error">{err}</div>
+                {/if}
                 <hr>
                 <div class="field-actions">
                     <button type="button" on:click={() => step--}>
