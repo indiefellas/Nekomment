@@ -1,6 +1,6 @@
 <script lang="ts">
     import { plaintext } from "svelte-highlight/languages";
-    import CodeBlock from "./CodeBlock.svelte";
+    import CodeBlock from "../code/CodeBlock.svelte";
 
     export let verificationToken: string;
 

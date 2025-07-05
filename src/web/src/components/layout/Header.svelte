@@ -1,7 +1,7 @@
 
 <script lang="ts">
-    import type { SafeUser } from "../lib/sanitize";
-    import Signature from "./Signature.svelte";
+    import type { SafeUser } from "../../lib/sanitize";
+    import Signature from "../branding/Signature.svelte";
     import Icon from "@iconify/svelte";
 
     export let user: SafeUser | undefined = undefined;
