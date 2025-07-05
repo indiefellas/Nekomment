@@ -32,9 +32,15 @@ export const comments = [
 ]
 
 export const authors = [
-    "jb",
-    "toasty",
-    "thin"
+    "poyo", 
+    "maxpixels", 
+    "jbcarreon123", 
+    "thinliquid", 
+    "ivory willows", 
+    "reduxflakes", 
+    "june",
+    "toasty", 
+    "duducat"
 ]
 
 function randArray<T>(arr: T[]): T {
