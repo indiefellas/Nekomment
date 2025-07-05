@@ -1,5 +1,6 @@
 
 <script lang="ts">
+    import { onMount } from "svelte";
     import type { SafeUser } from "../../lib/sanitize";
     import Signature from "../branding/Signature.svelte";
     import Icon from "@iconify/svelte";
@@ -19,9 +20,27 @@
     function setMenuMode(mode: string) {
         if (menuMode == mode) menuMode = "";
         else menuMode = mode;
-    } 
+    }
+
+    let header: Element;
+    onMount(() => {
+        document.addEventListener('scroll', () => {
+            if (window.scrollY > 10) {
+                header.classList.add('header-scroll')
+            } else {
+                header.classList.remove('header-scroll')
+            }
+            console.log(window.scrollY, header.scrollHeight)
+        })
+
+        if (window.scrollY > 10) {
+            header.classList.add('header-scroll')
+        } else {
+            header.classList.remove('header-scroll')
+        }
+    })
 </script>
-<header data-menu-mode={menuMode || undefined}>
+<header bind:this={header} data-menu-mode={menuMode || undefined}>
     <div class="container">
         <a class="main-logo" href="/" aria-label="Nekomment home page"><Signature noText /></a>
         <button class="menu-btn" aria-hidden={true} on:click={() => setMenuMode("nav")}>
@@ -63,6 +82,10 @@
         position: sticky;
         top: 0;
         z-index: 1000;
+
+        :global(&.header-scroll) {
+            background-color: var(--background-2);
+        }
     }
     
     .container {
