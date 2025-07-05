@@ -505,7 +505,7 @@ export class InternalService extends WorkerEntrypoint {
     website: string | null;
     createdAt: Date | null;
     parentId: string | null;
-    approved: boolean | null;
+    approved: boolean | null;p
     moderatedBy: string | null;
     replies: {
       id: string;

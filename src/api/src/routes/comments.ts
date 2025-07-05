@@ -55,18 +55,17 @@ app.get("/:host/:path", async (c) => {
             isNull(comments.parentId)
         )
     })
-    const cmts = comments.map(c => ({
-        ...c,
-        address: null,
-        parentId: null,
-        moderatedBy: null,
-        replies: c.replies.map(r => ({
-            ...r,
-            address: null,
-            parentId: null,
-            moderatedBy: null
-        }))
-    }))
+    const cmts = comments.map(c => {
+        const { address, parentId, moderatedBy, replies, ...rest } = c;
+        const repl = replies.map(r => {
+            const { address, parentId, moderatedBy, ...rest } = r;
+            return rest;
+        })
+        return {
+            ...rest,
+            replies: repl
+        };
+    })
     return c.json(cmts)
 });
 
