@@ -41,19 +41,33 @@ app.use(async (c, next) => {
 
 app.get("/:host/:path", async (c) => {
     const { host, path } = c.req.param();
-    let hostPage = await db.select()
-        .from(schema.comments)
-        .where(eq(schema.comments.host, host));
-    if (hostPage.length < 1) {
-        return c.json([])
-    }
-    const comments = hostPage.map((c) => ({
-        id: c.id,
-        author: c.author,
-        website: c.website,
-        content: c.content
+    const comments = await db.query.comments.findMany({
+        with: {
+            replies: true
+        },
+        where: (comments, { and, eq, isNull }) => and(
+            path ?
+                and(
+                    eq(comments.host, host),
+                    eq(comments.pagePath, path)
+                ) :
+                eq(comments.host, host),
+            isNull(comments.parentId)
+        )
+    })
+    const cmts = comments.map(c => ({
+        ...c,
+        address: null,
+        parentId: null,
+        moderatedBy: null,
+        replies: c.replies.map(r => ({
+            ...r,
+            address: null,
+            parentId: null,
+            moderatedBy: null
+        }))
     }))
-    return c.json(comments)
+    return c.json(cmts)
 });
 
 app.post("/:host/:path", async (c) => {
@@ -110,14 +124,14 @@ app.post("/:host/:path", async (c) => {
             .where(eq(schema.hosts.host, hostPage[0].host));
     }
 
-    const ifReviewRequired = 
+    const ifReviewRequired =
         pathCfg?.moderationMode == 1 ||
         hostCfg?.moderationMode == 1;
-    
-    let reviewReason = 
+
+    let reviewReason =
         pathCfg?.moderationMode == 1 ? 'Required by path rules' :
-        hostCfg?.moderationMode == 1 ? 'Required by host rules' :
-        ''
+            hostCfg?.moderationMode == 1 ? 'Required by host rules' :
+                ''
 
     let ifReview = false;
 
@@ -146,12 +160,12 @@ app.post("/:host/:path", async (c) => {
                 break;
             }
         }
-        
+
         if (v.actionType === 0 && ifReview && isMatched) {
             return c.text('Comment blocked by AutoMod rule', 422)
         }
     }
-    
+
     if (cfTurnstileKey || (backPath && backPath.toString().includes('cmt.nkko.link'))) {
         if (!cfTurnstileKey) {
             return c.text('security error, please close the tab', 403)
@@ -168,7 +182,7 @@ app.post("/:host/:path", async (c) => {
         });
         outcome = await result.json();
     } else {
-        outcome = { 
+        outcome = {
             success: true
         }
     }
