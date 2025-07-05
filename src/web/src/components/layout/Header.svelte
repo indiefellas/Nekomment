@@ -30,7 +30,6 @@
             } else {
                 header.classList.remove('header-scroll')
             }
-            console.log(window.scrollY, header.scrollHeight)
         })
 
         if (window.scrollY > 10) {
