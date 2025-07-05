@@ -1,0 +1,90 @@
+---
+import MainLayout from "../../../layouts/MainLayout.astro";
+import lodash from "lodash";
+
+const { env } = Astro.locals.runtime;
+const { host } = Astro.params;
+
+const rules = await env.NEKOMMENT_API.getRules(
+    Astro.cookies.get("token")?.value ?? "",
+    host ?? "",
+)
+
+if (!rules.success && rules.status == 401)
+    return Astro.redirect("/login?redirect=" + Astro.url.pathname, 302);
+else if (!rules.success) return Astro.redirect("/dash", 302);
+
+let err = "";
+if (Astro.request.method === "POST") {
+    try {
+        const data = await Astro.request.formData();
+        const name = data.get("name")?.toString() || "";
+        const rule = data.get("rule")?.toString() || "";
+        const type = parseInt(data.get("type")?.toString() || '0', 10);
+        const action = parseInt(data.get("action")?.toString() || '0', 10);
+        
+        let session = await env.NEKOMMENT_API.createRule(
+            Astro.cookies.get("token")?.value || "",
+            host || '',
+            name,
+            rule,
+            type,
+            action
+        );
+
+        if (!session.success) {
+            err = "An error occurred. Please try again.";
+        }
+    } catch {
+        err = "An error occurred. Please try again.";
+    }
+}
+---
+
+<MainLayout>
+    <Fragment slot="nav">
+        <a href="/dash">Switch hosts</a>
+        <a href="/dash/add-host">Add new host</a>
+    </Fragment>
+
+    <h1>AutoMod rules for {host}</h1>
+    <div class="login-form">
+        <h2>Create new rule</h2>
+        <p>{err}</p>
+        <form method="post">
+            <label>
+                Name:
+                <input type="text" name="name" required />
+            </label>
+            <label>
+                Rule:
+                <input type="text" name="rule" required />
+            </label>
+            <label>
+                Rule type:
+                <select name="type">
+                    <option value="0">String-based</option>
+                    <option value="1">Regular Expressions</option>
+                </select>
+            </label>
+            <label>
+                Action type:
+                <select name="action">
+                    <option value="0">Block comment</option>
+                    <option value="1">Mark to review</option>
+                </select>
+            </label>
+
+            <button type="submit">Add rule</button>
+        </form>
+    </div>
+    <h2>Existing rules</h2>
+    <div class="hosts-list">
+        {rules.data?.map(r =>
+            <div class="rule">
+                <h3>{r.name}</h3>
+                <p>{r.rule}</p> - <p>{r.type == 0 ? 'String-based' : 'Regex'}</p> - <p>{r.enabled}</p> - <p>{r.actionType == 0 ? 'Block comment' : 'Mark to review'}</p>
+            </div>
+        )}
+    </div>
+</MainLayout>

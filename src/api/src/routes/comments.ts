@@ -103,8 +103,11 @@ app.post("/:host/:path", async (c) => {
             with: {
                 autoModRules: true
             },
-            where: (p, { eq }) => eq(p.id, hostPage[0].settingsId ?? 0)
+            where: (p, { eq }) => eq(p.hostUri, hostPage[0].host)
         });
+        await db.update(schema.hosts)
+            .set({ settingsId: hostCfg?.id || 0 })
+            .where(eq(schema.hosts.host, hostPage[0].host));
     }
 
     const ifReviewRequired = 
@@ -118,7 +121,8 @@ app.post("/:host/:path", async (c) => {
 
     let ifReview = false;
 
-    hostCfg?.autoModRules.filter(v => v.enabled).forEach((v) => {
+    let rules = hostCfg?.autoModRules.filter(v => v.enabled)
+    for (const v of rules || []) {
         if (ifReview) return;
         let isMatched = false;
         switch (v.type) {
@@ -142,10 +146,11 @@ app.post("/:host/:path", async (c) => {
                 break;
             }
         }
+        
         if (v.actionType === 0 && ifReview && isMatched) {
             return c.text('Comment blocked by AutoMod rule', 422)
         }
-    })
+    }
     
     if (cfTurnstileKey || (backPath && backPath.toString().includes('cmt.nkko.link'))) {
         if (!cfTurnstileKey) {
@@ -192,7 +197,7 @@ app.post("/:host/:path", async (c) => {
             address: ip,
             pagePath: path,
             parentId: pId,
-            approved: !ifReview || !ifReviewRequired,
+            approved: !(ifReview || ifReviewRequired),
             moderatedBy: reviewReason
         })
         if (!backPath) return c.text('done', (!ifReview || !ifReviewRequired) ? 202 : 200)

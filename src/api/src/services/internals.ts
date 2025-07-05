@@ -41,6 +41,8 @@ export class InternalService extends WorkerEntrypoint {
       website: string | null;
       createdAt: Date | null;
       parentId: string | null;
+      approved: boolean | null;
+      moderatedBy: string | null;
       replies: {
         id: string;
         host: string;
@@ -51,6 +53,8 @@ export class InternalService extends WorkerEntrypoint {
         website: string | null;
         createdAt: Date | null;
         parentId: string | null;
+        approved: boolean | null;
+        moderatedBy: string | null;
       }[];
     }[],
     flattenedComments: {
@@ -63,6 +67,8 @@ export class InternalService extends WorkerEntrypoint {
       website: string | null;
       createdAt: Date | null;
       parentId: string | null;
+      approved: boolean | null;
+      moderatedBy: string | null;
     }[]
   }>> {
     const page = await db.query.pages.findFirst({
@@ -230,14 +236,14 @@ export class InternalService extends WorkerEntrypoint {
       }
 
       await db.update(schema.users)
-        .set({ passwordHash: await bcrypt.hash(newPassword, await bcrypt.genSalt(12))})
+        .set({ passwordHash: await bcrypt.hash(newPassword, await bcrypt.genSalt(12)) })
         .where(eq(schema.users.id, user.id));
-      
+
       console.log(`successfully changed password for user: ${user.name}`);
       return { success: true, message: 'password changed successfully' }
     } catch (err: any) {
       console.log(`error changing password:`, err);
-      return { success: false, message: `failed to change password: ${err.message}`, status: 500}
+      return { success: false, message: `failed to change password: ${err.message}`, status: 500 }
     }
   }
 
@@ -317,7 +323,7 @@ export class InternalService extends WorkerEntrypoint {
         ownerId: userSession[0].users?.id || 0,
         settingsId: hostSettings?.id
       });
-      
+
       return { success: true, message: `host '${host}' added to account '${userSession[0].users?.name}'` };
     } catch (error: any) {
       console.error("Error adding host:", error);
@@ -363,7 +369,7 @@ export class InternalService extends WorkerEntrypoint {
       with: {
         comments: true
       },
-      where: (host, {eq}) => eq(host.ownerId, userSession[0].users?.id || 0)
+      where: (host, { eq }) => eq(host.ownerId, userSession[0].users?.id || 0)
     })
     return {
       success: true,
@@ -431,7 +437,7 @@ export class InternalService extends WorkerEntrypoint {
       }
     }
     let hostName = await db.query.hosts.findFirst({
-      where: (sHost, {eq}) => eq(sHost.host, host)
+      where: (sHost, { eq }) => eq(sHost.host, host)
     })
     if (!hostName) {
       return {
@@ -499,6 +505,8 @@ export class InternalService extends WorkerEntrypoint {
     website: string | null;
     createdAt: Date | null;
     parentId: string | null;
+    approved: boolean | null;
+    moderatedBy: string | null;
     replies: {
       id: string;
       host: string;
@@ -509,6 +517,8 @@ export class InternalService extends WorkerEntrypoint {
       website: string | null;
       createdAt: Date | null;
       parentId: string | null;
+      approved: boolean | null;
+      moderatedBy: string | null;
     }[];
   }[]>> {
     let sHost = await this.getHost(sessionToken, host);
@@ -533,7 +543,7 @@ export class InternalService extends WorkerEntrypoint {
     }
   }
 
-  async createRule(sessionToken: string, host: string, name: string, rule: string, type: 0 | 1): Promise<RpcResponse> {
+  async getRules(sessionToken: string, host: string): Promise<RpcResponse<schema.AutoModRule[]>> {
     if (!sessionToken) {
       return {
         success: false,
@@ -553,7 +563,51 @@ export class InternalService extends WorkerEntrypoint {
       }
     }
     const hostData = await db.query.hosts.findFirst({
-      where: (h, {eq, and}) => and(
+      where: (h, { eq, and }) => and(
+        eq(h.ownerId, userSession[0].users?.id || 0),
+        eq(h.host, host)
+      ),
+      with: {
+        settings: true
+      }
+    });
+    if (!hostData) {
+      return {
+        success: false,
+        message: 'Host not found',
+        status: 404
+      }
+    }
+    let rules = await db.query.autoModRules.findMany({
+      where: (r, { eq }) => eq(r.settingsId, hostData.settingsId || 0)
+    });
+    return {
+      success: true,
+      data: rules
+    }
+  }
+
+  async createRule(sessionToken: string, host: string, name: string, rule: string, type: number, action: number): Promise<RpcResponse> {
+    if (!sessionToken) {
+      return {
+        success: false,
+        message: 'User not logged in or session expired',
+        status: 401
+      }
+    }
+    const userSession = await db.select()
+      .from(schema.sessions)
+      .leftJoin(schema.users, eq(schema.users.id, schema.sessions.userId))
+      .where(eq(schema.sessions.sessionToken, sessionToken));
+    if (userSession.length < 1 || !userSession[0].users) {
+      return {
+        success: false,
+        message: 'User not logged in or session expired',
+        status: 401
+      }
+    }
+    const hostData = await db.query.hosts.findFirst({
+      where: (h, { eq, and }) => and(
         eq(h.ownerId, userSession[0].users?.id || 0),
         eq(h.host, host)
       ),
@@ -582,7 +636,9 @@ export class InternalService extends WorkerEntrypoint {
       name: name,
       rule: rule,
       type: type,
-      settingsId: hostSettings.id
+      settingsId: hostSettings.id,
+      actionType: action,
+      enabled: true
     })
     return {
       success: true
