@@ -76,7 +76,7 @@
                     <CodeBlock language={plaintext} code={`nekomment-token=${verificationToken}`} />
                 {:else}
                     <p>Create a text file accessible on<br/><b>https://{domain}/.well-known/nekomment</b><br/>with the following content:</p>
-                    <CodeBlock language={plaintext} code={`nekomment-token=${verificationToken}`} />
+                    <CodeBlock language={plaintext} code={`${verificationToken}`} />
                     {#if domain.endsWith(".neocities.org")}
                         <blockquote>
                             <b>Note:</b> If you're using a free Neocities account, you can create your file at <b>/.well-known/nekomment/index.html</b>
