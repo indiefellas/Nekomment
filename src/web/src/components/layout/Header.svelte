@@ -46,6 +46,9 @@
                 <button aria-label="Site options">
                     <Icon icon="lucide:cog" inline />
                 </button>
+                <button aria-label="Accessibility options">
+                    <Icon icon="ion:accessibility" inline />
+                </button>
             </div>
         </div>
         <button class="menu-close-btn" aria-hidden={!menuMode} on:click={() => setMenuMode("")}>

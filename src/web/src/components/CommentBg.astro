@@ -1,0 +1,157 @@
+<script>
+    import { genRandomComment } from "../lib/randomComment";
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+
+    function random(min: number, max: number) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function bgLoop(bg: HTMLDivElement) {
+        const vw = Math.max(
+            document.documentElement.clientWidth || 0,
+            window.innerWidth || 0,
+        );
+        const vh = Math.max(
+            document.documentElement.clientHeight || 0,
+            window.innerHeight || 0,
+        );
+        let x = random(-100, vw);
+        let y = random(-100, vh);
+        if (random(0, 1) == 1) y = vh;
+        else x = vw;
+        if (reducedMotion.matches) {
+            x = random(-100, vw);
+            y = random(-100, vh);
+        }
+        const comment = genRandomComment();
+        const commentContainer = document.createElement("article");
+        commentContainer.className = "bg-comment";
+        commentContainer.innerHTML = `<div><h2>${comment.author}</h2><p>${comment.comment}</p></div>`;
+        const repliesContainer = document.createElement("div");
+        repliesContainer.className = "bg-replies";
+        comment.replies.forEach((r) => {
+            const reply = document.createElement("blockquote");
+            reply.innerHTML = `<h3>${r.author}</h3><p>${r.comment}</p>`;
+            repliesContainer.appendChild(reply);
+        });
+        if (comment.replies.length > 0)
+            commentContainer.appendChild(repliesContainer);
+        const delay = random(vw > 1000 ? 4000 : 7000, 10000);
+        commentContainer.style = `--x: ${x + commentContainer.offsetWidth / 2}px; --y: ${y + commentContainer.offsetHeight / 2}px; --speed: ${delay}ms`;
+        bg.appendChild(commentContainer);
+
+        setTimeout(() => commentContainer.remove(), delay + 100);
+        setTimeout(() => bgLoop(bg), random(500, 1000));
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const bg = document.querySelector(".background") as HTMLDivElement;
+        bgLoop(bg);
+    });
+</script>
+
+<div class="background" aria-hidden="true">
+    <div class="bg-gradient"></div>
+</div>
+
+<style scoped>
+    .background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        width: 100dvw;
+        height: 100dvh;
+        opacity: 0.25;
+        overflow: hidden;
+    }
+
+    .background .bg-gradient {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 50dvw;
+        height: 100dvh;
+        background-image: linear-gradient(
+            to left,
+            transparent,
+            var(--background-1)
+        );
+    }
+
+    :global(.bg-comment) {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        z-index: -2;
+        gap: 12px;
+        min-width: 200px;
+        max-width: 500px;
+        padding: 12px;
+        background: var(--background-2);
+        position: absolute;
+        top: var(--y);
+        left: var(--x);
+        border-radius: 5px;
+        animation: scroll-to-left var(--speed) forwards ease-in-out;
+        transform: skewY(-6deg);
+        box-shadow: 
+            1px 1px var(--background-4), 2px 2px var(--background-4), 
+            3px 3px var(--background-4), 4px 4px var(--background-4), 
+            5px 5px var(--background-4), 6px 6px var(--background-4), 
+            7px 7px var(--background-4), 8px 8px var(--background-4), 
+            9px 9px var(--background-4);
+
+        .bg-replies {
+            display: flex;
+            gap: 6px;
+            flex-direction: column;
+            margin-left: 24px;
+        }
+
+        * {
+            overflow-wrap: normal;
+            text-overflow: clip;
+        }
+    }
+
+    @keyframes scroll-to-left {
+        from {
+            left: var(--x);
+            top: var(--y);
+            opacity: 1;
+        }
+        to {
+            left: -500px;
+            top: -250px;
+            opacity: 0;
+        }
+    }
+
+    @keyframes fade {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+
+    @media screen and (prefers-reduced-motion: reduce) {
+        :global(.bg-comment) {
+            animation: fade var(--speed) forwards ease-in-out;
+        }
+    }
+
+    @media screen and (width <= 640px) {
+        .background .bg-gradient {
+            width: 100dvw;
+            height: 100dvh;
+            background-image: linear-gradient(
+                to bottom,
+                transparent,
+                var(--background-1)
+            );
+        }
+    }
+</style>
