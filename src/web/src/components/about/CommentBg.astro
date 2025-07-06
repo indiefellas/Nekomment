@@ -18,7 +18,7 @@ import { genRandomComment } from "../../lib/randomComment";
     function makeComment() {
         const lightMode = 
             document.body.classList.contains('light') ||
-            localStorage.getItem('nkm:theme') === 'light';
+            localStorage.getItem('nkm:theme')?.includes('light');
         const comment = genRandomComment();
         const commentContainer = document.createElement("article");
         commentContainer.className = "bg-comment";
