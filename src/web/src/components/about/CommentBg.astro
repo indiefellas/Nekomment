@@ -33,7 +33,7 @@ import { genRandomComment } from "../../lib/randomComment";
         if (comment.replies.length > 0)
             commentContainer.appendChild(repliesContainer);
         if (lightMode) commentContainer.setAttribute('data-light', 'true');
-        if (Math.random() > 0.5) commentContainer.setAttribute("data-variant", random(0, 10) + "");
+        if (Math.random() > 0.25) commentContainer.setAttribute("data-variant", random(0, 10) + "");
         commentHolder.appendChild(commentContainer);
         return commentContainer;
     }
