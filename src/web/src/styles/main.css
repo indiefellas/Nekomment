@@ -40,6 +40,10 @@
     --main-margin: max(calc(50dvw - 40em), 20px);
 }
 
+.light {
+    
+}
+
 * {
     font-smooth: none;
     margin-block: 0;
