@@ -47,13 +47,10 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
             </div>
         </div>
         <div class="right">
+            <h1>News</h1>
             <div class="card">
                 <h2>Work in progress!</h2>
                 <p>Please note that Nekomment is still work in progress!</p>
-            </div>
-            <div class="card">
-                <h2>News</h2>
-                <p>There are currently no news.</p>
             </div>
         </div>
     </div>
@@ -65,11 +62,17 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
         margin-top: 12px;
         display: grid;
         grid-template-columns: 0.65fr 0.35fr;
-        gap: 20px;
+        gap: 10px;
     }
 
     .left {
         container: left;
+    }
+
+    .right {
+        background-color: var(--background-1);
+        padding: 12px;
+        border-radius: 12px;
     }
 
     .hosts-container {
