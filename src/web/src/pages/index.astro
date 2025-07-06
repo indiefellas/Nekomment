@@ -2,9 +2,13 @@
 import CommentBg from "../components/about/CommentBg.astro";
 import Landing from "../components/about/Landing.astro";
 import MainLayout from "../layouts/MainLayout.astro";
+
+const { env } = Astro.locals.runtime;
+
+let user = await env.NEKOMMENT_API.checkUser(Astro.cookies.get('token')?.value ?? '')
+ 
 ---
 
-<MainLayout>
-	<CommentBg />
-	<Landing />
+<MainLayout {user}>
+	{user.data ? "" : <Landing />}
 </MainLayout>

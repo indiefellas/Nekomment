@@ -1,8 +1,14 @@
 ---
 import Signature from "../branding/Signature.svelte";
+import CommentBg from "./CommentBg.astro";
+
+const {
+    user
+} = Astro.props;
 
 ---
 
+<CommentBg />
 <div class="landing-hero fill-screen">
     <div class="introduction fill-screen">
         <h1>
@@ -12,10 +18,16 @@ import Signature from "../branding/Signature.svelte";
         </h1>
         <p>Nekomment is a free comment host that adapts to your website's design.</p>
         <p class="actions">
-            <a class="button primary" href="/register">
-                Sign me up<i>!</i>
-            </a>
-            <a class="button" href="/login">I already registered</a>
+            {user?.data ? (
+                <a class="button primary" href="/dash">
+                    Enter the Dashboard<i>!</i>
+                </a>
+            ) : (
+                <a class="button primary" href="/register">
+                    Sign me up<i>!</i>
+                </a>
+                <a class="button" href="/login">I already registered</a>
+            )}
         </p>
     </div>
 </div>
@@ -40,12 +52,13 @@ import Signature from "../branding/Signature.svelte";
                 transform-origin: bottom left;
                 width: fit-content;
                 margin-block: 20px 0.5em;
+                --blocky-bg: var(--background-4);
                 text-shadow: 
-                    1px 1px var(--background-4), 2px 2px var(--background-4), 
-                    3px 3px var(--background-4), 4px 4px var(--background-4), 
-                    5px 5px var(--background-4), 6px 6px var(--background-4), 
-                    7px 7px var(--background-4), 8px 8px var(--background-4), 
-                    9px 9px var(--background-4);
+                    1px 1px var(--blocky-bg), 2px 2px var(--blocky-bg), 
+                    3px 3px var(--blocky-bg), 4px 4px var(--blocky-bg), 
+                    5px 5px var(--blocky-bg), 6px 6px var(--blocky-bg), 
+                    7px 7px var(--blocky-bg), 8px 8px var(--blocky-bg), 
+                    9px 9px var(--blocky-bg), 10px 10px 10px #0007;
             }
 
             & > .actions {
@@ -57,13 +70,13 @@ import Signature from "../branding/Signature.svelte";
     /* couldn't unscope the .signature selector on nested css above :sob: */
     .landing-hero h1 :global(.signature) {
         display: block;
-        font-size: 2rem;
+        font-size: 0.6em;
         text-shadow: none;
         letter-spacing: 0;
         margin-left: 10px;
     }
 
-    @media (max-width: 640px) {
+    @media (width <= 640px) {
         .landing-hero > .introduction {
             justify-content: end;
         }

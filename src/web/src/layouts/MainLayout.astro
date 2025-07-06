@@ -3,7 +3,10 @@ import Header from "../components/layout/Header.astro";
 import Footer from "../components/layout/Footer.astro";
 import "../styles/main.css";
 
-const { title = "Nekomment" } = Astro.props;
+const { 
+    title = "Nekomment",
+    user = null,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -22,7 +25,7 @@ const { title = "Nekomment" } = Astro.props;
         <slot name="head" />
     </head>
     <body>
-        <Header />
+        <Header {user} />
         <main>
             <slot />
         </main>

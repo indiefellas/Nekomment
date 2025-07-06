@@ -6,7 +6,7 @@ export const prerender = false;
 
 const { env } = Astro.locals.runtime;
 
-const user = await env.NEKOMMENT_API.checkUser(Astro.cookies.get('token')?.value ?? '');
+let user = Astro.props.user ?? await env.NEKOMMENT_API.checkUser(Astro.cookies.get('token')?.value ?? '');
 ---
 
 <HeaderSvelte user={user.data ? sanitizeUser(user.data) : undefined} client:load />

@@ -1,29 +1,21 @@
 <script>
-    import { genRandomComment } from "../../lib/randomComment";
+import { mathematica } from "svelte-highlight/languages";
+import { genRandomComment } from "../../lib/randomComment";
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
-    const mobileMode = matchMedia("(width <= 640px)");
+    
+    let commentHolder: HTMLElement;
+    let lastMobileMode;
+
+    let delta, time = performance.now();
+    let offset = 0, xOffset = 0, yOffset = 0;
+
+    let comments: HTMLElement[] = [];
 
     function random(min: number, max: number) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    function bgLoop(bg: HTMLDivElement) {
-        const vw = Math.max(
-            document.documentElement.clientWidth || 0,
-            window.innerWidth || 0,
-        );
-        const vh = Math.max(
-            document.documentElement.clientHeight || 0,
-            window.innerHeight || 0,
-        );
-        let x = random(-100, vw);
-        let y = random(-100, vh);
-        if (random(0, 1) == 1) y = vh;
-        else x = vw;
-        if (reducedMotion.matches) {
-            x = random(-100, vw);
-            y = random(-100, vh);
-        }
+    function makeComment() {
         const comment = genRandomComment();
         const commentContainer = document.createElement("article");
         commentContainer.className = "bg-comment";
@@ -37,32 +29,68 @@
         });
         if (comment.replies.length > 0)
             commentContainer.appendChild(repliesContainer);
-        const delay = random(vw > 1000 ? 5500 : 7000, 10000);
-        commentContainer.style = `--x: ${x + commentContainer.offsetWidth / 2}px; --y: ${y + commentContainer.offsetHeight / 2}px; --speed: ${delay}ms`;
-        bg.appendChild(commentContainer);
+        if (Math.random() > 0.75) commentContainer.setAttribute("data-variant", random(1, 2) + "");
+        commentHolder.appendChild(commentContainer);
+        return commentContainer;
+    }
 
-        setTimeout(() => commentContainer.remove(), delay + 100);
-        setTimeout(() => bgLoop(bg), mobileMode.matches ? random(1500, 3000) : random(500, 1000));
+    function bgLoop() {
+        delta = performance.now() - time;
+        time += delta;
+
+        const vw = Math.max(
+            document.documentElement.clientWidth || 0,
+            window.innerWidth || 0,
+        );
+        const vh = Math.max(
+            document.documentElement.clientHeight || 0,
+            window.innerHeight || 0,
+        );
+
+        if (!reducedMotion.matches) {
+            offset += delta / 50;
+            commentHolder.style.setProperty("--offset", offset + "px");
+        }
+
+        if (comments[0] && parseInt(comments[0].style.left) < -510 + offset) {
+            comments.shift()!.remove();
+        }
+        if (!comments[0] || xOffset < offset + vw) {
+            const comment = makeComment();
+            comment.style.top = xOffset * 0.12 + yOffset + "px";
+            comment.style.left = xOffset + "px";
+            yOffset += comment.clientHeight + 10;
+            if (yOffset > vh) {
+                yOffset = vw * -0.12;
+                xOffset += comment.clientWidth + 10;
+            }
+            comments.push(comment);
+        }
+
+        setTimeout(bgLoop, 50);
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-        const bg = document.querySelector(".background") as HTMLDivElement;
-        bgLoop(bg);
+        commentHolder = document.querySelector(".comment-holder")!;
+        bgLoop();
     });
 </script>
 
 <div class="background" aria-hidden="true">
+    <div class="comment-holder"></div>
     <div class="bg-gradient"></div>
 </div>
 
 <style scoped>
+    @font-face {
+        font-family: "Flow Rounded";
+        src: url(/fonts/FlowRounded-Regular.ttf);
+    }
+
     .background {
-        position: absolute;
-        top: 0;
-        left: 0;
+        position: fixed;
+        inset: 0;
         z-index: -1;
-        width: 100dvw;
-        height: 100dvh;
         opacity: 0.35;
         overflow: hidden;
         
@@ -78,72 +106,119 @@
                 var(--background-0)
             );
         }
+
+        .comment-holder {
+            position: absolute;
+            inset: 0;
+            transform: translate(calc(var(--offset) * -1), calc(var(--offset) * -0.12));
+            transition: transform 0.12s;
+        }
     }
 
     .background :global(.bg-comment) {
-        width: 100%;
+        --blocky-bg: var(--background-2);
+        width: 60%;
         display: flex;
         flex-direction: column;
         z-index: -2;
         gap: 12px;
         min-width: 200px;
         max-width: 500px;
-        padding: 12px;
-        background: var(--background-2);
+        padding: 6px 18px 18px 18px;
+        background: var(--background-3);
+        font-family: "Flow Rounded", cursive;
+        font-size: 2rem;
+        line-height: 0.7;
         position: absolute;
-        top: var(--y);
-        left: var(--x);
         border-radius: 5px;
-        animation: scroll-to-left var(--speed) forwards ease-in-out;
         transform: skewY(-6deg);
+        animation: comment-fly-in cubic-bezier(0.075, 0.82, 0.165, 1) 2.5s, comment-fly-in-2 ease-out 2.5s;
         box-shadow: 
-            1px 1px var(--background-1), 2px 2px var(--background-1), 
-            3px 3px var(--background-1), 4px 4px var(--background-1), 
-            5px 5px var(--background-1), 6px 6px var(--background-1), 
-            7px 7px var(--background-1), 8px 8px var(--background-1), 
-            9px 9px var(--background-1);
+            1px 1px var(--blocky-bg), 2px 2px var(--blocky-bg), 
+            3px 3px var(--blocky-bg), 4px 4px var(--blocky-bg), 
+            5px 5px var(--blocky-bg), 6px 6px var(--blocky-bg), 
+            7px 7px var(--blocky-bg), 8px 8px var(--blocky-bg), 
+            9px 9px var(--blocky-bg), 10px 10px 10px #0007;
 
         .bg-replies {
             display: flex;
             gap: 6px;
             flex-direction: column;
             margin-left: 24px;
+
+            blockquote {
+                padding: 6px 18px 18px 18px;
+            }
+        }
+
+        p {
+            opacity: 0.5;
         }
 
         * {
             overflow-wrap: normal;
             text-overflow: clip;
         }
+
+        &[data-variant="1"] {
+            background: white;
+            --blocky-bg: #aaa;
+            color: #000;
+            border-radius: 0;
+
+            blockquote {
+                background: #0001;
+                border: 1px solid white;
+                border-radius: 0;
+            }
+        }
+        &[data-variant="2"] {
+            background: url(/_assets/veryspace.png);
+            --blocky-bg: black;
+            color: white;
+            border-radius: 0;
+
+            blockquote {
+                background: #000;
+                border: 1px solid white;
+                border-radius: 0;
+            }
+        }
     }
 
-
-    @keyframes scroll-to-left {
+    @keyframes comment-fly-in {
         from {
-            left: var(--x);
-            top: var(--y);
-            opacity: 1;
-            transform: skewY(-6deg) scale(0.75);
+            z-index: -100;
+            transform: skewY(-6deg) translate(100vw, 50vw);
+            filter: brightness(0);
         }
         to {
-            left: -500px;
-            top: calc(var(--y) - 250px);
-            opacity: 0;
-            transform: skewY(-6deg) scale(1);
+            z-index: 0;
+            transform: skewY(-6deg);
+            filter: brightness(1);
+        }
+    }
+    @keyframes comment-fly-in-2 {
+        from {
+            filter: brightness(0);
+        }
+        to {
+            filter: brightness(1);
         }
     }
 
-    @keyframes fade {
+    @keyframes comment-fade-in {
         from {
-            opacity: 1;
+            opacity: 0;
         }
         to {
-            opacity: 0;
+            opacity: 1;
         }
     }
 
     @media screen and (prefers-reduced-motion: reduce) {
         .background :global(.bg-comment) {
-            animation: fade var(--speed) forwards ease-in-out;
+            animation: comment-fade-in 1s;
         }
     }
 

@@ -1,8 +1,13 @@
 ---
 import Landing from "../components/about/Landing.astro";
 import MainLayout from "../layouts/MainLayout.astro";
+
+const { env } = Astro.locals.runtime;
+
+let user = await env.NEKOMMENT_API.checkUser(Astro.cookies.get('token')?.value ?? '')
+
 ---
 
-<MainLayout>
-	<Landing />
+<MainLayout {user}>
+	<Landing {user} />
 </MainLayout>
