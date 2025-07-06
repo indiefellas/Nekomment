@@ -27,6 +27,22 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
                             <p>{h.comments?.length || 0} total comments</p>
                         </a>
                     )}
+                    {hosts.data?.length === 0 && <p>No hosts yet!</p>}
+                </div>
+            </div>
+            <div class="hosts-container">
+                <div class="heading">
+                    <h2>Pages</h2>
+                    <button class="primary">Add new</button>
+                </div>
+                <div class="hosts-list">
+                    {pages.data?.map(h => 
+                        <a class="button" href={"/dash/" + h.host}>
+                            <h2>{h.name}</h2>
+                            <p>{h.hostName}</p>
+                        </a>
+                    )}
+                    {pages.data?.length === 0 && <p>No pages yet!</p>}
                 </div>
             </div>
         </div>
