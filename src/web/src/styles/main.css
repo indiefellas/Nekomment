@@ -161,6 +161,12 @@ h1:first-of-type {
     max-width: calc(100dvw - 20px);
 }
 
+.card {
+    background: var(--background-1);
+    border-radius: 10px;
+    padding: 20px;
+}
+
 form {
     display: flex;
     flex-flow: column;
@@ -272,26 +278,6 @@ blockquote {
 
 .comments-list .reply-content {
     width: 100%;
-}
-
-.hosts-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(100px, 1fr));
-    gap: 12px;
-}
-
-.hosts-list a {
-    width: 100%;
-    padding: 6px;
-    background-color: var(--background-4);
-    &>* {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        margin: 0;
-    }
-    &:hover {
-        background-color: var(--background-1);
-    }
 }
 
 .small {
