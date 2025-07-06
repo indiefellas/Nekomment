@@ -41,7 +41,25 @@
 }
 
 .light {
-    
+    --background-0: #f2ede8;
+    --background-1: #d7d0c7;
+    --background-2: #d3c9be;
+    --background-3: #c4baaf;
+    --background-4: #a69787;
+    --background-red: #ddb5b5;
+
+    --color-0: #111010;
+    --color-1: #493531;
+    --color-red: #473232;
+    --color-blue: #344266;
+    --color-green: #37523a;
+
+    --btn-base-bg: #b1a89f;
+    --btn-base-hover-bg: #8c8278;
+    --btn-base-color: #111010;
+    --btn-primary-bg: #120b04;
+    --btn-primary-hover-bg: #2d2317;
+    --btn-primary-color: #f2ede8;
 }
 
 * {
@@ -117,6 +135,10 @@ button, .button {
 
 .fill-screen {
     min-height: calc(100dvh - 2em - 20px);
+}
+
+.content-only .fill-screen {
+    min-height: 100dvh;
 }
 
 .center-child {

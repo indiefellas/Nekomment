@@ -4,6 +4,7 @@
     import type { SafeUser } from "../../lib/sanitize";
     import Signature from "../branding/Signature.svelte";
     import Icon from "@iconify/svelte";
+    import ThemeSelect from "../buttons/ThemeSelect.svelte";
 
     export let user: SafeUser | undefined = undefined;
 
@@ -67,6 +68,7 @@
                 <button aria-label="Accessibility options">
                     <Icon icon="ion:accessibility" inline />
                 </button>
+                <ThemeSelect />
             </div>
         </div>
         <button class="menu-close-btn" aria-hidden={!menuMode} on:click={() => setMenuMode("")}>

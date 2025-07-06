@@ -5,8 +5,9 @@
 
 <div class="fill-screen center-child">
     <div class="center-form">
-        <p>{err}</p>
+        <h1>Log in</h1>
         <form method="post">
+            <p>{err}</p>
             <div class="field-group">
                 <label for="username">Username:</label>
                 <input type="text" name="username" id="username" required />
@@ -33,6 +34,11 @@
             {/if}
             <hr>
             <div class="field-actions">
+                {#if !isRegister}
+                <button type="submit">
+                    Forgot password
+                </button>
+                {/if}
                 <button class="primary" type="submit">
                     {isRegister ? "Register!" : "Login!"}
                 </button>

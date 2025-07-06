@@ -16,6 +16,9 @@ import { genRandomComment } from "../../lib/randomComment";
     }
 
     function makeComment() {
+        const lightMode = 
+            document.body.classList.contains('light') ||
+            localStorage.getItem('nkm:theme') === 'light';
         const comment = genRandomComment();
         const commentContainer = document.createElement("article");
         commentContainer.className = "bg-comment";
@@ -29,7 +32,8 @@ import { genRandomComment } from "../../lib/randomComment";
         });
         if (comment.replies.length > 0)
             commentContainer.appendChild(repliesContainer);
-        if (Math.random() > 0.75) commentContainer.setAttribute("data-variant", random(1, 2) + "");
+        if (lightMode) commentContainer.setAttribute('data-light', 'true');
+        commentContainer.setAttribute("data-variant", random(0, 10) + "");
         commentHolder.appendChild(commentContainer);
         return commentContainer;
     }
@@ -88,18 +92,19 @@ import { genRandomComment } from "../../lib/randomComment";
     }
 
     .background {
-        position: fixed;
+        position: absolute;
         inset: 0;
         z-index: -1;
-        opacity: 0.35;
+        opacity: 0.25;
         overflow: hidden;
+        height: calc(100dvh + 12px);
         
         .bg-gradient {
             position: relative;
             top: 0;
             left: 0;
             width: 50dvw;
-            height: 100dvh;
+            height: calc(100dvh + 12px);
             background-image: linear-gradient(
                 to left,
                 transparent,
@@ -110,7 +115,7 @@ import { genRandomComment } from "../../lib/randomComment";
         .comment-holder {
             position: absolute;
             inset: 0;
-            transform: translate(calc(var(--offset) * -1), calc(var(--offset) * -0.12));
+            transform: translate(calc(var(--offset) * -1), calc(var(--offset) * -0.13));
             transition: transform 0.12s;
         }
     }
@@ -160,19 +165,7 @@ import { genRandomComment } from "../../lib/randomComment";
             text-overflow: clip;
         }
 
-        &[data-variant="1"] {
-            background: white;
-            --blocky-bg: #aaa;
-            color: #000;
-            border-radius: 0;
-
-            blockquote {
-                background: #0001;
-                border: 1px solid white;
-                border-radius: 0;
-            }
-        }
-        &[data-variant="2"] {
+        &:not([data-light])[data-variant="1"] {
             background: url(/_assets/veryspace.png);
             --blocky-bg: black;
             color: white;
@@ -184,12 +177,76 @@ import { genRandomComment } from "../../lib/randomComment";
                 border-radius: 0;
             }
         }
+        &:not([data-light])[data-variant="2"] {
+            background: #3d2c66;
+            --blocky-bg: #bbffca;
+            border: 1px solid #bbffca;
+            color: #bbffca;
+            border-radius: 0;
+
+            blockquote {
+                background: #19033dc4;
+                border: 1px solid #bbffca;
+                border-radius: 0;
+            }
+        }
+        &:not([data-light])[data-variant="3"] {
+            background: #504945;
+            --blocky-bg: #32302f;
+            color: #e8dbb2;
+            border-radius: 0;
+
+            blockquote {
+                background: #32302f;
+                border: none;
+                border-radius: 0;
+            }
+        }
+
+        &[data-light][data-variant="1"] {
+            background: white;
+            --blocky-bg: #aaa;
+            color: #000;
+            border-radius: 0;
+
+            blockquote {
+                background: #0001;
+                border: 1px solid white;
+                border-radius: 0;
+            }
+        }
+        &[data-light][data-variant="2"] {
+            background: #fffffa;
+            --blocky-bg: #000;
+            color: #000;
+            border: 1px solid #000;
+            border-radius: 5px;
+
+            blockquote {
+                background: #ffffff;
+                border: none;
+                border: 1px solid #000;
+                border-radius: 3px;
+            }
+        }
+        &[data-light][data-variant="3"] {
+            background: #d5c4a1;
+            --blocky-bg: #f2e5bc;
+            color: #3c3836;
+            border-radius: 0;
+
+            blockquote {
+                background: #f2e5bc;
+                border: none;
+                border-radius: 0;
+            }
+        }
     }
 
     @keyframes comment-fly-in {
         from {
             z-index: -100;
-            transform: skewY(-6deg) translate(100vw, 50vw);
+            transform: skewY(-6deg) translate(100vw, 70vw);
             filter: brightness(0);
         }
         to {
