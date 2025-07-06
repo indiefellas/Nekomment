@@ -1,0 +1,31 @@
+---
+import Header from "../components/layout/Header.astro";
+import Footer from "../components/layout/Footer.astro";
+import "../styles/main.css";
+
+const { 
+    title = "Nekomment"
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content={Astro.generator} />
+        <link rel="icon" href="/favicon.svg" />
+        <title>{title}</title>
+        <meta name="description" content="Nekomment is a free comment host that adapts to your website's design." />
+        <meta name="theme-color" content="#A6FFB0" />
+        <meta property="og:site_name" content="Nekomment" />
+        <meta property="og:title" content="A quirky comment host for your quirky website." />
+        <meta property="og:description" content="Nekomment is a free comment host that adapts to your website's design.">
+        <slot name="head" />
+    </head>
+    <body>
+        <main class="content-only">
+            <slot />
+        </main>
+    </body>
+</html>

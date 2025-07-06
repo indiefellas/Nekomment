@@ -1,0 +1,45 @@
+---
+import ContentOnlyLayout from "../layouts/ContentOnlyLayout.astro";
+import Signature from "../components/branding/Signature.svelte";
+---
+
+<ContentOnlyLayout>
+    <div class="fill-screen error-page">
+        <h1 class="signature"><Signature client:load /></h1>
+        <h1>Something just happened.</h1>
+        <p>Don't worry, this is on our end. We're working on fixing it!</p>
+    </div>
+
+    <style scoped>
+        .error-page {
+            --hero-margin: max(calc(50dvw - 960px), calc(var(--main-margin) / 2 + 15px));
+            padding-inline: var(--hero-margin);
+            padding-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h1 {
+            font-size: min(calc(2vw + 2em), 6em);
+            text-shadow:
+                1px 1px var(--background-4),
+                2px 2px var(--background-4),
+                3px 3px var(--background-4),
+                4px 4px var(--background-4),
+                5px 5px var(--background-4)
+        }
+
+        @media screen and (width <= 640px) {
+            .error-page {
+                justify-content: end;
+                padding-inline: 12px;
+            }
+        }
+
+        .signature {
+            font-size: 2em;
+            text-shadow: none;
+        }
+    </style>
+</ContentOnlyLayout>
