@@ -136,7 +136,7 @@
     
     header[data-menu-mode="nav"] {
         .blur-background {
-            opacity: 0.5;
+            opacity: 0.95;
         }
     }
 
