@@ -58,6 +58,9 @@
             <div class="user-info flex-left">
                 {#if user}
                     <p>{user.name} <i>({type})</i></p>
+                    {#if type === 'Admin'}
+                    <a class="button primary" href="/admin">Admin</a>
+                    {/if}
                     <a class="button primary" href="/dash">Dashboard</a>
                 {:else}
                     <a class="button" href="/login">Login</a>
