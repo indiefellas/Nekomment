@@ -262,7 +262,13 @@ export class InternalService extends WorkerEntrypoint {
         return { success: false, message: 'authentication required', status: 401 };
       }
 
-      const hostToken = crypto.randomUUID();
+      let hostToken = userSession[0].users.hostToken;
+      if (!hostToken) {
+        hostToken = crypto.randomUUID();
+        await db.update(schema.users)
+          .set({hostToken})
+          .where(eq(schema.users.id, userSession[0].users.id))
+      }
 
       return { success: true, data: hostToken };
     } catch (error: any) {
@@ -272,15 +278,12 @@ export class InternalService extends WorkerEntrypoint {
   }
 
 
-  async addHost(sessionToken: string, hostToken: string, host: string, method: string): Promise<RpcResponse> {
+  async addHost(sessionToken: string, host: string, method: string): Promise<RpcResponse> {
     if (!sessionToken) {
       return { success: false, message: 'authentication required', status: 401 };
     }
     if (!host) {
       return { success: false, message: 'host required', status: 400 };
-    }
-    if (!hostToken) {
-      return { success: false, message: 'host token required', status: 400 };
     }
 
     try {
@@ -291,6 +294,11 @@ export class InternalService extends WorkerEntrypoint {
 
       if (userSession.length < 1 || !userSession[0].users) {
         return { success: false, message: 'authentication required', status: 401 };
+      }
+
+      const hostToken = userSession[0].users.hostToken;
+      if (!hostToken) {
+        return { success: false, message: 'host token not yet initialized', status: 401 };
       }
 
       switch (method) {

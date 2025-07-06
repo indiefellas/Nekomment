@@ -3,5 +3,8 @@
 	"private": true,
 	"workspaces": [
 	  "src/*"
-	]
+	],
+	"scripts": {
+		"migrate-dev": "cd src/api && npx drizzle-kit generate && npx wrangler d1 migrations apply nekomment-testdb"
+	}
 }

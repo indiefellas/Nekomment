@@ -160,6 +160,10 @@
             height: calc(2em + 24px);
             align-items: center;
             padding-block: 0;
+
+            a.main-logo {
+                font-size: 24px;
+            }
         }
         .menu {
             position: fixed;

@@ -4,13 +4,9 @@ import MainLayout from "../../layouts/MainLayout.astro";
 export const prerender = false;
 const { env } = Astro.locals.runtime;
 
-let token = Astro.cookies.get("host-token")?.value;
-if (!token) {
-    token = await env.NEKOMMENT_API.initializeAddHostToken(
-        Astro.cookies.get("token")?.value || "",
-    ).data;
-    Astro.cookies.set("host-token", token || "");
-}
+let token = await env.NEKOMMENT_API.initializeAddHostToken(
+    Astro.cookies.get("token")?.value || "",
+).data;
 
 let err = "";
 
@@ -25,7 +21,6 @@ if (Astro.request.method === "POST") {
         const method = data.get("method")?.toString() || "";
         let session = await env.NEKOMMENT_API.addHost(
             Astro.cookies.get("token")?.value || "",
-            token || '',
             domain,
             method,
         );
