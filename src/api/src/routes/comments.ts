@@ -5,6 +5,7 @@ import * as schema from '../../db/schema';
 import { eq, and } from "drizzle-orm";
 import { chunk } from "lodash";
 import { cors } from "hono/cors";
+import { safeRegexMatch } from "../utils";
 
 const app = new Hono<{
     Bindings: Cloudflare
@@ -142,10 +143,16 @@ app.post("/:host/:path", async (c) => {
             case 1: {
                 let ruleSplit = v.rule.split('/');
                 let re = new RegExp(ruleSplit[1], ruleSplit[2] ?? '');
-                if (name.toString().match(re) || content.toString().match(re)) {
+                try {
+                    if (await safeRegexMatch(name.toString(), re) || await safeRegexMatch(content.toString(), re)) {
+                        ifReview = true;
+                        isMatched = true;
+                        reviewReason = `Flagged by AutoMod rule '${v.name}'`;
+                    }
+                } catch {
                     ifReview = true;
-                    isMatched = true;
-                    reviewReason = `Flagged by AutoMod rule '${v.name}'`;
+                    reviewReason = `AutoMod rule '${v.name}' took too long to execute so we automatically marked this comment for review. `
+                        + `Please check your regular expression of this rule for possible performance issues.`;
                 }
                 break;
             }

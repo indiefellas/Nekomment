@@ -1,3 +1,5 @@
+import * as vm from "vm";
+
 export function genId(length: number) {
     var result           = '';
     var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -70,4 +72,11 @@ export function genDefaultTemplate(theme: string) {
     /* See https://docs.beta.cmt.nkko.link/Pages/Styling for more info */
 </style>`
     }
+}
+
+export async function safeRegexMatch(str: string, regex: RegExp) {
+    let args = { regex, str, result: null };
+    let context = vm.createContext(args);
+    new vm.Script("result = str.match(regex)").runInContext(context, { timeout: 500 })
+    return args.result as RegExpMatchArray | null;
 }
