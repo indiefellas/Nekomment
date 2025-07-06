@@ -330,4 +330,8 @@ li {
     .hosts-list {
         grid-template-columns: repeat(1, 1fr);
     }
+
+    button, .button {
+        font-size: 1.25em;
+    }
 }

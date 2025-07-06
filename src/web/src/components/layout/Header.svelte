@@ -42,9 +42,10 @@
 </script>
 <header bind:this={header} data-menu-mode={menuMode || undefined}>
     <div class="container">
+        <div class="blur-background"></div>
         <a class="main-logo" href="/" aria-label="Nekomment home page"><Signature noText /></a>
         <button class="menu-btn" aria-hidden={true} on:click={() => setMenuMode("nav")}>
-            <Icon icon="lucide:map" inline />
+            <Icon icon="material-symbols:menu-rounded" inline />
         </button>
         <div class="menu">
             <nav>
@@ -62,13 +63,15 @@
                     <a class="button" href="/login">Login</a>
                     <a class="button primary" href="/register">Register</a>
                 {/if}
-                <button aria-label="Site options">
-                    <Icon icon="lucide:cog" inline />
-                </button>
-                <button aria-label="Accessibility options">
-                    <Icon icon="ion:accessibility" inline />
-                </button>
-                <ThemeSelect />
+                <div class="icon-buttons">
+                    <button aria-label="Site options">
+                        <Icon icon="lucide:cog" inline />
+                    </button>
+                    <button aria-label="Accessibility options">
+                        <Icon icon="ion:accessibility" inline />
+                    </button>
+                    <ThemeSelect />
+                </div>
             </div>
         </div>
         <button class="menu-close-btn" aria-hidden={!menuMode} on:click={() => setMenuMode("")}>
@@ -96,6 +99,10 @@
         justify-content: space-between;
         padding-block: 12px;
 
+        &>* {
+            z-index: 1;
+        }
+
         a:not(.button) {
             padding: 0.35em 0.6ch;
             text-decoration: none;
@@ -113,14 +120,33 @@
             flex-direction: row;
             list-style: none;
         }
+
+        .blur-background {
+            position: fixed;
+            inset: 0;
+            filter: blur(3px);
+            z-index: 0;
+            pointer-events: none;
+            width: 100dvw;
+            height: 100dvh;
+            background: var(--background-2);
+            opacity: 0;
+        }
     }
     
+    header[data-menu-mode="nav"] {
+        .blur-background {
+            opacity: 0.5;
+        }
+    }
+
     .menu {
         display: flex;
         flex-direction: row;
         align-items: baseline;
         flex-grow: 1;
     }
+
     .menu-btn, .menu-close-btn {
         display: none;
     }
@@ -141,23 +167,6 @@
     }
 
     @media (max-width: 640px) {
-        header {
-            order: 1;
-            top: auto;
-            bottom: 0;
-            background: var(--background-2);
-            height: calc(2em + 24px);
-        }
-        header::before {
-            content: "";
-            position: fixed;
-            display: block;
-            inset: 0 0 calc(2em + 24px) 0;
-            opacity: 0;
-            pointer-events: none;
-            background: linear-gradient(160deg, transparent, var(--background-0)) bottom / 120% 400%;
-            transition: opacity 0.3s, backdrop-filter 0.5s;
-        }
         .container {
             height: calc(2em + 24px);
             align-items: center;
@@ -169,7 +178,7 @@
         }
         .menu {
             position: fixed;
-            inset: 0 0 calc(2em + 24px) 0;
+            inset: calc(2em + 24px) 0 0 0;
             flex-direction: column;
             justify-content: space-between;
             opacity: 0;

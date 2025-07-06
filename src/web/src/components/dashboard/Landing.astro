@@ -37,7 +37,7 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
                 </div>
                 <div class="hosts-list">
                     {pages.data?.map(h => 
-                        <a class="button" href={"/dash/" + h.host}>
+                        <a class="button" href={"/dash/" + h.hostName + "/pages/" + h.name}>
                             <h2>{h.name}</h2>
                             <p>{h.hostName}</p>
                         </a>
