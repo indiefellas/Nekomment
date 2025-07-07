@@ -20,12 +20,6 @@ export default defineConfig({
     imageService: "cloudflare"
   }),
 
-  vite: {
-    css: {
-      transformer: 'lightningcss',
-    }
-  },
-
   integrations: [expressiveCode({
     themes: ['catppuccin-macchiato']
   }), svelte()]

@@ -4,11 +4,15 @@ import Signature from "../branding/Signature.svelte";
 const { user, host } = Astro.props;
 const { env } = Astro.locals.runtime;
 
-const hosts = await env.NEKOMMENT_API.getHosts(Astro.cookies.get('token')?.value ?? '');
-if (!hosts.success) return Astro.redirect('/login?redirect=' + Astro.url.pathname, 302);
+const hostData = await env.NEKOMMENT_API.getHost(
+    Astro.cookies.get("token")?.value ?? "",
+    host ?? ""
+)
 
-const pages = await env.NEKOMMENT_API.getPages(Astro.cookies.get('token')?.value ?? '');
-if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathname, 302);
+const comments = await env.NEKOMMENT_API.getComments(
+    Astro.cookies.get("token")?.value ?? "",
+    host ?? ""
+)
 ---
 
 <div class="fill-screen">
@@ -16,36 +20,28 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
         <div class="left">
             <div class="heading">
                 <h1>{host}</h1>
-                <a href="cmts">Latest comments</a>
             </div>
-            <div class="hosts-container">
+            <div class="comments-container">
                 <div class="heading">
-                    <h2>Hosts</h2>
-                    <button class="primary">Add new</button>
+                    <h2>Latest comments</h2>
                 </div>
-                <div class="hosts-list">
-                    {hosts.data?.map(h => 
-                        <a class="button" href={"/dash/" + h.host}>
-                            <h2>{h.host}</h2>
-                            <p>{h.comments?.length || 0} total comments</p>
-                        </a>
-                    )}
-                    {hosts.data?.length === 0 && <p>No hosts yet!</p>}
-                </div>
-            </div>
-            <div class="hosts-container">
-                <div class="heading">
-                    <h2>Pages</h2>
-                    <button class="primary">Add new</button>
-                </div>
-                <div class="hosts-list">
-                    {pages.data?.map(h => 
-                        <a class="button" href={"/dash/" + h.hostName + "/pages/" + h.name}>
-                            <h2>{h.name}</h2>
-                            <p>{h.hostName}</p>
-                        </a>
-                    )}
-                    {pages.data?.length === 0 && <p>No pages yet!</p>}
+                <div class="comments-list">
+                    {comments.data?.reverse().map(c => <div class="card comment">
+                        <div class="heading">
+                            <h2>{c.author}</h2>
+                            <p>{c.createdAt?.toDateString()}</p>
+                        </div>
+                        <p>{c.content}</p>
+                        {c.replies.length > 0 && <div class="replies">
+                            {c.replies.reverse().map(r => <blockquote>
+                                <div class="heading">
+                                    <h3>{r.author}</h3>
+                                    <p>{r.createdAt?.toDateString()}</p>
+                                </div>
+                                <p>{r.content}</p>
+                            </blockquote>)}    
+                        </div>}
+                    </div>)}
                 </div>
             </div>
         </div>
@@ -65,7 +61,18 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
         margin-top: 12px;
         display: grid;
         grid-template-columns: 0.65fr 0.35fr;
-        gap: 10px;
+        gap: 25px;
+    }
+
+    hr, .right h1 {
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        border: none;
+        border-bottom: 1px solid var(--background-3);
+    }
+
+    .right h1 {
+        margin-bottom: 0;
     }
 
     .left {
@@ -73,29 +80,38 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
     }
 
     .right {
-        background-color: var(--background-1);
-        padding: 12px;
-        border-radius: 12px;
+        border-radius: 5px;
     }
 
-    .hosts-container {
+    .comments-container {
         margin-top: 12px;
 
         .heading {
             display: flex;
             justify-content: space-between;
             align-items: end;
+            width: 100%;
         }
 
-        .hosts-list {
+        .comments-list {
             margin-top: 12px;
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
 
-            a {
+            .comment {
                 text-decoration: none;
                 padding: 10px;
+                flex-direction: column;
+                gap: 0;
+
+                .heading {
+                    align-items: start;
+                }
+
+                blockquote {
+                    flex-direction: column;
+                    margin-left: 24px;
+                }
             }
         }
     }
@@ -111,8 +127,8 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
             grid-template-columns: 1fr;
         }
 
-        .hosts-container {
-            .hosts-list {
+        .comments-container {
+            .comments-list {
                 grid-template-columns: repeat(1, 1fr);
             }
         }

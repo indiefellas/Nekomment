@@ -1,6 +1,9 @@
+---
+    const { noGradient = false } = Astro.props;
+---
+
 <script>
-import { mathematica } from "svelte-highlight/languages";
-import { genRandomComment } from "../../lib/randomComment";
+    import { genRandomComment } from "../../lib/randomComment";
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
     
     let commentHolder: HTMLElement;
@@ -52,7 +55,7 @@ import { genRandomComment } from "../../lib/randomComment";
         );
 
         if (!reducedMotion.matches) {
-            offset += delta / 50;
+            offset += delta / 10;
             commentHolder.style.setProperty("--offset", offset + "px");
         }
 
@@ -64,8 +67,9 @@ import { genRandomComment } from "../../lib/randomComment";
             comment.style.top = xOffset * 0.12 + yOffset + "px";
             comment.style.left = xOffset + "px";
             yOffset += comment.clientHeight + 10;
-            if (yOffset > vh) {
-                yOffset = vw * -0.12;
+            if (yOffset > vh + (xOffset * 0.12)) {
+                console.log(yOffset, vh, xOffset * 0.5)
+                yOffset = vh * -0.12;
                 xOffset += comment.clientWidth + 10;
             }
             comments.push(comment);
@@ -82,7 +86,7 @@ import { genRandomComment } from "../../lib/randomComment";
 
 <div class="background" aria-hidden="true">
     <div class="comment-holder"></div>
-    <div class="bg-gradient"></div>
+    {!noGradient && <div class="bg-gradient"></div>}
 </div>
 
 <style scoped>
@@ -137,7 +141,7 @@ import { genRandomComment } from "../../lib/randomComment";
         position: absolute;
         border-radius: 5px;
         transform: skewY(-6deg);
-        animation: comment-fly-in cubic-bezier(0.075, 0.82, 0.165, 1) 2.5s, comment-fly-in-2 ease-out 2.5s;
+        animation: comment-fly-in cubic-bezier(0.075, 0.82, 0.165, 1) 1s, comment-fly-in-2 ease-out 1s;
         box-shadow: 
             1px 1px var(--blocky-bg), 2px 2px var(--blocky-bg), 
             3px 3px var(--blocky-bg), 4px 4px var(--blocky-bg), 

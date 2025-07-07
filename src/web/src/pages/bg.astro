@@ -1,0 +1,14 @@
+---
+import CommentBg from "../components/about/CommentBg.astro";
+import ContentOnlyLayout from "../layouts/ContentOnlyLayout.astro";
+---
+
+<ContentOnlyLayout>
+    <CommentBg noGradient={true} />
+
+    <style is:inline>
+        body, main {
+            overflow: hidden;
+        }
+    </style>
+</ContentOnlyLayout>

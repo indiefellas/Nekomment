@@ -85,14 +85,15 @@
 </header>
 
 <style>
-    header :global(.header-scroll) {
-        background-color: var(--background-2);
-    }
 
     header {
         position: sticky;
         top: 0;
         z-index: 1000;
+
+        :global(&.header-scroll) {
+            background-color: var(--background-2);
+        }
     }
     
     .container {

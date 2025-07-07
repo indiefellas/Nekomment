@@ -67,6 +67,7 @@
     margin-block: 0;
     box-sizing: border-box;
     transition: all 100ms;
+    overflow-wrap: anywhere;
 }
 
 body {
