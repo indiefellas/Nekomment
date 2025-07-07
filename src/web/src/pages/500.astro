@@ -5,23 +5,38 @@ import Signature from "../components/branding/Signature.svelte";
 
 <ContentOnlyLayout>
     <div class="fill-screen error-page">
-        <h1 class="signature"><Signature client:load /></h1>
-        <h1>Something just happened.</h1>
-        <p>Don't worry, this is on our end. We're working on fixing it!</p>
+        <p class="signature-holder"><Signature /></p>
+        <h1>well, that's awkward</h1>
+        <>
+            Looks like an unexpected error has occured.
+            Don't worry, this is on our end. 
+            We're working on fixing it!
+        </p>
+        <p>
+            <a class="button primary" href="/">Back to home page</a>
+        </p>
     </div>
 
     <style scoped>
         .error-page {
-            --hero-margin: max(calc(50dvw - 960px), calc(var(--main-margin) / 2 + 15px));
             padding-inline: var(--hero-margin);
-            padding-bottom: 16px;
+            padding-bottom: 25px;
             display: flex;
+            gap: 8px;
             flex-direction: column;
             justify-content: center;
         }
 
+        .signature-holder {
+            font-size: min(calc(1vw + 1em), 3em);
+        }
+
         h1 {
             font-size: min(calc(2vw + 2em), 6em);
+            line-height: 0.85;
+            transform: skewY(-6deg);
+            transform-origin: bottom left;
+            margin-block: 0.8em 0.5em;
             text-shadow:
                 1px 1px var(--background-4),
                 2px 2px var(--background-4),
@@ -33,7 +48,6 @@ import Signature from "../components/branding/Signature.svelte";
         @media screen and (width <= 640px) {
             .error-page {
                 justify-content: end;
-                padding-inline: 12px;
             }
         }
 

@@ -124,24 +124,6 @@
             flex-direction: row;
             list-style: none;
         }
-
-        .blur-background {
-            position: fixed;
-            inset: 0;
-            filter: blur(3px);
-            z-index: 0;
-            pointer-events: none;
-            width: 100dvw;
-            height: 100dvh;
-            background: var(--background-2);
-            opacity: 0;
-        }
-    }
-    
-    header[data-menu-mode="nav"] {
-        .blur-background {
-            opacity: 0.95;
-        }
     }
 
     .menu {
@@ -167,6 +149,9 @@
         p i {
             color: var(--color-1);
         }
+    }
+    .blur-background {
+        display: none;
     }
 
     .flex-left {
@@ -197,8 +182,13 @@
                 flex-direction: column;
             }
             nav li {
-                font-size: 1.5em;
+                font-size: 2em;
+                line-height: 1.3;
                 margin-block: 0.125em;
+
+                a:not(.button) {
+                    padding: 0;
+                }
             }
             .user-info {
                 flex-direction: column;
@@ -218,6 +208,16 @@
                     font-size: 1.5em;
                 }
             }
+        }
+        .blur-background {
+            display: block;
+            position: fixed;
+            inset: calc(2em + 24px) 0 0 0;
+            opacity: 0;
+            backdrop-filter: blur(0.25em);
+            transition: opacity 0.3, backdrop-filter 0.3s;
+            pointer-events: none;
+            background: linear-gradient(20deg, transparent, var(--background-1)) top right / 1600% 100%;
         }
         .container > :is(button, button:hover, button:active) {
             padding: 0;
@@ -253,7 +253,9 @@
             }
         }
         header[data-menu-mode] {
-            &::before {
+            background-color: var(--background-2);
+
+            .blur-background {
                 opacity: 1;
                 backdrop-filter: blur(0.25em);
                 transition: opacity 0.5s, backdrop-filter 1s;
