@@ -20,7 +20,7 @@ function genBoilerplate(output: string, name: string, id: string, turnstileKey: 
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <link rel="stylesheet" href="/_assets/pagesDefault.css" />
+        <link rel="stylesheet" href="/res/pagesDefault.css" />
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" href="/favicon.svg" />
