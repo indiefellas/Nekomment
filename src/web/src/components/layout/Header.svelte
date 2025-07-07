@@ -119,10 +119,6 @@
             align-self: center;
         }
 
-        .user-name {
-            margin-right: 10px;
-        }
-
         nav {
             display: flex;
             flex-direction: row;
@@ -165,6 +161,9 @@
         align-items: baseline;
         gap: 6px;
 
+        p {
+            margin-right: 0.5ch;
+        }
         p i {
             color: var(--color-1);
         }
@@ -209,6 +208,7 @@
 
                 p {
                     margin-bottom: 5px;
+                    margin-right: 0;
                     
                     i {
                         display: block;

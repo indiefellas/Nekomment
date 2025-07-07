@@ -11,9 +11,14 @@ import Signature from "../branding/Signature.svelte";
                     &copy; Indiefellas, 2025.<br/>
                     Nekomment is under the MIT License.
                 </p>
+                <p class="b88x31-holder">
+                    <a class="button" href="https://team.indieseas.net" target="_blank">
+                        <img src="https://team.indieseas.net/img/indiefellas.svg" alt="indiefellas">
+                    </a>
+                </p>
             </div>
             <div class="bottom">
-                In development phase
+                (We're in development phase, please mind the bugs)
             </div>
         </div>
         <nav class="links">
@@ -27,17 +32,17 @@ import Signature from "../branding/Signature.svelte";
                 </nav>
             </li>
             <li>
-                <h5>Obligatory legal stuff</h5>
-                <nav>
-                    <li><a href="/terms">Terms of Use</a></li>
-                    <li><a href="/privacy">Privacy Policy</a></li>
-                </nav>
-            </li>
-            <li>
                 <h5>Contribute!</h5>
                 <nav>
                     <li><a href="/gold">Nekomment Gold&trade;</a></li>
                     <li><a href="https://github.com/indiefellas/Nekomment/">Source Code</a></li>
+                </nav>
+            </li>
+            <li>
+                <h5>Obligatory legal stuff</h5>
+                <nav>
+                    <li><a href="/terms">Terms of Use</a></li>
+                    <li><a href="/privacy">Privacy Policy</a></li>
                 </nav>
             </li>
             <li>
@@ -76,7 +81,23 @@ import Signature from "../branding/Signature.svelte";
             justify-content: space-between;
 
             .bottom {
+                margin-top: 0.5em;
                 color: var(--color-1);
+            }
+            .b88x31-holder {
+                margin-top: 0.5em;
+
+                button, .button {
+                    padding: 0;
+                    border-radius: 0;
+                }
+
+                img {
+                    display: block;
+                    width: 88px;
+                    height: 31px;
+                    image-rendering: crisp-edges;
+                }
             }
         }
 
