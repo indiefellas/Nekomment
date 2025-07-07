@@ -1,14 +1,20 @@
 ---
-import Signature from "../branding/Signature.svelte";
+import HostCard from "./HostCard.svelte";
 
 const { user } = Astro.props;
 const { env } = Astro.locals.runtime;
 
-const hosts = await env.NEKOMMENT_API.getHosts(Astro.cookies.get('token')?.value ?? '');
-if (!hosts.success) return Astro.redirect('/login?redirect=' + Astro.url.pathname, 302);
+const hosts = await env.NEKOMMENT_API.getHosts(
+    Astro.cookies.get("token")?.value ?? "",
+);
+if (!hosts.success)
+    return Astro.redirect("/login?redirect=" + Astro.url.pathname, 302);
 
-const pages = await env.NEKOMMENT_API.getPages(Astro.cookies.get('token')?.value ?? '');
-if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathname, 302);
+const pages = await env.NEKOMMENT_API.getPages(
+    Astro.cookies.get("token")?.value ?? "",
+);
+if (!pages.success)
+    return Astro.redirect("/login?redirect=" + Astro.url.pathname, 302);
 ---
 
 <div class="fill-screen">
@@ -22,12 +28,17 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
                     <a href="/dash/add-host" class="button primary">Add new</a>
                 </div>
                 <div class="hosts-list">
-                    {hosts.data?.map(h => 
-                        <a class="button" href={"/dash/" + h.host}>
-                            <h2>{h.host}</h2>
-                            <p>{h.comments?.length || 0} total comments</p>
-                        </a>
-                    )}
+                    {
+                        hosts.data?.map((h) => (
+                            <HostCard 
+                                host={h.host}
+                                comments={h.comments.length}
+                                inReview={h.comments.filter(x=>!x.approved).length}
+                                paths={0}
+                                client:load
+                            />
+                        ))
+                    }
                     {hosts.data?.length === 0 && <p>No hosts yet!</p>}
                 </div>
             </div>
@@ -38,12 +49,19 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
                     <a href="/dash/add-page" class="button primary">Add new</a>
                 </div>
                 <div class="hosts-list">
-                    {pages.data?.map(h => 
-                        <a class="button" href={"/dash/" + h.hostName + "/pages/" + h.name}>
-                            <h2>{h.name}</h2>
-                            <p>{h.hostName}</p>
-                        </a>
-                    )}
+                    {
+                        pages.data?.map((h) => (
+                            <a
+                                class="button"
+                                href={
+                                    "/dash/" + h.hostName + "/pages/" + h.name
+                                }
+                            >
+                                <h2>{h.name}</h2>
+                                <p>{h.hostName}</p>
+                            </a>
+                        ))
+                    }
                     {pages.data?.length === 0 && <p>No pages yet!</p>}
                 </div>
             </div>
@@ -58,7 +76,7 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
     </div>
 </div>
 
-<style scoped>
+<style>
     .dashboard-container {
         margin-inline: var(--main-margin);
         margin-top: 12px;
@@ -67,7 +85,8 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
         gap: 25px;
     }
 
-    hr, .right h1 {
+    hr,
+    .right h1 {
         padding-bottom: 10px;
         margin-bottom: 20px;
         border: none;
@@ -88,6 +107,7 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
 
     .hosts-container {
         margin-top: 12px;
+        container-type: inline-size;
 
         .heading {
             display: flex;
@@ -106,6 +126,12 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
                 padding: 10px;
             }
         }
+
+        @container (width <= 700px) {
+            .hosts-list {
+                grid-template-columns: repeat(1, 1fr);
+            }
+        }
     }
 
     .right {
@@ -117,12 +143,6 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
     @media screen and (width <= 900px) {
         .dashboard-container {
             grid-template-columns: 1fr;
-        }
-
-        .hosts-container {
-            .hosts-list {
-                grid-template-columns: repeat(1, 1fr);
-            }
         }
     }
 </style>

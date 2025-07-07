@@ -1,17 +1,20 @@
 ---
 import Signature from "../branding/Signature.svelte";
-
-
 ---
 
 <footer>
     <div class="container">
         <div class="info">
-            <Signature />
-            <p>
-                &copy; Indiefellas, 2025.<br/>
-                Nekomment is under the MIT License.
-            </p>
+            <div class="top">
+                <Signature />
+                <p>
+                    &copy; Indiefellas, 2025.<br/>
+                    Nekomment is under the MIT License.
+                </p>
+            </div>
+            <div class="bottom">
+                In development phase
+            </div>
         </div>
         <nav class="links">
             <li>
@@ -49,14 +52,14 @@ import Signature from "../branding/Signature.svelte";
 </footer>
 
 <style scoped>
-
     footer .info :global(.signature) {
-        font-size: 1.125em;
+        font-size: 1.5em;
     }
 
     footer {
         background-color: var(--background-1);
         padding-block: 20px;
+        margin-top: 10px;
 
         .container {
             display: flex;
@@ -68,6 +71,13 @@ import Signature from "../branding/Signature.svelte";
         .info {
             font-size: 0.8em;
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            .bottom {
+                color: var(--color-1);
+            }
         }
 
         .links {
