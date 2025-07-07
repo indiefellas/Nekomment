@@ -34,7 +34,7 @@ const {
 
 <style scoped>
     .landing-hero {
-        --hero-margin: var(--main-margin);
+        --hero-margin: max(calc(50dvw - 960px), calc(var(--main-margin) / 2 + 15px));
         position: relative;
 
         & > .introduction {

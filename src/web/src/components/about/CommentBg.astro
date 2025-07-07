@@ -64,11 +64,11 @@
         }
         if (!comments[0] || xOffset < offset + vw) {
             const comment = makeComment();
-            comment.style.top = xOffset * 0.12 + yOffset + "px";
+            comment.style.top = (xOffset * 0.12) + yOffset + "px";
             comment.style.left = xOffset + "px";
             yOffset += comment.clientHeight + 10;
             if (yOffset > vh + (xOffset * 0.12)) {
-                yOffset = vh * -0.12;
+                yOffset = vh * -0.20;
                 xOffset += comment.clientWidth + 10;
             }
             comments.push(comment);
