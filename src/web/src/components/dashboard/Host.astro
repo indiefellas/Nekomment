@@ -1,7 +1,7 @@
 ---
 import Signature from "../branding/Signature.svelte";
 
-const { user } = Astro.props;
+const { user, host } = Astro.props;
 const { env } = Astro.locals.runtime;
 
 const hosts = await env.NEKOMMENT_API.getHosts(Astro.cookies.get('token')?.value ?? '');
@@ -14,7 +14,10 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
 <div class="fill-screen">
     <div class="dashboard-container">
         <div class="left">
-            <h1>Hello, {user.data.name}<i>!</i></h1>
+            <div class="heading">
+                <h1>{host}</h1>
+                <a href="cmts">Latest comments</a>
+            </div>
             <div class="hosts-container">
                 <div class="heading">
                     <h2>Hosts</h2>

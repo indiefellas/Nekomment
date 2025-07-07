@@ -57,7 +57,7 @@
             </nav>
             <div class="user-info flex-left">
                 {#if user}
-                    <p>{user.name} <i>({type})</i></p>
+                    <p class="user-name">{user.name} <i>({type})</i></p>
                     {#if type === 'Admin'}
                     <a class="button primary" href="/admin">Admin</a>
                     {/if}
@@ -116,6 +116,10 @@
             margin-right: 1ch;
             font-size: 1.2em;
             align-self: center;
+        }
+
+        .user-name {
+            margin-right: 10px;
         }
 
         nav {

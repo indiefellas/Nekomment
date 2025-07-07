@@ -163,7 +163,7 @@ h1:first-of-type {
 
 .card {
     background: var(--background-3);
-    border-radius: 10px;
+    border-radius: 6px;
     padding: 20px;
 }
 

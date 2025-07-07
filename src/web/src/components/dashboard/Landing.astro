@@ -15,10 +15,11 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
     <div class="dashboard-container">
         <div class="left">
             <h1>Hello, {user.data.name}<i>!</i></h1>
+            <hr />
             <div class="hosts-container">
                 <div class="heading">
                     <h2>Hosts</h2>
-                    <button class="primary">Add new</button>
+                    <a href="/dash/add-host" class="button primary">Add new</a>
                 </div>
                 <div class="hosts-list">
                     {hosts.data?.map(h => 
@@ -30,10 +31,11 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
                     {hosts.data?.length === 0 && <p>No hosts yet!</p>}
                 </div>
             </div>
+            <hr />
             <div class="hosts-container">
                 <div class="heading">
                     <h2>Pages</h2>
-                    <button class="primary">Add new</button>
+                    <a href="/dash/add-page" class="button primary">Add new</a>
                 </div>
                 <div class="hosts-list">
                     {pages.data?.map(h => 
@@ -62,7 +64,18 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
         margin-top: 12px;
         display: grid;
         grid-template-columns: 0.65fr 0.35fr;
-        gap: 10px;
+        gap: 25px;
+    }
+
+    hr, .right h1 {
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        border: none;
+        border-bottom: 1px solid var(--background-3);
+    }
+
+    .right h1 {
+        margin-bottom: 0;
     }
 
     .left {
@@ -70,9 +83,7 @@ if (!pages.success) return Astro.redirect('/login?redirect=' + Astro.url.pathnam
     }
 
     .right {
-        background-color: var(--background-1);
-        padding: 12px;
-        border-radius: 12px;
+        border-radius: 5px;
     }
 
     .hosts-container {
