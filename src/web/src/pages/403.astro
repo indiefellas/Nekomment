@@ -1,0 +1,53 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+
+const context = 
+    Astro.originPathname.includes("/c/") ? "comment-page" :
+    "regular";
+
+Astro.response.status = 403;
+Astro.response.statusText = 'Forbidden';
+---
+
+<MainLayout>
+    <div class="fill-screen error-page">
+        <h1>hey, what you doin?</h1>
+        <p>
+            Seems like you tried to go to a page that you don't have access to!
+        </p>
+        <p>
+            <a class="button primary" href="/">Back to home page</a>
+        </p>
+    </div>
+
+    <style scoped>
+        .error-page {
+            padding-inline: var(--hero-margin);
+            padding-bottom: 25px;
+            display: flex;
+            gap: 8px;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h1 {
+            font-size: min(calc(2vw + 2em), 6em);
+            line-height: 0.85;
+            transform: skewY(-6deg);
+            transform-origin: bottom left;
+            margin-block: 20px 0.5em;
+            text-shadow:
+                1px 1px var(--background-4),
+                2px 2px var(--background-4),
+                3px 3px var(--background-4),
+                4px 4px var(--background-4),
+                5px 5px var(--background-4)
+        }
+
+        @media screen and (width <= 640px) {
+            .error-page {
+                justify-content: end;
+            }
+        }
+    </style>
+</MainLayout>
