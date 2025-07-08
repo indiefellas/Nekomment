@@ -61,7 +61,6 @@
                     {#if type === 'Admin'}
                     <a class="button primary" href="/admin">Admin</a>
                     {/if}
-                    <a class="button primary" href="/dash">Dashboard</a>
                 {:else}
                     <a class="button" href="/login">Login</a>
                     <a class="button primary" href="/register">Register</a>
@@ -69,9 +68,6 @@
                 <div class="icon-buttons">
                     <button aria-label="Site options">
                         <Icon icon="lucide:cog" inline />
-                    </button>
-                    <button aria-label="Accessibility options">
-                        <Icon icon="ion:accessibility" inline />
                     </button>
                     <ThemeSelect />
                 </div>

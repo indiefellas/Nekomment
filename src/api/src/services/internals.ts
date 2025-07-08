@@ -414,7 +414,17 @@ export class InternalService extends WorkerEntrypoint {
           eq(schema.hosts.host, host)
         )
       );
-    if (host.length < 1) {
+    if (hosts.length < 1) {
+      let hosts = await db.select()
+        .from(schema.hosts)
+        .where(eq(schema.hosts.host, host));
+      if (hosts.length > 0) {
+        return {
+          success: false,
+          message: 'Account does not have access on this host',
+          status: 403
+        }
+      }
       return {
         success: false,
         message: 'Host not found',

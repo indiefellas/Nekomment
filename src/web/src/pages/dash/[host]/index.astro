@@ -1,15 +1,141 @@
 ---
-import Host from "../../../components/dashboard/Host.astro";
 import MainLayout from "../../../layouts/MainLayout.astro";
 import lodash from "lodash";
 
 const { env } = Astro.locals.runtime;
 const { host } = Astro.params;
-const page = parseInt(Astro.url.searchParams.get("page") || "1", 10) - 1;
 
-const user = await env.NEKOMMENT_API.checkUser(Astro.cookies.get('token')?.value ?? '')
+const hostData = await env.NEKOMMENT_API.getHost(
+    Astro.cookies.get("token")?.value ?? "",
+    host ?? ""
+)
+
+if (!hostData.success) return Astro.rewrite('/' + hostData.status || 0)
+
+const comments = await env.NEKOMMENT_API.getComments(
+    Astro.cookies.get("token")?.value ?? "",
+    host ?? ""
+)
 ---
 
-<MainLayout>
-    <Host user={user} host={host} />
+<MainLayout title={host + ' - Nekomment'}>
+    <div class="fill-screen">
+        <div class="dashboard-container">
+            <div class="left">
+                <div class="heading">
+                    <h1>{host}</h1>
+                </div>
+                <div class="comments-container">
+                    <div class="heading">
+                        <h2>Latest comments</h2>
+                    </div>
+                    <div class="comments-list">
+                        {comments.data?.reverse().map(c => <div class="card comment">
+                            <div class="heading">
+                                <h2>{c.author}</h2>
+                                <p>{c.createdAt?.toDateString()}</p>
+                            </div>
+                            <p>{c.content}</p>
+                            {c.replies.length > 0 && <div class="replies">
+                                {c.replies.reverse().map(r => <blockquote>
+                                    <div class="heading">
+                                        <h3>{r.author}</h3>
+                                        <p>{r.createdAt?.toDateString()}</p>
+                                    </div>
+                                    <p>{r.content}</p>
+                                </blockquote>)}    
+                            </div>}
+                        </div>)}
+                    </div>
+                </div>
+            </div>
+            <div class="right">
+                <h1>News</h1>
+                <div class="card">
+                    <h2>Work in progress!</h2>
+                    <p>Please note that Nekomment is still work in progress!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <style scoped>
+        .dashboard-container {
+            margin-inline: var(--main-margin);
+            margin-top: 12px;
+            display: grid;
+            grid-template-columns: 0.65fr 0.35fr;
+            gap: 25px;
+        }
+    
+        hr, .right h1 {
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            border: none;
+            border-bottom: 1px solid var(--background-3);
+        }
+    
+        .right h1 {
+            margin-bottom: 0;
+        }
+    
+        .left {
+            container: left;
+        }
+    
+        .right {
+            border-radius: 5px;
+        }
+    
+        .comments-container {
+            margin-top: 12px;
+    
+            .heading {
+                display: flex;
+                justify-content: space-between;
+                align-items: end;
+                width: 100%;
+            }
+    
+            .comments-list {
+                margin-top: 12px;
+                display: grid;
+                gap: 12px;
+    
+                .comment {
+                    text-decoration: none;
+                    padding: 10px;
+                    flex-direction: column;
+                    gap: 0;
+    
+                    .heading {
+                        align-items: start;
+                    }
+    
+                    blockquote {
+                        flex-direction: column;
+                        margin-left: 24px;
+                    }
+                }
+            }
+        }
+    
+        .right {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+    
+        @media screen and (width <= 900px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+    
+            .comments-container {
+                .comments-list {
+                    grid-template-columns: repeat(1, 1fr);
+                }
+            }
+        }
+    </style>
 </MainLayout>
