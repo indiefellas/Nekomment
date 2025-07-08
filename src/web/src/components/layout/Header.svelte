@@ -5,6 +5,7 @@
     import Signature from "../branding/Signature.svelte";
     import Icon from "@iconify/svelte";
     import ThemeSelect from "../buttons/ThemeSelect.svelte";
+    import SiteOptions from "../buttons/SiteOptions.svelte";
 
     export let user: SafeUser | undefined = undefined;
 
@@ -66,10 +67,10 @@
                     <a class="button primary" href="/register">Register</a>
                 {/if}
                 <div class="icon-buttons">
-                    <button aria-label="Site options">
-                        <Icon icon="lucide:cog" inline />
-                    </button>
                     <ThemeSelect />
+                    {#if user}
+                        <SiteOptions />
+                    {/if}
                 </div>
             </div>
         </div>
@@ -81,7 +82,6 @@
 </header>
 
 <style>
-
     header {
         position: sticky;
         top: 0;
@@ -144,6 +144,12 @@
         }
         p i {
             color: var(--color-1);
+        }
+
+        .icon-buttons {
+            display: flex;
+            flex-direction: row;
+            gap: 6px;
         }
     }
     .blur-background {

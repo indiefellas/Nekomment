@@ -25,6 +25,7 @@ const comments = await env.NEKOMMENT_API.getComments(
                 <div class="heading">
                     <h1>{host}</h1>
                 </div>
+                <hr>
                 <div class="comments-container">
                     <div class="heading">
                         <h2>Latest comments</h2>
@@ -46,6 +47,7 @@ const comments = await env.NEKOMMENT_API.getComments(
                                 </blockquote>)}    
                             </div>}
                         </div>)}
+                        {comments.data?.length === 0 && <p>No comments yet!</p>}
                     </div>
                 </div>
             </div>
