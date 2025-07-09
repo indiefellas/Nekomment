@@ -1,6 +1,7 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
 import LoginForm from "../components/forms/LoginForm.svelte";
+import CommentBg from "../components/about/CommentBg.astro";
 
 export const prerender = false; 
 const { env } = Astro.locals.runtime;
@@ -31,5 +32,6 @@ if (Astro.request.method === 'POST') {
 ---
 
 <MainLayout>
+    <CommentBg noGradient={true} />
     <LoginForm {err} client:load />
 </MainLayout>
