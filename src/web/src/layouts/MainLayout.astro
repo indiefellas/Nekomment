@@ -3,10 +3,7 @@ import Header from "../components/layout/Header.astro";
 import Footer from "../components/layout/Footer.astro";
 import "../styles/main.css";
 
-const { 
-    title = "Nekomment",
-    user = null,
-} = Astro.props;
+const { title = "Nekomment", user = null } = Astro.props;
 ---
 
 <!doctype html>
@@ -16,17 +13,65 @@ const {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="generator" content={Astro.generator} />
         <link rel="icon" href="/favicon.svg" />
-        <link rel="preload" href="/fonts/InterVariable.woff2" as="font" type="font/woff2" />
-        <link rel="preload" href="/fonts/InterVariable-Italic.woff2" as="font" type="font/woff2" />
-        <link rel="preload" href="/fonts/FlowRounded-Regular.ttf" as="font" type="font/ttf" />
+        <link
+            rel="preload"
+            href="/fonts/InterVariable.woff2"
+            as="font"
+            type="font/woff2"
+        />
+        <link
+            rel="preload"
+            href="/fonts/InterVariable-Italic.woff2"
+            as="font"
+            type="font/woff2"
+        />
+        <link
+            rel="preload"
+            href="/fonts/FlowRounded-Regular.ttf"
+            as="font"
+            type="font/ttf"
+        />
         <title>{title}</title>
-        <meta name="description" content="Nekomment is a free comment host that adapts to your website's design." />
+        <meta
+            name="description"
+            content="Nekomment is a free comment host that adapts to your website's design."
+        />
         <meta name="theme-color" content="#A6FFB0" />
         <meta property="og:site_name" content="Nekomment" />
-        <meta property="og:title" content="A quirky comment host for your quirky website." />
-        <meta property="og:description" content="Nekomment is a free comment host that adapts to your website's design.">
+        <meta
+            property="og:title"
+            content="A quirky comment host for your quirky website."
+        />
+        <meta
+            property="og:description"
+            content="Nekomment is a free comment host that adapts to your website's design."
+        />
         <script>
-            import '../lib/common';
+            (() => {
+                const body = document.body;
+                const prefersLight = window.matchMedia(
+                    "(prefers-color-scheme: light)",
+                );
+                if (
+                    localStorage.getItem("nkm:theme")?.includes("light") ||
+                    (prefersLight.matches &&
+                        !localStorage.getItem("nkm:theme")?.includes("user"))
+                ) {
+                    body.classList.add("light");
+                    localStorage.setItem("nkm:theme", "light");
+                }
+                prefersLight.addEventListener("change", (ev) => {
+                    if (localStorage.getItem("nkm:theme")?.includes("user"))
+                        return;
+                    if (ev.matches) {
+                        body.classList.add("light");
+                        localStorage.setItem("nkm:theme", "light");
+                    } else {
+                        body.classList.remove("light");
+                        localStorage.setItem("nkm:theme", "dark");
+                    }
+                });
+            })();
         </script>
         <slot name="head" />
     </head>
