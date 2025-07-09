@@ -17,21 +17,15 @@
         }
     }
     onMount(() => {
-        const body = document.body;
         const prefersLight = window.matchMedia('(prefers-color-scheme: light)');
         if (localStorage.getItem('nkm:theme').includes('light') || (prefersLight.matches && !localStorage.getItem('nkm:theme').includes('user'))) {
-            body.classList.add('light');
-            localStorage.setItem('nkm:theme', 'light');
             isLight = true;
         }
         prefersLight.addEventListener('change', (ev) => {
-            if (ev.matches && !localStorage.getItem('nkm:theme').includes('user')) {
-                body.classList.add('light');
-                localStorage.setItem('nkm:theme', 'light');
+            if (localStorage.getItem('nkm:theme').includes('user')) return;
+            if (ev.matches) {
                 isLight = true;
             } else {
-                body.classList.remove('light');
-                localStorage.setItem('nkm:theme', 'dark');
                 isLight = false;
             }
         })
