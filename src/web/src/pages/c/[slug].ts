@@ -173,7 +173,7 @@ export const GET: APIRoute = async ({ params, request, locals, url }) => {
         {
             headers: {
                 'Content-Type': 'text/html',
-                'Content-Security-Policy': `script-src 'self' 'nonce-nkm-${id}' https://challenges.cloudflare.com; object-src 'none'; frame-ancestors 'self' https://${page.hostName}; base-uri 'self'; style-src 'self' 'unsafe-inline';`
+                'Content-Security-Policy': `script-src 'self' 'nonce-nkm-${id}' https://challenges.cloudflare.com; object-src 'none'; frame-ancestors 'self' https://${page.hostName}; base-uri 'self'; style-src 'self' 'unsafe-inline'; upgrade-insecure-requests;`
             }
         }
     );
