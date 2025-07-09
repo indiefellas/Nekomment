@@ -227,9 +227,4 @@ app.post("/:host/:path", async (c) => {
     }
 });
 
-app.delete("/:host/:path/:id", async (c) => {
-    const { host, path, id } = c.req.param();
-    return c.redirect(`https://${host}${path}`, 303)
-});
-
 export default app;  
