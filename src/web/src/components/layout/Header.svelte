@@ -87,11 +87,34 @@
         top: 0;
         z-index: 1000;
 
-        :global(&.header-scroll) {
+        &:before {
+            content: '';
+            height: 0;
+            display: block;
+            position: absolute;
+            inset: 0;
             background-color: var(--background-2);
+            transition: height 100ms ease;
+        }
+
+        :global(&.header-scroll) {
+            transition: background-color 100ms ease;
+
+            &:before {
+                height: 100%;
+            }
+
+            &:after {
+                position: absolute;
+                content: '';
+                width: 100%;
+                background-image: linear-gradient(to bottom, var(--background-0), transparent);
+                height: 5px;
+                display: block;
+            }
         }
     }
-    
+
     .container {
         display: flex;
         flex-direction: row;
