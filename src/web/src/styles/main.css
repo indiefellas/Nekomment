@@ -1,12 +1,14 @@
 @font-face {
     font-family: Inter;
     src: url(/fonts/InterVariable.woff2);
+    font-display: swap;
 }
 
 @font-face {
     font-family: Inter;
     font-style: italic;
     src: url(/fonts/InterVariable-Italic.woff2);
+    font-display: swap;
 }
 
 :root {
@@ -99,7 +101,9 @@ a {
     color: var(--color-blue);
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
     padding: 6px 8px;
     font: inherit;
     background-color: var(--btn-base-bg);
@@ -110,7 +114,17 @@ input, textarea, select {
     min-width: none;
 }
 
-button, .button {
+.sr-only {
+    position: fixed;
+    inset: -1000px;
+    font-size: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+button,
+.button {
     --btn-bg: var(--btn-base-bg);
     --btn-hover-bg: var(--btn-base-hover-bg);
     --btn-color: var(--btn-base-color);
@@ -130,6 +144,7 @@ button, .button {
         transform: translateY(-1px);
         box-shadow: var(--shadow-1);
     }
+
     &:active {
         background: var(--btn-bg);
         transform: translateY(1px);
@@ -194,7 +209,7 @@ form {
         flex-flow: column;
         gap: 5px;
 
-        & > * {
+        &>* {
             width: 100%;
         }
     }
@@ -229,7 +244,8 @@ form {
     gap: 12px;
 }
 
-.comments-list article, .comments-list blockquote {
+.comments-list article,
+.comments-list blockquote {
     &>* {
         margin: 0;
     }
@@ -309,11 +325,12 @@ blockquote {
     gap: 6px;
 }
 
-.pages a.selected { 
+.pages a.selected {
     font-weight: bold;
 }
 
-ul, ol {
+ul,
+ol {
     padding-bottom: 9px;
 }
 
@@ -321,18 +338,19 @@ li {
     margin-block: 9px;
 }
 
-@media screen and (width <= 1280px) {
+@media screen and (width <=1280px) {
     body {
         font-size: 1em;
     }
 }
 
-@media screen and (width <= 640px) {
+@media screen and (width <=640px) {
     body {
         margin-block: 0;
     }
 
-    header, footer {
+    header,
+    footer {
         flex-direction: column;
         gap: 0;
 
@@ -349,7 +367,8 @@ li {
         grid-template-columns: repeat(1, 1fr);
     }
 
-    button, .button {
+    button,
+    .button {
         font-size: 1.25em;
     }
 }
