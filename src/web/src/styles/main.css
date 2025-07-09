@@ -18,12 +18,14 @@
     --background-red: #473232;
     --background-blue: #344266;
     --background-green: #37523a;
+    --background-yellow: #555738;
 
     --color-0: #fffffe;
     --color-1: #b5b5dd;
     --color-red: #ddb5b5;
     --color-blue: #96b4ff;
     --color-green: #A6FFB0;
+    --color-yellow: #e7ffa6;
 
     --btn-base-bg: #535365;
     --btn-base-hover-bg: #79798d;
@@ -52,12 +54,14 @@
     --background-red: #ddb5b5;
     --background-blue: #96b4ff;
     --background-green: #A6FFB0;
+    --background-yellow: #e7ffa6;
 
     --color-0: #111010;
     --color-1: #493531;
     --color-red: #473232;
     --color-blue: #344266;
     --color-green: #37523a;
+    --color-yellow: #555738;
 
     --btn-base-bg: #b1a89f;
     --btn-base-hover-bg: #8c8278;
@@ -205,6 +209,14 @@ form {
     .field-error {
         background: var(--background-red);
         border: 1px solid var(--color-red);
+        padding: 0.35em 1.2ch;
+        border-left-width: 5px;
+        border-radius: 5px;
+    }
+
+    .field-warning {
+        background: var(--background-yellow);
+        border: 1px solid var(--color-yellow);
         padding: 0.35em 1.2ch;
         border-left-width: 5px;
         border-radius: 5px;

@@ -5,9 +5,18 @@
 
 <div class="fill-screen center-child">
     <div class="center-form">
-        <h1>Log in</h1>
+        {#if isRegister}
+            <h1>Register</h1>
+        {:else}
+            <h1>Log in</h1>
+        {/if}
         <form method="post">
-            <p>{err}</p>
+            {#if isRegister}
+                <div class="field-warning">Please note that Nekomment is still in development phase, so expect bugs!</div>
+            {/if}
+            {#if err}
+                <div class="field-error">{err}</div>
+            {/if}
             <div class="field-group">
                 <label for="username">Username:</label>
                 <input type="text" name="username" id="username" required />
@@ -50,5 +59,9 @@
 <style scoped>
     .center-form {
         width: 400px;
+    }
+
+    h1 {
+        margin-bottom: 10px;
     }
 </style>
