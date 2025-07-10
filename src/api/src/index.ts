@@ -22,5 +22,10 @@ app.use(async (c, next) => {
 
 app.route('/v1/comments', comments);
 
+app.get('/', (c) => {
+  return c.text(`
+`)
+})
+
 export default app;
 export { InternalService };

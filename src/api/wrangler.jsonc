@@ -22,6 +22,10 @@
             "migrations_dir": "drizzle"
 		}
 	],
+	"assets": {
+		"binding": "ASSETS",
+		"directory": "./static"
+	},
 	"unsafe": {
     	"bindings": [
 			{

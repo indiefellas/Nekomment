@@ -3,37 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Nekomment API</title>
     <style>
-        body, * {
-            background: #333;
-            color: white;
+        :root {
+            --background-0: #10101a;
+            --color-0: #fffffe;
+            --color-1: #b5b5dd;
+        }
+
+        body {
+            background-color: var(--background-0);
+            color: var(--color-0);
+            font-family: monospace;
+            font-size: 1.125em;
+            margin: 30px;
+        }
+
+        a {
+            color: var(--color-1);
+        }
+
+        code {
+            white-space: break-spaces;
+            font-weight: 600;
+        }
+
+        p {
+            margin: 0;
         }
     </style>
 </head>
 <body>
-    <p>signup</p>
-    <form method="post" action="/v1/internals/user">
-        <input type="text" name="name" placeholder="username">
-        <input type="text" name="email" placeholder="email">
-        <input type="password" name="password" placeholder="password">
-        <input type="submit">
-    </form>
-    <p>login</p>
-    <form method="post" action="/v1/internals/login">
-        <input type="text" name="name" placeholder="username">
-        <input type="password" name="password" placeholder="password">
-        <input type="submit">
-    </form>
-    <p>add domain button</p>
-    <form method="post" action="/v1/internals/initAddHostToken">
-        <input type="submit">
-    </form>
-    <p>add domain</p>
-    <form method="post" action="/v1/internals/addHost">
-        <input type="text" name="host" placeholder="host">
-        <input type="text" name="method" placeholder="method">
-        <input type="submit">
-    </form>
+    <code>            _                                        _   
+           | |                                      | |  
+ _ __   ___| | _____  _ __ ___  _ __ ___   ___ _ __ | |_ 
+| '_ \ / _ \ |/ / _ \| '_ ` _ \| '_ ` _ \ / _ \ '_ \| __|
+| | | |  __/   < (_) | | | | | | | | | | |  __/ | | | |_ 
+|_| |_|\___|_|\_\___/|_| |_| |_|_| |_| |_|\___|_| |_|\__|</code><br /><br />
+    <p>This is the Nekomment API backend.</p>
+    <p>All API routes are on /v1/comments.</p><br />
+
+    <p>GET /v1/comments/:host/:path - get all comments</p>
+    <p>GET /v1/comments/:host/:path - publish a comment (data: multipart/form-data)</p><br />
+
+    <p>Main site: <a href="https://beta.cmt.nkko.link">https://beta.cmt.nkko.link</a></p>
+    <p>Repository: <a href="https://github.com/indiefellas/Nekomment">https://github.com/indiefellas/Nekomment</a></p>
 </body>
 </html>
