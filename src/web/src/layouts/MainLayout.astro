@@ -76,7 +76,9 @@ const { title = "Nekomment", user = null } = Astro.props;
         <slot name="head" />
     </head>
     <body>
-        <Header {user} />
+        <Header {user}>
+            <slot name="nav-mobile" />
+        </Header>
         <main>
             <slot />
         </main>

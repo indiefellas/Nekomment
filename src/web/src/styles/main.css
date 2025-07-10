@@ -35,6 +35,9 @@
     --btn-primary-bg: #f1f1ff;
     --btn-primary-hover-bg: #d8d8ee;
     --btn-primary-color: #10101a;
+    --btn-warning-bg: #d44418;
+    --btn-warning-hover-bg: #ff5420;
+    --btn-warning-color: #fffffe;
 
     --shadow-0: 0 1px 2px #0007;
     --shadow-1: 0 2px 4px #0007;
@@ -156,6 +159,12 @@ button,
         --btn-hover-bg: var(--btn-primary-hover-bg);
         --btn-color: var(--btn-primary-color);
     }
+
+    &.warning {
+        --btn-bg: var(--btn-warning-bg);
+        --btn-hover-bg: var(--btn-warning-hover-bg);
+        --btn-color: var(--btn-warning-color);
+    }
 }
 
 .fill-screen {
@@ -170,6 +179,12 @@ button,
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
 }
 
 h1:first-of-type {

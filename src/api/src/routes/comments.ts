@@ -61,13 +61,13 @@ app.get("/:host/:path", async (c) => {
         const repl = replies.map(r => {
             const { address, parentId, moderatedBy, ...rest } = r;
             return rest;
-        })
+        }).reverse();
         return {
             ...rest,
             replies: repl
         };
     })
-    return c.json(cmts)
+    return c.json(cmts.reverse())
 });
 
 app.post("/:host/:path", async (c) => {

@@ -9,4 +9,4 @@ const { env } = Astro.locals.runtime;
 let user = Astro.props.user ?? await env.NEKOMMENT_API.checkUser(Astro.cookies.get('token')?.value ?? '');
 ---
 
-<HeaderSvelte user={user.data ? sanitizeUser(user.data) : undefined} client:load />
+<HeaderSvelte user={user.data ? sanitizeUser(user.data) : undefined} client:load><slot /></HeaderSvelte>

@@ -1,0 +1,38 @@
+---
+import type { Host } from "../../../../api/db/schema";
+
+const { host }: { host?: Host } = Astro.props;
+const hostRoot = '/' + host?.host;
+---
+
+<h4 class="host-name">{host?.host}</h4>
+<nav>
+    <a href={hostRoot}>Comments</a>
+    <a href={hostRoot + '/pages'}>Pages</a>
+    <a href={hostRoot + '/automod'}>Auto Moderation</a>
+    <a href={hostRoot + '/settings'}>Host Settings</a>
+</nav>
+
+<style scoped>
+    .host-name {
+        text-transform: uppercase;
+    }
+
+    nav {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+
+        a {
+            font-size: 1.10em;
+            text-decoration: none;
+        }
+    }
+
+    @media screen and (width <= 640px) {
+        nav a {
+            font-size: 1.75em;
+        }
+    }
+</style>

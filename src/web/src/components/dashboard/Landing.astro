@@ -54,7 +54,7 @@ if (!pages.success)
                             <a
                                 class="button"
                                 href={
-                                    "/dash/" + h.hostName + "/pages/" + h.name
+                                    "/" + h.hostName + "/pages/" + h.name
                                 }
                             >
                                 <h2>{h.name}</h2>
@@ -108,12 +108,6 @@ if (!pages.success)
     .hosts-container {
         margin-top: 12px;
         container-type: inline-size;
-
-        .heading {
-            display: flex;
-            justify-content: space-between;
-            align-items: end;
-        }
 
         .hosts-list {
             margin-top: 12px;

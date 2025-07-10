@@ -3,7 +3,7 @@
     const { host, comments, inReview, paths } = $props();
 </script>
 
-<a class="button" href={"/dash/" + host}>
+<a class="button" href={"/" + host}>
     <h2>{host}</h2>
     <div class="host-stats">
         <p>
