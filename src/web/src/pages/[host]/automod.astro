@@ -1,8 +1,7 @@
 ---
-import { rules } from "../../../../api/db/schema";
+import { AutoModBehavior, AutoModType } from "../../../../api/db/enums";
 import HostNav from "../../components/dashboard/HostNav.astro";
 import MainLayout from "../../layouts/MainLayout.astro";
-import lodash from "lodash";
 
 const { env } = Astro.locals.runtime;
 const { host } = Astro.params;
@@ -71,7 +70,7 @@ if (Astro.request.method === "POST") {
                         {rules.data?.map(r =>
                             <div class="card rule">
                                 <h3>{r.name}</h3>
-                                <p>{r.rule}</p> - <p>{r.type == 0 ? 'String-based' : 'Regex'}</p> - <p>{r.enabled}</p> - <p>{r.actionType == 0 ? 'Block comment' : 'Mark to review'}</p>
+                                <p>{r.rule}</p> - <p>{r.type == AutoModType.KeywordList ? 'Keyword List' : 'Regex'}</p> - <p>{r.enabled}</p> - <p>{r.behavior == AutoModBehavior.Block ? 'Block comment' : 'Hold for review'}</p>
                                 <button>Edit rule</button> <button class="warning">Delete rule</button>
                             </div>
                         )}

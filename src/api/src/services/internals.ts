@@ -7,6 +7,7 @@ import { eq, and } from "drizzle-orm";
 // @ts-ignore
 import { resolveTxt } from "node:dns/promises";
 import { genDefaultTemplate } from "../utils";
+import { PostBehavior } from "../../db/enums";
 
 const db = createDb(env);
 
@@ -321,7 +322,7 @@ export class InternalService extends WorkerEntrypoint {
 
       await db.insert(schema.hostSettings).values({
         hostUri: host,
-        moderationMode: 0
+        postBehavior: PostBehavior.AutoPublish
       });
       let hostSettings = await db.query.hostSettings.findFirst({
         where: (s, { eq }) => eq(s.hostUri, host)
@@ -338,7 +339,8 @@ export class InternalService extends WorkerEntrypoint {
       return { success: false, message: `Failed to add host: ${error.message}`, status: 500 };
     }
   }
-
+  
+  // TODO we probably don't need to return every single comment ever made on an user's host
   async getHosts(sessionToken: string): Promise<RpcResponse<{
     host: string;
     ownerId: number;
@@ -646,7 +648,7 @@ export class InternalService extends WorkerEntrypoint {
     if (!hostSettings) {
       await db.insert(schema.hostSettings).values({
         hostUri: host,
-        moderationMode: 0
+        postBehavior: PostBehavior.AutoPublish
       });
       hostSettings = await db.query.hostSettings.findFirst({
         where: (s, { eq }) => eq(s.hostUri, host)
@@ -657,7 +659,7 @@ export class InternalService extends WorkerEntrypoint {
       rule: rule,
       type: type,
       settingsId: hostSettings.id,
-      actionType: action,
+      behavior: action,
       enabled: true
     })
     return {

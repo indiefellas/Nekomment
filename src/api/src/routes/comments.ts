@@ -6,6 +6,7 @@ import { eq, and } from "drizzle-orm";
 import { chunk } from "lodash";
 import { cors } from "hono/cors";
 import { safeRegexMatch } from "../utils";
+import { AutoModBehavior, AutoModType, PostBehavior } from "../../db/enums";
 
 const app = new Hono<{
     Bindings: Cloudflare
@@ -14,7 +15,7 @@ const db = createDb(env);
 
 app.use('/:host/:path', cors({
     origin: (origin, c) => {
-        if (/^https:\/\/.*\.cmt\.nkko\.link/.test(origin)) return origin;
+        if (/^https:\/\/(.+\.)?cmt\.nkko\.link/.test(origin)) return origin;
         const { host } = c.req.param();
         if (host) {
             return `https://${host}`
@@ -23,7 +24,7 @@ app.use('/:host/:path', cors({
         }
     },
     allowMethods: (origin, c) => {
-        if (/^https:\/\/.*\.cmt\.nkko\.link/.test(origin)) return ['GET', 'POST']; // same-host (api.cmt.nkko.link and cmt.nkko.link)
+        if (/^https:\/\/(.+\.)?cmt\.nkko\.link/.test(origin)) return ['GET', 'POST']; // same-host (api.cmt.nkko.link and cmt.nkko.link)
         const { host } = c.req.param();
         if (host) {
             return ['GET', 'POST'];
@@ -125,41 +126,41 @@ app.post("/:host/:path", async (c) => {
     }
 
     const ifReviewRequired =
-        pathCfg?.moderationMode == 1 ||
-        hostCfg?.moderationMode == 1;
+        pathCfg?.postBehavior == PostBehavior.HoldForReview ||
+        hostCfg?.postBehavior == PostBehavior.HoldForReview;
 
     let reviewReason =
-        pathCfg?.moderationMode == 1 ? 'Required by path rules' :
-            hostCfg?.moderationMode == 1 ? 'Required by host rules' :
+        pathCfg?.postBehavior == PostBehavior.HoldForReview ? 'Required by path rules' :
+            hostCfg?.postBehavior == PostBehavior.HoldForReview ? 'Required by host rules' :
                 ''
 
-    let ifReview = false;
+    let needsReview = false;
 
     let rules = hostCfg?.autoModRules.filter(v => v.enabled)
     for (const v of rules || []) {
-        if (ifReview) return;
+        if (needsReview) return;
         let isMatched = false;
         switch (v.type) {
-            case 1: {
+            case AutoModType.Regex: {
                 let ruleSplit = v.rule.split('/');
                 let re = new RegExp(ruleSplit[1], ruleSplit[2] ?? '');
                 try {
                     if (await safeRegexMatch(name.toString(), re) || await safeRegexMatch(content.toString(), re)) {
-                        ifReview = true;
+                        needsReview = true;
                         isMatched = true;
                         reviewReason = `Flagged by AutoMod rule '${v.name}'`;
                     }
                 } catch {
-                    ifReview = true;
+                    needsReview = true;
                     reviewReason = `AutoMod rule '${v.name}' took too long to execute so we automatically marked this comment for review. `
                         + `Please check your regular expression of this rule for possible performance issues.`;
                 }
                 break;
             }
-            default: {
+            case AutoModType.KeywordList: default: {
                 let valueSplit = v.rule.split(',').map(v => v.trim());
                 if (valueSplit.filter(s => name.toString().includes(s) || content.toString().includes(s)).length > 0) {
-                    ifReview = true;
+                    needsReview = true;
                     isMatched = true;
                     reviewReason = `Flagged by AutoMod rule '${v.name}'`;
                 }
@@ -167,7 +168,7 @@ app.post("/:host/:path", async (c) => {
             }
         }
 
-        if (v.actionType === 0 && ifReview && isMatched) {
+        if (v.behavior === AutoModBehavior.Block && needsReview && isMatched) {
             return c.text('Comment blocked by AutoMod rule', 422)
         }
     }
@@ -217,10 +218,10 @@ app.post("/:host/:path", async (c) => {
             address: ip,
             pagePath: path,
             parentId: pId,
-            approved: !(ifReview || ifReviewRequired),
+            approved: !(needsReview || ifReviewRequired),
             moderatedBy: reviewReason
         })
-        if (!backPath) return c.text('done', (!ifReview || !ifReviewRequired) ? 202 : 200)
+        if (!backPath) return c.text('done', (!needsReview || !ifReviewRequired) ? 202 : 200)
         return c.redirect(backPath.toString(), 303);
     } else {
         return c.text('security error, please close the tab', 403)

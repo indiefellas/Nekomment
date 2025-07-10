@@ -1,6 +1,7 @@
 import { InferInsertModel, InferSelectModel, relations, sql } from "drizzle-orm";
 import { blob, int, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { genId } from "../src/utils";
+import { AutoModBehavior, AutoModType, PostBehavior } from "./enums";
 
 export const users = sqliteTable("users", {
 	id: int().primaryKey({ autoIncrement: true }),
@@ -75,7 +76,7 @@ export const paths = sqliteTable("paths", {
 	locked: integer({ mode: 'boolean' }).default(false),
 	// 0: publish comments
 	// 1: mark them as review by default
-	moderationMode: int().notNull().default(0)
+	postBehavior: int().notNull().$type<PostBehavior>().default(PostBehavior.AutoPublish)
 })
 
 export const pathsRelations = relations(paths, ({ one, many }) => ({
@@ -122,9 +123,7 @@ export const commentsRelations = relations(comments, ({ one, many }) => ({
 export const hostSettings = sqliteTable("host_settings", {
 	id: int().primaryKey({ autoIncrement: true }),
 	hostUri: text().notNull(),
-	// 0: publish comments
-	// 1: mark them as review by default
-	moderationMode: int().notNull().default(0)
+	postBehavior: int().notNull().$type<PostBehavior>().default(PostBehavior.AutoPublish)
 })
 
 export const hostSettingsRelations = relations(hostSettings, ({ one, many }) => ({
@@ -154,12 +153,8 @@ export const autoModRules = sqliteTable("automod_rules", {
 	id: int().primaryKey({ autoIncrement: true }),
 	name: text().notNull(),
 	rule: text().notNull(),
-	// 0: strings, delimited with a comma
-	// 1: regex
-	type: int().notNull().default(0),
-	// 0: block comment
-	// 1: mark comment to review
-	actionType: int().notNull().default(0),
+	type: int().notNull().$type<AutoModType>().default(AutoModType.KeywordList),
+	behavior: int().notNull().$type<AutoModBehavior>().default(AutoModBehavior.Block),
 	settingsId: int().notNull(),
 	enabled: integer({ mode: 'boolean' }).default(true)
 })
