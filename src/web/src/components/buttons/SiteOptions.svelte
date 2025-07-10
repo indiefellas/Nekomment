@@ -28,17 +28,19 @@
 
         .options {
             position: absolute;
+            top: 75%;
             right: 0;
             width: 150px;
-            background-color: var(--background-2);
+            background-color: var(--background-1);
             border-radius: 3px;
             padding: 10px;
-            margin-top: 10px;
             display: flex;
             flex-direction: column;
+            margin-top: 10px;
             gap: 10px;
             opacity: 0;
             pointer-events: none;
+            box-shadow: var(--shadow-2);
 
             a {
                 text-decoration: none;
@@ -47,6 +49,12 @@
             &:global(.visible) {
                 opacity: 1;
                 pointer-events: all;
+                top: 100%;
+            }
+
+            @media screen and (width <= 640px) {
+                margin-top: 20px;
+                top: calc(-200% - 20px);
             }
         }
     }
