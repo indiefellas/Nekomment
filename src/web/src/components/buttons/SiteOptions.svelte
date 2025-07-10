@@ -50,11 +50,11 @@
                 opacity: 1;
                 pointer-events: all;
                 top: 100%;
-            }
 
-            @media screen and (width <= 640px) {
-                margin-top: 20px;
-                top: calc(-200% - 20px);
+                @media screen and (width <= 640px) {
+                    margin-top: 20px;
+                    top: calc(-200% - 20px);
+                }
             }
         }
     }
