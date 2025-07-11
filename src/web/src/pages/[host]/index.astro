@@ -8,18 +8,18 @@ const { host } = Astro.params;
 
 const hostData = await env.NEKOMMENT_API.getHost(
     Astro.cookies.get("token")?.value ?? "",
-    host ?? ""
-)
+    host ?? "",
+);
 
-if (!hostData.success) return Astro.rewrite('/' + hostData.status || 0)
+if (!hostData.success) return Astro.rewrite("/" + hostData.status || 0);
 
 const comments = await env.NEKOMMENT_API.getComments(
     Astro.cookies.get("token")?.value ?? "",
-    host ?? ""
-)
+    host ?? "",
+);
 ---
 
-<MainLayout title={host + ' - Nekomment'}>
+<MainLayout title={host + " - Nekomment"}>
     <Fragment slot="nav-mobile">
         <HostNav host={hostData.data} />
     </Fragment>
@@ -34,29 +34,80 @@ const comments = await env.NEKOMMENT_API.getComments(
                 <h1>Comments</h1>
                 <div class="comments-container">
                     <div class="comments-list">
-                        {comments.data?.reverse().map(c => <div class="card comment">
-                            <div class="heading">
-                                <h2>{c.author}</h2>
-                                <p>{c.createdAt?.toDateString()}</p>
-                            </div>
-                            <p>{c.content}</p>
-                            {c.replies.length > 0 && <div class="replies">
-                                {c.replies.reverse().map(r => <blockquote>
+                        {
+                            comments.data?.reverse().map((c) => (
+                                <div class="card comment">
                                     <div class="heading">
-                                        <h3>{r.author}</h3>
-                                        <p>{r.createdAt?.toDateString()}</p>
+                                        <h2>{c.author}</h2>
+                                        <p>{c.createdAt?.toDateString()}</p>
                                     </div>
-                                    <p>{r.content}</p>
-                                </blockquote>)}    
-                            </div>}
-                        </div>)}
+                                    <p>{c.content}</p>
+                                    <div class="heading review-container">
+                                        <div>
+                                            {!c.approved && (
+                                                <div class="in-review">
+                                                    In review: {c.moderatedBy}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div>
+                                            {!c.approved ? 
+                                                <button>Approve</button> :
+                                                <button>Reply</button>
+                                            }
+                                            
+                                            <button class="warning">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {c.replies.length > 0 && (
+                                        <div class="replies">
+                                            {c.replies.reverse().map((r) => (
+                                                <blockquote>
+                                                    <div class="heading">
+                                                        <h3>{r.author}</h3>
+                                                        <p>
+                                                            {r.createdAt?.toDateString()}
+                                                        </p>
+                                                    </div>
+                                                    <p>{r.content}</p>
+                                                    <div class="heading review-container">
+                                                        <div>
+                                                            {!r.approved && (
+                                                                <div class="in-review">
+                                                                    In review:{" "}
+                                                                    {
+                                                                        r.moderatedBy
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            {!r.approved && (
+                                                                <button>
+                                                                    Approve
+                                                                </button>
+                                                            )}
+                                                            <button class="warning">
+                                                                Delete
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </blockquote>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            ))
+                        }
                         {comments.data?.length === 0 && <p>No comments yet!</p>}
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <style scoped>
         .dashboard-container {
             margin-inline: var(--main-margin);
@@ -65,7 +116,7 @@ const comments = await env.NEKOMMENT_API.getComments(
             grid-template-columns: 300px 1fr;
             gap: 25px;
         }
-    
+
         .left {
             container: left;
         }
@@ -74,40 +125,55 @@ const comments = await env.NEKOMMENT_API.getComments(
             position: sticky;
             top: 80px;
         }
-    
+
         .comments-container {
             margin-top: 12px;
-    
+
             .heading {
                 display: flex;
                 justify-content: space-between;
                 align-items: end;
                 width: 100%;
             }
-    
+
             .comments-list {
                 margin-top: 12px;
                 display: grid;
                 gap: 12px;
-    
+
                 .comment {
                     text-decoration: none;
                     padding: 10px;
                     flex-direction: column;
                     gap: 0;
-    
+
                     .heading {
                         align-items: start;
                     }
-    
+
                     blockquote {
                         flex-direction: column;
                         margin-left: 24px;
                     }
+
+                    .review-container {
+                        display: flex;
+                        align-items: end;
+                        height: 100%;
+                        margin-top: 10px;
+                    }
+
+                    .in-review {
+                        background: var(--color-red);
+                        color: var(--background-red);
+                        padding-inline: 0.4ch;
+                        border-radius: 5px;
+                        width: fit-content;
+                    }
                 }
             }
         }
-    
+
         @media screen and (width <= 900px) {
             .dashboard-container {
                 grid-template-columns: 1fr;
@@ -116,7 +182,7 @@ const comments = await env.NEKOMMENT_API.getComments(
                     display: none;
                 }
             }
-    
+
             .comments-container {
                 .comments-list {
                     grid-template-columns: repeat(1, 1fr);
