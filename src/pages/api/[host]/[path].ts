@@ -56,6 +56,9 @@ export const POST: APIRoute = async ({ params, request, locals, redirect }) => {
     if (!name || !content || !host || !path) {
         return text('name and content are required', 400)
     }
+    if (name.length > 64 || (website && website.length > 64) || content.length > 1024) {
+        return text('comment is over the enforced length', 413)
+    }
     const ip = request.headers.get('CF-Connecting-IP') || '0.0.0.0';
     let b = request.headers.get('Referer') || `https://${host}${path}`;
     if (backPath) {
