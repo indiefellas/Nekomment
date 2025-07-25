@@ -61,6 +61,10 @@ const comments = await db.getComments(
                                             <button class="warning">
                                                 Delete
                                             </button>
+
+                                            <button class="warning">
+                                                Block user
+                                            </button>
                                         </div>
                                     </div>
                                     {c.replies.length > 0 && (
@@ -93,6 +97,9 @@ const comments = await db.getComments(
                                                             )}
                                                             <button class="warning">
                                                                 Delete
+                                                            </button>
+                                                            <button class="warning">
+                                                                Block user
                                                             </button>
                                                         </div>
                                                     </div>

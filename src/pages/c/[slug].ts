@@ -110,10 +110,10 @@ export const GET: APIRoute = async ({ params, request, locals, url }) => {
             </noscript>
             <form class="nkm-editor" method="POST" action="/api/${value[0].host}/${encodeURIComponent(value[0].path)}">
                 <div class="nkm-topInput">
-                    <input type="text" name="name" placeholder="Display name" aria-label="Display name" required />
-                    <input type="url" name="website" placeholder="Website (optional)" aria-label="Website (optional)" />
+                    <input type="text" maxlength="64" name="name" placeholder="Display name" aria-label="Display name" required />
+                    <input type="url" maxlength="64" name="website" placeholder="Website (optional)" aria-label="Website (optional)" />
                 </div>
-                <textarea name="content" placeholder="Your comment..." aria-label="Your comment" required></textarea>
+                <textarea name="content" maxlength="1024" placeholder="Your comment..." aria-label="Your comment" required></textarea>
                 
                 <input type="hidden" id="parentid" name="parentId" value="">
                 <input type="hidden" name="backPath" value="${value[0].backpath}">
