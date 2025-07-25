@@ -1,0 +1,14 @@
+---
+import Landing from "../components/about/Landing.astro";
+import MainLayout from "../layouts/MainLayout.astro";
+import { Database } from "../lib/databaseInterface";
+
+const { env } = Astro.locals.runtime;
+const db = new Database(env);
+let user = await db.checkUser(Astro.cookies.get('token')?.value ?? '')
+
+---
+
+<MainLayout {user}>
+	<Landing {user} />
+</MainLayout>

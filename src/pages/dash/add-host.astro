@@ -1,0 +1,48 @@
+---
+import AddDomainForm from "../../components/forms/AddDomainForm.svelte";
+import MainLayout from "../../layouts/MainLayout.astro";
+export const prerender = false;
+const { env } = Astro.locals.runtime;
+
+let token = await db.initializeAddHostToken(
+    Astro.cookies.get("token")?.value || "",
+).data;
+
+let err = "";
+
+let args = {}
+if (err) {
+}
+
+if (Astro.request.method === "POST") {
+    try {
+        const data = await Astro.request.formData();
+        const domain = data.get("domain")?.toString() || "";
+        const method = data.get("method")?.toString() || "";
+        let session = await db.addHost(
+            Astro.cookies.get("token")?.value || "",
+            domain,
+            method,
+        );
+        Astro.cookies.delete("host-token");
+        if (session.success) {
+            return Astro.redirect("/dash/" + domain, 302);
+        } else {
+            err = "An error occurred. Please try again. " + session.message;
+        }
+
+        args = {
+            step: 2,
+            domain,
+            method,
+            err,
+        }
+    } catch {
+        err = "An error occurred. Please try again.";
+    }
+}
+---
+
+<MainLayout>
+    <AddDomainForm verificationToken={token} {...args} client:load />
+</MainLayout>

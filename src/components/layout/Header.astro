@@ -1,0 +1,13 @@
+---
+import { Database } from "../../lib/databaseInterface";
+import { sanitizeUser } from "../../lib/sanitize";
+import HeaderSvelte from "./Header.svelte";
+
+export const prerender = false;
+
+const { env } = Astro.locals.runtime;
+const db = new Database(env);
+let user = Astro.props.user ?? await db.checkUser(Astro.cookies.get('token')?.value ?? '');
+---
+
+<HeaderSvelte user={user.data ? sanitizeUser(user.data) : undefined} client:load><slot /></HeaderSvelte>

@@ -1,0 +1,39 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import LoginForm from "../components/forms/LoginForm.svelte";
+import CommentBg from "../components/about/CommentBg.astro";
+import { Database } from "../lib/databaseInterface";
+
+export const prerender = false; 
+const { env } = Astro.locals.runtime;
+const db = new Database(env);
+
+let err = '';
+if (Astro.request.method === 'POST') {
+    try {
+        const data = await Astro.request.formData();
+        const username = data.get('username')?.toString() || '';
+        const password = data.get('password')?.toString() || '';
+
+        let session = await db.loginUser(username, password);
+
+        if (session.success && session.data) {
+            Astro.cookies.set('token', session.data.token, {
+                httpOnly: true,
+                sameSite: 'lax'
+            });
+            return Astro.redirect(Astro.url.searchParams.get('redirect') || '/', 302);
+        } else {
+            err = 'Invalid username or password';
+        }
+    }
+    catch {
+        Astro.rewrite('/500')
+    }
+}
+---
+
+<MainLayout>
+    <CommentBg noGradient={true} />
+    <LoginForm {err} client:load />
+</MainLayout>
