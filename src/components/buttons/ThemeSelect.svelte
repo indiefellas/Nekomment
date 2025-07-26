@@ -18,11 +18,11 @@
     }
     onMount(() => {
         const prefersLight = window.matchMedia('(prefers-color-scheme: light)');
-        if (localStorage.getItem('nkm:theme').includes('light') || (prefersLight.matches && !localStorage.getItem('nkm:theme').includes('user'))) {
+        if (localStorage.getItem('nkm:theme')?.includes('light') || (prefersLight.matches && !localStorage.getItem('nkm:theme')?.includes('user'))) {
             isLight = true;
         }
         prefersLight.addEventListener('change', (ev) => {
-            if (localStorage.getItem('nkm:theme').includes('user')) return;
+            if (localStorage.getItem('nkm:theme')?.includes('user')) return;
             if (ev.matches) {
                 isLight = true;
             } else {
