@@ -122,6 +122,44 @@ export class Database {
         }
     }
 
+    async getPageConfig(sessionToken: string, page: string, host: string): Promise<Response<schema.Page>> {
+        if (!sessionToken) {
+            return {
+                success: false,
+                message: 'User not logged in or session expired',
+                status: 401
+            }
+        }
+        let userSession = await this.#db.select()
+            .from(schema.sessions)
+            .leftJoin(schema.users, eq(schema.users.id, schema.sessions.userId))
+            .where(eq(schema.sessions.sessionToken, sessionToken));
+        if (userSession.length < 1 || !userSession[0].users) {
+            return {
+                success: false,
+                message: 'User not logged in or session expired',
+                status: 401
+            }
+        }
+        let pageCfg = await this.#db.query.pages.findFirst({
+            where: (p, { eq, and }) => and(
+                eq(p.name, page),
+                eq(p.hostName, host)
+            )
+        })
+        if (!pageCfg) {
+            return {
+                success: false,
+                message: 'Page not found',
+                status: 404
+            }
+        }
+        return {
+            success: true,
+            data: pageCfg
+        }
+    }
+
     async createUser(name: string, password: string, email: string): Promise<Response> {
         if (!name || !password || !email) {
             return { success: false, message: 'name, password, and email are all required', status: 400 };
@@ -417,16 +455,6 @@ export class Database {
                 )
             );
         if (hosts.length < 1) {
-            let hosts = await this.#db.select()
-                .from(schema.hosts)
-                .where(eq(schema.hosts.host, host));
-            if (hosts.length > 0) {
-                return {
-                    success: false,
-                    message: 'Account does not have access on this host',
-                    status: 403
-                }
-            }
             return {
                 success: false,
                 message: 'Host not found',

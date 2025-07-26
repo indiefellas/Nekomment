@@ -1,0 +1,239 @@
+---
+import HostNav from "../../../../components/dashboard/HostNav.astro";
+import MainLayout from "../../../../layouts/MainLayout.astro";
+import { Database } from "../../../../lib/databaseInterface";
+
+const { env } = Astro.locals.runtime;
+const { host, page } = Astro.params;
+const db = new Database(env);
+
+const hostData = await db.getHost(
+    Astro.cookies.get("token")?.value ?? "",
+    host ?? "",
+);
+
+if (!hostData.success) return Astro.rewrite("/" + hostData.status || 0);
+
+const pageData = await db.getPageConfig(
+    Astro.cookies.get("token")?.value ?? "",
+    page ?? "",
+    host ?? ""
+)
+
+if (!pageData.success) return Astro.rewrite("/" + hostData.status || 0);
+---
+
+<MainLayout title={host + " - Nekomment"}>
+    <Fragment slot="nav-mobile">
+        <HostNav host={hostData.data} />
+    </Fragment>
+
+    <div class="fill-screen">
+        <div class="dashboard-container">
+            <div class="left">
+                <div class="left-nav">
+                    <HostNav host={hostData.data} />
+                </div>
+            </div>
+            <div class="right">
+                <h1>Page '{page}'</h1>
+
+                <div class="settings">
+                    <section class="setting">
+                        <h2>Styling</h2>
+                        <p>Current theme: <b>Default</b></p>
+                        <div class="controls">
+                            <a
+                                class="button"
+                                href={Astro.url.pathname + "/edit"}
+                                >Edit style</a
+                            >
+                            <a
+                                class="button"
+                                href={Astro.url.pathname + "/explore"}
+                                >Explore styles</a
+                            >
+                        </div>
+                    </section>
+                    <section class="setting">
+                        <h2>Embedding</h2>
+                        <p>
+                            Embedding allows you to put your Page on your site
+                            as an iframe.
+                        </p>
+                        <form>
+                            <div class="controls">
+                                <h3>Embed Behavior</h3>
+                                <div role="group">
+                                    <div>
+                                        <input
+                                            type="radio"
+                                            name="behavior"
+                                            value="disabled"
+                                            id="b-disabled"
+                                        />
+                                        <label for="b-disabled"
+                                            >Disable embedding</label
+                                        >
+                                    </div>
+
+                                    <div>
+                                        <input
+                                            type="radio"
+                                            name="behavior"
+                                            value="enable-host"
+                                            id="b-enable-host"
+                                            checked
+                                        />
+                                        <label for="b-enable-host"
+                                            >Allow embedding on host {
+                                                host
+                                            }</label
+                                        >
+                                    </div>
+
+                                    <div>
+                                        <input
+                                            type="radio"
+                                            name="behavior"
+                                            value="enable"
+                                            id="b-enable"
+                                        />
+                                        <label for="b-enable"
+                                            >Allow embedding on all sites
+                                            <i
+                                                >(not recommended - be careful!)</i
+                                            ></label
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="controls">
+                                <input
+                                    type="checkbox"
+                                    name="enable-turnstile"
+                                    id="enable-turnstile"
+                                    checked
+                                />
+                                <label for="enable-turnstile"
+                                    >Enable Cloudflare Turnstile</label
+                                >
+                                <p class="info">
+                                    Cloudflare Turnstile is a CAPTCHA service
+                                    that is privacy-friendly and won't make your
+                                    users that wants to comment to click where
+                                    is the fire hydrants or traffic lights.
+                                    <a href="https://www.cloudflare.com/application-services/products/turnstile/">Learn more</a>
+                                </p>
+                            </div>
+                            <div class="controls">
+                                <input
+                                    type="checkbox"
+                                    name="use-referer"
+                                    id="use-referer"
+                                    checked
+                                />
+                                <label for="use-referer"
+                                    >Use Referer header for paths</label
+                                >
+                                <p class="info">
+                                    This will allow Nekomment to determine where is the
+                                    user by checking the Referer header. Please note that
+                                    you need to have a lax referrerpolicy attribute to make
+                                    this work.<br/>
+                                    Disabling this will make the Page a single-page comment
+                                    site. Enable this if you want the Page comments to be the
+                                    same for all pages you want to embed it on.
+                                </p>
+                            </div>
+                            <div>
+                                <button type="submit">Save</button>
+                            </div>
+                        </form>
+                    </section>
+                    <section class="setting">
+                        <h2>Danger Zone</h2>
+                        <p>Things that might make or break your Page, be careful!</p>
+                            <div class="controls">
+                                <h3><label for="path">Change default path</label></h3>
+                                <form class="sideways">
+                                    <input type="text" name="change-path" id="path" value={pageData.data?.pagePath} />
+                                    <button type="submit">Save</button>
+                                </form>
+                            </div>
+                            <div class="controls">
+                                <h3>Delete this page</h3>
+                                <button class="warning">Delete page '{page}'</button>
+                            </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style scoped>
+        .dashboard-container {
+            margin-inline: var(--main-margin);
+            margin-top: 12px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 25px;
+        }
+
+        .left {
+            container: left;
+        }
+
+        .left-nav {
+            position: sticky;
+            top: 80px;
+        }
+
+        .settings {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+
+            .controls {
+                margin-top: 6px;
+
+                .info {
+                    font-size: 0.85em;
+                    margin-left: 26px;
+                    max-width: 75%;
+                    color: var(--color-1);
+                }
+            }
+        }
+
+        h2,
+        h3 {
+            margin-block: 12px 6px;
+        }
+
+        div[role="group"] {
+            display: flex;
+            flex-direction: column;
+            margin-top: 6px;
+        }
+
+        form.sideways {
+            display: flex;
+            flex-direction: row;
+
+            button {
+                width: fit-content;
+            }
+        }
+
+        @media screen and (width <= 900px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+
+                .left {
+                    display: none;
+                }
+            }
+        }
+    </style>
+</MainLayout>

@@ -73,3 +73,19 @@ export function genDefaultTemplate(theme: string) {
 </style>`
     }
 }
+
+export function convertToTemplate(input: string): string {
+    return input
+        .replaceAll('<NKM_TRIPLE_CURL>', '{{{')
+        .replaceAll('</NKM_TRIPLE_CURL>', '}}}')
+        .replaceAll('<NKM_DOUBLE_CURL>', '{{')
+        .replaceAll('</NKM_DOUBLE_CURL>', '}}')
+}
+
+export function convertToTags(input: string): string {
+    return input
+        .replaceAll('{{{', '<NKM_TRIPLE_CURL>')
+        .replaceAll('}}}', '</NKM_TRIPLE_CURL>')
+        .replaceAll('{{', '<NKM_DOUBLE_CURL>')
+        .replaceAll('}}', '</NKM_DOUBLE_CURL>')
+}
