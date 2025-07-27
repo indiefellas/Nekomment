@@ -10,6 +10,12 @@
     export let err = "";
 
     function setDomain() {
+        try {
+            new URL(domain)
+        } catch {
+            alert('Put a valid domain name, please!');
+            return;
+        }
         if (step == 0) {
             step++;
         }

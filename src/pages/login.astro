@@ -8,14 +8,17 @@ export const prerender = false;
 const { env } = Astro.locals.runtime;
 const db = new Database(env);
 
+if (Astro.cookies.get("token")?.value) 
+    return Astro.redirect(Astro.url.searchParams.get('redirect') || '/');
+
 let err = '';
 if (Astro.request.method === 'POST') {
     try {
-        const data = await Astro.request.formData();
+        const data = await Astro.request.clone().formData();
         const username = data.get('username')?.toString() || '';
         const password = data.get('password')?.toString() || '';
 
-        let session = await db.loginUser(username, password);
+        let session = await db.loginUser(username, password, Astro.request.clone().headers.get('User-Agent') ?? '', Astro.clientAddress);
 
         if (session.success && session.data) {
             Astro.cookies.set('token', session.data.token, {
