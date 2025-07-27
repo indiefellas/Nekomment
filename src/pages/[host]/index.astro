@@ -19,6 +19,7 @@ const comments = await db.getComments(
     Astro.cookies.get("token")?.value ?? "",
     host ?? "",
 );
+
 ---
 
 <MainLayout title={host + " - Nekomment"}>
@@ -33,7 +34,7 @@ const comments = await db.getComments(
                 </div>
             </div>
             <div class="right">
-                <h1>Comments</h1>
+                <h1 class="sep">Comments</h1>
                 <div class="comments-container">
                     <div class="comments-list">
                         {

@@ -191,6 +191,13 @@ h1:first-of-type {
     margin-top: 0;
 }
 
+.sep {
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    border: none;
+    border-bottom: 1px solid var(--background-3);
+}
+
 .center-form {
     background: var(--background-1);
     border-radius: 10px;
