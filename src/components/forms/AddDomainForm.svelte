@@ -10,9 +10,7 @@
     export let err = "";
 
     function setDomain() {
-        try {
-            new URL(domain)
-        } catch {
+        if (domain.length < 1 || !domain.includes('.')) {
             alert('Put a valid domain name, please!');
             return;
         }
