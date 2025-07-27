@@ -64,9 +64,9 @@
                 </nav>
                 <nav>
                     <slot name="nav">
-                        <li><a href="/about">About</a></li>
-                        <li><a href="/faqs">FAQs</a></li>
-                        <li><a href="/docs">API Docs</a></li>
+                        <a href="/about">About</a>
+                        <a href="/faqs">FAQs</a>
+                        <a href="/docs">API Docs</a>
                     </slot>
                 </nav>
             </div>
@@ -148,14 +148,7 @@
             z-index: 1;
         }
 
-        .navs {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
-
-        a:not(.button) {
-            padding: 0.35em 0.6ch;
+        :global(a:not(.button)) {
             text-decoration: none;
         }
 
@@ -166,10 +159,14 @@
             align-self: center;
         }
 
-        nav {
+        :global(nav) {
             display: flex;
             flex-direction: row;
             list-style: none;
+
+            :global(a:not(.button)) {
+                padding: 0.35em 0.6ch;
+            }
         }
 
         .mobile-nav {
@@ -244,18 +241,21 @@
             padding: 20px;
             overflow-y: auto;
 
-            nav {
-                flex-direction: column;
+            .navs {
+                width: 100%;
             }
-            nav li {
-                font-size: 1.75em;
-                line-height: 1.3;
-                margin-block: 0.125em;
 
-                a:not(.button) {
+            :global(nav) {
+                flex-direction: column;
+
+                :global(a:not(.button)) {
+                    font-size: 1.75em;
+                    line-height: 1.3;
+                    margin-block: 0.125em;
                     padding: 0;
                 }
             }
+
             .user-info {
                 flex-direction: column;
                 text-align: end;

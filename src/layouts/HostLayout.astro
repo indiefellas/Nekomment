@@ -1,0 +1,68 @@
+---
+import Header from "../components/layout/Header.astro";
+import Footer from "../components/layout/Footer.astro";
+import "../styles/main.css";
+import MainLayout from "./MainLayout.astro";
+import HostNav from "../components/dashboard/HostNav.astro";
+
+const { hostData, ...layoutProps } = Astro.props;
+---
+
+<MainLayout {...layoutProps}>
+    <Fragment slot="nav-mobile">
+        <HostNav host={hostData.data} />
+    </Fragment>
+    <div class="fill-screen">
+        <div class="dashboard-container">
+            <div class="left">
+                <div class="left-nav">
+                    <HostNav host={hostData.data} />
+                </div>
+            </div>
+            <div class="right">
+                <slot />
+            </div>
+        </div>
+    </div>
+</MainLayout>
+
+<style scoped>
+    .dashboard-container {
+        margin-inline: var(--main-margin);
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: 18em 1fr;
+        gap: 25px;
+    }
+
+    .left {
+        container: left;
+    }
+
+    .left-nav {
+        position: sticky;
+        top: 80px;
+    }
+
+    @media screen and (width <= 900px) {
+        .dashboard-container {
+            grid-template-columns: 14em 1fr;
+        }
+    }
+
+    @media screen and (width <= 640px) {
+        .dashboard-container {
+            grid-template-columns: 1fr;
+
+            .left {
+                display: none;
+            }
+        }
+
+        .comments-container {
+            .comments-list {
+                grid-template-columns: repeat(1, 1fr);
+            }
+        }
+    }
+</style>
