@@ -23,7 +23,7 @@ const pages = pagesRes.data;
 
 <div>
     {
-        pages && pages.length >= 0 &&
+        pages?.length !== 0 &&
         <Fragment>
             <h4 class="host-name">Linked Pages</h4>
             <nav>

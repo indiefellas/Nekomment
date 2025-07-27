@@ -13,7 +13,7 @@ const hostData = await db.getHost(
     host ?? "",
 );
 
-if (!hostData.success) return Astro.rewrite("/" + hostData.status || 0);
+if (!hostData.success) return new Response('404 Not Found', { status: 404 });
 
 const comments = await db.getComments(
     Astro.cookies.get("token")?.value ?? "",

@@ -68,11 +68,11 @@ function genBoilerplate(output: string, name: string, id: string, turnstileKey: 
 `
 }
 
-export const GET: APIRoute = async ({ params, request, locals, url }) => {
+export const GET: APIRoute = async ({ params, request, locals, url, rewrite }) => {
     try {
         let id = genId(24);
 
-    if (!params.slug) return new Response('Page not found', { status: 404 });
+    if (!params.slug) return rewrite('/404');
     const path = request.headers.get('Referer') || '';
     const pathUrl = path ? new URL(path) : new URL('https://cmt.nkko.link/');
     const pageNum = parseInt(url.searchParams.get('page') || "1", 10);
@@ -81,7 +81,7 @@ export const GET: APIRoute = async ({ params, request, locals, url }) => {
     const pageRes = await db.getPage(params.slug, pathUrl.pathname);
     const page = pageRes.data;
     if (!page || !pageRes.success) {
-        return new Response(pageRes.message, { status: 404 });
+        return rewrite('/404');
     }
     
     const cache = await locals.runtime.caches.open(`nkm-cache:pages`);

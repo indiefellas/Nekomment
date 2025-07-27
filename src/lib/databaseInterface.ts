@@ -495,6 +495,59 @@ export class Database {
         }
     }
 
+    async deletePage(sessionToken: string, host: string, name: string): Promise<Response> {
+        if (!sessionToken) {
+            return {
+                success: false,
+                message: 'User not logged in or session expired',
+                status: 401
+            }
+        }
+        let userSession = await this.#db.select()
+            .from(schema.sessions)
+            .leftJoin(schema.users, eq(schema.users.id, schema.sessions.userId))
+            .where(eq(schema.sessions.sessionToken, sessionToken));
+        if (userSession.length < 1 || !userSession[0].users) {
+            return {
+                success: false,
+                message: 'User not logged in or session expired',
+                status: 401
+            }
+        }
+        let hostName = await this.#db.query.hosts.findFirst({
+            where: (sHost, { eq }) => eq(sHost.host, host)
+        })
+        if (!hostName) {
+            return {
+                success: false,
+                message: 'host not found',
+                status: 404
+            }
+        }
+        let pageCfg = await this.#db.query.pages.findFirst({
+            where: (p, { eq, and }) => and(
+                eq(p.name, name),
+                eq(p.hostName, host)
+            )
+        })
+        if (!pageCfg) {
+            return {
+                success: false,
+                message: 'Page not found',
+                status: 404
+            }
+        }
+        await this.#db.delete(schema.pages)
+            .where(and(
+                eq(schema.pages.name, name),
+                eq(schema.pages.hostName, host)
+            ))
+        return {
+            success: true,
+            message: 'Successfully deleted page ' + name 
+        }
+    }
+
     async createPage(sessionToken: string, name: string, host: string, theme: string, pagePath?: string): Promise<Response> {
         if (!sessionToken) {
             return {
