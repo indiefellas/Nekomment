@@ -4,7 +4,7 @@
 </script>
 
 <a class="button" href={"/" + host}>
-    <h2>{host}</h2>
+    <h3>{host}</h3>
     <div class="host-stats">
         <p>
             <Icon icon="material-symbols:comment" inline />
@@ -20,6 +20,9 @@
 </a>
 
 <style scoped>
+    h3 {
+        font-size: 1.5em;
+    }
     .host-stats {
         display: flex;
         justify-content: end;
@@ -30,6 +33,11 @@
             color: var(--background-red);
             padding-inline: 0.4ch;
             border-radius: 5px;
+        }
+    }
+    @media screen and (width <= 640px) {
+        h3 {
+            font-size: 1.3em;
         }
     }
 </style>

@@ -67,9 +67,9 @@ if (!pages.success)
             </div>
         </div>
         <div class="right">
-            <h1 class="sep">News</h1>
+            <h2>News</h2>
             <div class="card">
-                <h2>Work in progress!</h2>
+                <h3>Work in progress!</h3>
                 <p>Please note that Nekomment is still work in progress!</p>
             </div>
         </div>
@@ -111,7 +111,7 @@ if (!pages.success)
 
             a {
                 text-decoration: none;
-                padding: 10px;
+                padding: 20px;
             }
         }
 
@@ -125,12 +125,23 @@ if (!pages.success)
     .right {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 10px;
     }
 
     @media screen and (width <= 900px) {
         .dashboard-container {
             grid-template-columns: 1fr;
+        }
+
+        .left {
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--background-3);
+        }
+    }
+
+    @media screen and (width <= 640px) {
+        h2 {
+            font-size: 1.8em;
         }
     }
 </style>
