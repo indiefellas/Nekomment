@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { eq, and } from "drizzle-orm";
 // @ts-ignore
 import { resolveTxt } from "node:dns/promises";
-import { genDefaultTemplate } from "./generators";
+import { genDefaultTemplate, genId } from "./generators";
 import { PostBehavior } from "../db/enums";
 
 interface Response<T = any> {
@@ -221,7 +221,7 @@ export class Database {
         return { success: true, message: `delete user (RPC)` };
     }
 
-    async loginUser(name: string, password: string): Promise<Response<{ token: string }>> {
+    async loginUser(name: string, password: string, userAgent: string, ipAddress: string): Promise<Response<{ token: string }>> {
         if (!name || !password) {
             return { success: false, message: 'name and password are all required', status: 400 };
         }
@@ -233,13 +233,13 @@ export class Database {
                 return { success: false, message: 'incorrect username or password', status: 401 };
             }
 
-            const token = btoa(crypto.randomUUID() + Date.now());
+            const token = btoa(genId(64) + Date.now());
 
             await this.#db.insert(schema.sessions).values({
                 sessionToken: token,
                 userId: user[0].id,
-                userAgent: 'RPC_CALL',
-                address: 'RPC_CALL_IP'
+                userAgent: userAgent,
+                address: ipAddress
             });
             return { success: true, message: 'logged in', data: { token } };
         } catch (error: any) {

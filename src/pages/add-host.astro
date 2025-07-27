@@ -1,20 +1,20 @@
 ---
-import AddDomainForm from "../../components/forms/AddDomainForm.svelte";
-import MainLayout from "../../layouts/MainLayout.astro";
-import { Database } from "../../lib/databaseInterface";
+import AddDomainForm from "../components/forms/AddDomainForm.svelte";
+import MainLayout from "../layouts/MainLayout.astro";
+import { Database } from "../lib/databaseInterface";
 export const prerender = false;
 const { env } = Astro.locals.runtime;
 
+if (!Astro.cookies.get("token")?.value) return Astro.redirect('/login?redirect=/add-host');
+
 const db = new Database(env);
-let token = await db.initializeAddHostToken(
+let token = (await db.initializeAddHostToken(
     Astro.cookies.get("token")?.value || "",
-).data;
+)).data;
 
 let err = "";
 
 let args = {}
-if (err) {
-}
 
 if (Astro.request.method === "POST") {
     try {
