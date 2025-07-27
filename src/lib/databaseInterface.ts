@@ -160,6 +160,34 @@ export class Database {
         }
     }
 
+    async getPagesConfig(sessionToken: string, host: string): Promise<Response<Array<schema.Page>>> {
+        if (!sessionToken) {
+            return {
+                success: false,
+                message: 'User not logged in or session expired',
+                status: 401
+            }
+        }
+        let userSession = await this.#db.select()
+            .from(schema.sessions)
+            .leftJoin(schema.users, eq(schema.users.id, schema.sessions.userId))
+            .where(eq(schema.sessions.sessionToken, sessionToken));
+        if (userSession.length < 1 || !userSession[0].users) {
+            return {
+                success: false,
+                message: 'User not logged in or session expired',
+                status: 401
+            }
+        }
+        let pageCfg = await this.#db.query.pages.findMany({
+            where: (p, { eq }) => eq(p.hostName, host)
+        })
+        return {
+            success: true,
+            data: pageCfg
+        }
+    }
+
     async createUser(name: string, password: string, email: string): Promise<Response> {
         if (!name || !password || !email) {
             return { success: false, message: 'name, password, and email are all required', status: 400 };
@@ -464,6 +492,59 @@ export class Database {
         return {
             success: true,
             data: hosts[0]
+        }
+    }
+
+    async deletePage(sessionToken: string, host: string, name: string): Promise<Response> {
+        if (!sessionToken) {
+            return {
+                success: false,
+                message: 'User not logged in or session expired',
+                status: 401
+            }
+        }
+        let userSession = await this.#db.select()
+            .from(schema.sessions)
+            .leftJoin(schema.users, eq(schema.users.id, schema.sessions.userId))
+            .where(eq(schema.sessions.sessionToken, sessionToken));
+        if (userSession.length < 1 || !userSession[0].users) {
+            return {
+                success: false,
+                message: 'User not logged in or session expired',
+                status: 401
+            }
+        }
+        let hostName = await this.#db.query.hosts.findFirst({
+            where: (sHost, { eq }) => eq(sHost.host, host)
+        })
+        if (!hostName) {
+            return {
+                success: false,
+                message: 'host not found',
+                status: 404
+            }
+        }
+        let pageCfg = await this.#db.query.pages.findFirst({
+            where: (p, { eq, and }) => and(
+                eq(p.name, name),
+                eq(p.hostName, host)
+            )
+        })
+        if (!pageCfg) {
+            return {
+                success: false,
+                message: 'Page not found',
+                status: 404
+            }
+        }
+        await this.#db.delete(schema.pages)
+            .where(and(
+                eq(schema.pages.name, name),
+                eq(schema.pages.hostName, host)
+            ))
+        return {
+            success: true,
+            message: 'Successfully deleted page ' + name 
         }
     }
 

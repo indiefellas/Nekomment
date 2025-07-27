@@ -1,6 +1,7 @@
 ---
 import HostNav from "../../../../components/dashboard/HostNav.astro";
 import MainLayout from "../../../../layouts/MainLayout.astro";
+import FormModal from "../../../../components/ui/FormModal.svelte";
 import { Database } from "../../../../lib/databaseInterface";
 
 const { env } = Astro.locals.runtime;
@@ -21,12 +22,68 @@ const pageData = await db.getPageConfig(
 )
 
 if (!pageData.success) return Astro.rewrite("/" + hostData.status || 0);
+
+if (Astro.request.method === "POST") {
+    try {
+        const data = await Astro.request.formData();
+        const del = data.get("delete")?.toString() || "";
+        if (del == 'true') {
+            await db.deletePage(
+                Astro.cookies.get("token")?.value ?? "",
+                host ?? "",
+                page ?? "",
+            )
+        }
+        return Astro.redirect('/' + host);
+    } catch {
+
+    }
+}
 ---
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let el = document.querySelector('#delete-button') as HTMLButtonElement;
+        let form = document.querySelector('#delete-modal') as HTMLFormElement;
+        console.log(el, form)
+
+        el.addEventListener('click', ()=>{
+            let ev = new Event('delete-button-clicked', {
+                bubbles: true,
+                composed: true,
+            })
+            form.dispatchEvent(ev);
+        })
+
+        form.querySelector('#cancel')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            let ev = new Event('delete-button-clicked', {
+                bubbles: true,
+                composed: true,
+            })
+            form.dispatchEvent(ev);
+        })
+    })
+</script>
 
 <MainLayout title={host + " - Nekomment"}>
     <Fragment slot="nav-mobile">
         <HostNav host={hostData.data} />
     </Fragment>
+
+    <FormModal client:load title="Do you wanna delete this Page?" event="delete-button-clicked" id="delete-modal">
+        <p>
+            This will delete your page '{page}'. Are you sure you want to continue?
+        </p>
+        <p>
+            <b>This can't be undone!</b>
+        </p>
+        <Fragment slot="buttons">
+            <input type="hidden" name="delete" value="true" />
+            <button id="cancel">Cancel</button>
+            <button class="warning">Delete</button>
+        </Fragment>
+    </FormModal>
 
     <div class="fill-screen">
         <div class="dashboard-container">
@@ -36,7 +93,7 @@ if (!pageData.success) return Astro.rewrite("/" + hostData.status || 0);
                 </div>
             </div>
             <div class="right">
-                <h1>Page '{page}'</h1>
+                <h1 class="sep">Page '{page}'</h1>
 
                 <div class="settings">
                     <section class="setting">
@@ -163,7 +220,7 @@ if (!pageData.success) return Astro.rewrite("/" + hostData.status || 0);
                             </div>
                             <div class="controls">
                                 <h3>Delete this page</h3>
-                                <button class="warning">Delete page '{page}'</button>
+                                <button class="warning" id="delete-button">Delete page '{page}'</button>
                             </div>
                     </section>
                 </div>
@@ -192,7 +249,7 @@ if (!pageData.success) return Astro.rewrite("/" + hostData.status || 0);
         .settings {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 24px;
 
             .controls {
                 margin-top: 6px;
@@ -208,7 +265,7 @@ if (!pageData.success) return Astro.rewrite("/" + hostData.status || 0);
 
         h2,
         h3 {
-            margin-block: 12px 6px;
+            margin-bottom: 6px;
         }
 
         div[role="group"] {

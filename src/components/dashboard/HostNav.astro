@@ -1,18 +1,38 @@
 ---
-import type { Host } from "../../../../api/db/schema";
+import type { Host, Page } from "../../db/schema";
+import { Database } from "../../lib/databaseInterface";
 
 const { host }: { host?: Host } = Astro.props;
 const hostRoot = '/' + host?.host;
+
+const { env } = Astro.locals.runtime;
+const db = new Database(env);
+const pagesRes = await db.getPagesConfig(
+    Astro.cookies.get("token")?.value ?? "",
+    host?.host ?? "",
+)
+const pages = pagesRes.data;
 ---
 
 <h4>Host</h4>
 <p class="host-name">{host?.host}</p>
 <nav>
     <a href={hostRoot}>Comments</a>
-    <a href={hostRoot + '/pages'}>Pages</a>
     <a href={hostRoot + '/automod'}>Auto Moderation</a>
     <a href={hostRoot + '/settings'}>Host Settings</a>
 </nav>
+
+<div>
+    {
+        pages?.length !== 0 &&
+        <Fragment>
+            <h4 class="host-name">Linked Pages</h4>
+            <nav>
+                {pages.map(p => <a href={hostRoot + '/pages/' + p.name}>{p.name} ({p.pagePath})</a>)}
+            </nav>
+        </Fragment>
+    }
+</div>
 
 <style scoped>
     h4 {
@@ -33,6 +53,10 @@ const hostRoot = '/' + host?.host;
             font-size: 1.10em;
             text-decoration: none;
         }
+    }
+
+    div {
+        margin-top: 24px;
     }
 
     @media screen and (width <= 640px) {

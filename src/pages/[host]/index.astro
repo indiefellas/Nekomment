@@ -9,17 +9,20 @@ const { env } = Astro.locals.runtime;
 const { host } = Astro.params;
 const db = new Database(env);
 
+if (!Astro.cookies.get("token")?.value) return new Response('404 Not Found', { status: 404 });
+
 const hostData = await db.getHost(
     Astro.cookies.get("token")?.value ?? "",
     host ?? "",
 );
 
-if (!hostData.success) return Astro.rewrite("/" + hostData.status || 0);
+if (!hostData.success) return new Response('404 Not Found', { status: 404 });
 
 const comments = await db.getComments(
     Astro.cookies.get("token")?.value ?? "",
     host ?? "",
 );
+
 ---
 
 <HostLayout title={host + " - Nekomment"} {hostData}>
