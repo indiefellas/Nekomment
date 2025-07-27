@@ -8,6 +8,8 @@ const { env } = Astro.locals.runtime;
 const { host } = Astro.params;
 const db = new Database(env);
 
+if (!Astro.cookies.get("token")?.value) return new Response('404 Not Found', { status: 404 });
+
 const hostData = await db.getHost(
     Astro.cookies.get("token")?.value ?? "",
     host ?? "",
