@@ -178,7 +178,7 @@
         padding-bottom: 10px;
         margin-bottom: 20px;
         border: none;
-        border-bottom: 1px solid var(--background-4);
+        border-bottom: 1px solid var(--color-1);
         width: 100%;
     }
 

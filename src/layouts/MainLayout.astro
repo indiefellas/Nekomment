@@ -80,6 +80,11 @@ const { title = "Nekomment", user = null } = Astro.props;
             <slot name="nav-mobile" />
         </Header>
         <main>
+            <noscript>
+                <div class="field-warning">
+                    <b>JavaScript is required</b> to use Nekomment Dashboard. Please enable JavaScript.
+                </div>
+            </noscript>
             <slot />
         </main>
         <Footer />

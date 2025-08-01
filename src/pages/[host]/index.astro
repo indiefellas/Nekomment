@@ -1,113 +1,37 @@
 ---
-import MainLayout from "../../layouts/MainLayout.astro";
-import HostNav from "../../components/dashboard/HostNav.astro";
-import lodash from "lodash";
 import { Database } from "../../lib/databaseInterface";
 import HostLayout from "../../layouts/HostLayout.astro";
+import CommentCard from "../../components/dashboard/CommentCard.svelte";
 
 const { env } = Astro.locals.runtime;
 const { host } = Astro.params;
 const db = new Database(env);
 
-if (!Astro.cookies.get("token")?.value) return new Response('404 Not Found', { status: 404 });
+if (!Astro.cookies.get("token")?.value)
+    return new Response("404 Not Found", { status: 404 });
 
 const hostData = await db.getHost(
     Astro.cookies.get("token")?.value ?? "",
     host ?? "",
 );
 
-if (!hostData.success) return new Response('404 Not Found', { status: 404 });
+if (!hostData.success) return new Response("404 Not Found", { status: 404 });
 
 const comments = await db.getComments(
     Astro.cookies.get("token")?.value ?? "",
     host ?? "",
 );
-
 ---
 
 <HostLayout title={host + " - Nekomment"} {hostData}>
     <h1>Comments</h1>
     <div class="comments-container">
         <div class="comments-list">
-            {
-                comments.data?.reverse().map((c) => (
-                    <div class="card comment">
-                        <div class="heading">
-                            <h2>{c.author}</h2>
-                            <p>{c.createdAt?.toDateString()}</p>
-                        </div>
-                        <p>{c.content}</p>
-                        <div class="heading review-container">
-                            <div>
-                                {!c.approved && (
-                                    <div class="in-review">
-                                        In review: {c.moderatedBy}
-                                    </div>
-                                )}
-                            </div>
-                            <div>
-                                {!c.approved ? 
-                                    <button>Approve</button> :
-                                    <button>Reply</button>
-                                }
-                                
-                                <button class="warning">
-                                    Delete
-                                </button>
-
-                                <button class="warning">
-                                    Block user
-                                </button>
-                            </div>
-                        </div>
-                        {c.replies.length > 0 && (
-                            <div class="replies">
-                                {c.replies.reverse().map((r) => (
-                                    <blockquote>
-                                        <div class="heading">
-                                            <h3>{r.author}</h3>
-                                            <p>
-                                                {r.createdAt?.toDateString()}
-                                            </p>
-                                        </div>
-                                        <p>{r.content}</p>
-                                        <div class="heading review-container">
-                                            <div>
-                                                {!r.approved && (
-                                                    <div class="in-review">
-                                                        In review:{" "}
-                                                        {
-                                                            r.moderatedBy
-                                                        }
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div>
-                                                {!r.approved && (
-                                                    <button>
-                                                        Approve
-                                                    </button>
-                                                )}
-                                                <button class="warning">
-                                                    Delete
-                                                </button>
-                                                <button class="warning">
-                                                    Block user
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </blockquote>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                ))
-            }
+            <CommentCard client:load comments={comments.data?.reverse()} />
             {comments.data?.length === 0 && <p>No comments yet!</p>}
         </div>
     </div>
 </HostLayout>
-
 
 <style scoped>
     .comments-container {
@@ -118,6 +42,14 @@ const comments = await db.getComments(
             justify-content: space-between;
             align-items: end;
             width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .actions {
+            margin-top: 10px;
+            display: flex;
+            justify-content: end;
+            gap: 5px;
         }
 
         .comments-list {
@@ -148,8 +80,8 @@ const comments = await db.getComments(
                 }
 
                 .in-review {
-                    background: var(--color-red);
-                    color: var(--background-red);
+                    background: var(--background-red);
+                    color: var(--color-red);
                     padding-inline: 0.4ch;
                     border-radius: 5px;
                     width: fit-content;
