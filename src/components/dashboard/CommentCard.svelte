@@ -38,7 +38,7 @@
             {/if}
         </div>
         <p>
-            <span>[IP redacted]</span> -
+            <span>[comment.address]</span> -
             <span>{comment.createdAt?.toLocaleDateString()}</span>
         </p>
     </div>
@@ -67,7 +67,7 @@
                             {/if}
                         </div>
                         <p>
-                            <span>[IP redacted]</span> -
+                            <span>{reply.address}</span> -
                             <span>
                                 {reply.createdAt?.toLocaleDateString()}
                             </span>
