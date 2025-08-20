@@ -50,7 +50,7 @@
     --hero-margin: max(calc(50dvw - 60em), calc(var(--main-margin) / 2), 20px);
 }
 
-.light {
+[data-theme="light"] {
     --background-0: #f2ede8;
     --background-1: #d7d0c7;
     --background-2: #d3c9be;

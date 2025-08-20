@@ -46,9 +46,10 @@ const { title = "Nekomment", user = null } = Astro.props;
             property="og:description"
             content="Nekomment is a free comment host that adapts to your website's design."
         />
-        <script>
+        <!-- Run script immediately so the color don't begin dark then flashes to light -->
+        <script async is:inline>
             (() => {
-                const body = document.body;
+                const body = document.querySelector("html");
                 const prefersLight = window.matchMedia(
                     "(prefers-color-scheme: light)",
                 );
@@ -57,17 +58,17 @@ const { title = "Nekomment", user = null } = Astro.props;
                     (prefersLight.matches &&
                         !localStorage.getItem("nkm:theme")?.includes("user"))
                 ) {
-                    body.classList.add("light");
+                    body.setAttribute("data-theme", "light");
                     localStorage.setItem("nkm:theme", "light");
                 }
                 prefersLight.addEventListener("change", (ev) => {
                     if (localStorage.getItem("nkm:theme")?.includes("user"))
                         return;
                     if (ev.matches) {
-                        body.classList.add("light");
+                        body.setAttribute("data-theme", "light");
                         localStorage.setItem("nkm:theme", "light");
                     } else {
-                        body.classList.remove("light");
+                        body.setAttribute("data-theme", "dark");
                         localStorage.setItem("nkm:theme", "dark");
                     }
                 });

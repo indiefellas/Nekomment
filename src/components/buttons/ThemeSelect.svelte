@@ -5,13 +5,13 @@
     let isLight = false;
 
     function onThemeToggle() {
-        const body = document.body;
-        if (body.classList.contains('light')) {
-            body.classList.remove('light');
+        const body = document.querySelector("html");
+        if (body.getAttribute("data-theme")?.includes('light')) {
+            body.setAttribute("data-theme", "dark");
             localStorage.setItem('nkm:theme', 'dark user');
             isLight = false;
         } else {
-            body.classList.add('light');
+            body.setAttribute("data-theme", "light");
             localStorage.setItem('nkm:theme', 'light user');
             isLight = true;
         }
