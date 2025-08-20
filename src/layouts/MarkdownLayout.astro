@@ -1,0 +1,33 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import { Database } from "../lib/databaseInterface";
+
+const { env } = Astro.locals.runtime;
+const db = new Database(env);
+let user = Astro.props.user ?? await db.checkUser(Astro.cookies.get('token')?.value ?? '');
+const { title } = Astro.props.frontmatter;
+---
+
+<MainLayout {user} title={title + ' - Nekomment'}>
+	<div class="fill-screen">
+        <slot />
+    </div>
+</MainLayout>
+
+<style scoped>
+    .fill-screen {
+        margin-inline: var(--main-margin);
+        margin-top: 12px;
+    }
+
+    :global(h1) {
+        margin-block: 20px;
+        border: none;
+        padding-bottom: 5px;
+        border-bottom: 1px solid var(--color-1);
+    }
+
+    :global(h2, h3) {
+        margin-block: 10px;
+    }
+</style>

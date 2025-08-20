@@ -19,17 +19,19 @@ if (Astro.request.method === 'POST') {
         const email = data.get('email')?.toString() || '';
         const password = data.get('password')?.toString() || '';
         await db.createUser(username, password, email);
-        let session = await db.loginUser(username, password, Astro.request.clone().headers.get('User-Agent') ?? '', Astro.clientAddress);
+        let session = await db.loginUser(username, password, Astro.request.headers.get('User-Agent') ?? '', Astro.clientAddress);
+        console.log('a')
         if (session.success && session.data) {
+            console.log('a')
             Astro.cookies.set('token', session.data.token, {
                 httpOnly: true,
                 sameSite: 'lax'
             });
+            console.log('b')
             return Astro.redirect(Astro.url.searchParams.get('redirect') || '/', 302);
         }
-    }
-    catch {
-        err = 'An error occured. Please try again.';
+    } catch (e) {
+        err = 'An error occurred. Please try logging in again.'
     }
 }
 ---
