@@ -6,7 +6,7 @@
 <a class="button" href={"/" + host}>
     <h3>{host}</h3>
     <div class="host-stats">
-        <p>
+        <p aria-description="total comments">
             <Icon icon="material-symbols:comment" inline />
             {comments}
         </p>

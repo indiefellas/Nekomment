@@ -13,10 +13,10 @@
     </button>
     
     <div class="options" bind:this={optionsDiv}>
-        <a href="/settings">
+        <a href="/settings" onclick={loadUserSettings}>
             User Settings
         </a>
-        <a href="/logout">
+        <a href="/logout" onclick={loadUserSettings}>
             Logout
         </a>
     </div>    

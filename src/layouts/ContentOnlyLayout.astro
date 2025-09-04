@@ -2,6 +2,7 @@
 import Header from "../components/layout/Header.astro";
 import Footer from "../components/layout/Footer.astro";
 import "../styles/main.css";
+import { ClientRouter } from "astro:transitions";
 
 const { title = "Nekomment" } = Astro.props;
 ---
@@ -28,7 +29,7 @@ const { title = "Nekomment" } = Astro.props;
             property="og:description"
             content="Nekomment is a free comment host that adapts to your website's design."
         />
-        <script>
+        <script is:inline data-astro-rerun>
             (() => {
                 const body = document.body;
                 const prefersLight = window.matchMedia(
@@ -55,10 +56,11 @@ const { title = "Nekomment" } = Astro.props;
                 });
             })();
         </script>
+        <ClientRouter />
         <slot name="head" />
     </head>
     <body>
-        <main class="content-only">
+        <main transition:animate="fade" class="content-only">
             <slot />
         </main>
     </body>

@@ -28,6 +28,7 @@
 
     let header: Element;
     onMount(() => {
+        document.addEventListener("astro:before-preparation", () => setMenuMode(""))
         document.addEventListener("scroll", () => {
             if (window.scrollY > 10) {
                 header.classList.add("header-scroll");

@@ -214,6 +214,22 @@ h1:first-of-type {
     padding: 20px;
 }
 
+.card.session {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 10px;
+
+    svg {
+        height: 100%;
+        width: 100%;
+    }
+}
+
+nav ul {
+    list-style: none;
+    display: block;
+}
+
 form {
     display: flex;
     flex-flow: column;
@@ -260,14 +276,15 @@ form {
     }
 }
 
-.comments-list {
+.comments-list, section.sessions {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
 .comments-list article,
-.comments-list blockquote {
+.comments-list blockquote,
+section.sessions .session {
     &>* {
         margin: 0;
     }
@@ -289,7 +306,8 @@ blockquote {
     border-radius: 5px;
 }
 
-.comments-list article {
+.comments-list article,
+section.sessions .session {
     background-color: var(--background-3);
     padding: 12px;
 }

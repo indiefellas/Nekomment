@@ -7,7 +7,7 @@ import { resolveTxt } from "node:dns/promises";
 import { genDefaultTemplate, genId } from "./generators";
 import { PostBehavior } from "../db/enums";
 
-interface Response<T = any> {
+export interface Response<T = any> {
     success: boolean;
     message?: string;
     data?: T;
@@ -271,6 +271,17 @@ export class Database {
             success: true,
             message: 'User found',
             data: userSession[0].users
+        }
+    }
+
+    async getSessionsFromUser(user: schema.User): Promise<Response<schema.Session[]>> {
+        let userSessions = await this.#db.query.sessions.findMany({
+            where: (u, { eq }) => eq(u.userId, user.id)
+        });
+
+        return {
+            success: true,
+            data: userSessions
         }
     }
 

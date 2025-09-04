@@ -3,7 +3,6 @@ import { Handlebars } from "handlebars-jle";
 import sanitizeHTML from 'sanitize-html';
 import lodash from "lodash";
 const { chunk } = lodash;
-import { site } from "astro:config/server";
 import { Database } from "../../lib/databaseInterface";
 
 export function genId(length: number) {
@@ -74,7 +73,7 @@ export const GET: APIRoute = async ({ params, request, locals, url, rewrite }) =
 
     if (!params.slug) return rewrite('/404');
     const path = request.headers.get('Referer') || '';
-    const pathUrl = path ? new URL(path) : new URL('https://cmt.nkko.link/');
+    const pathUrl = path ? new URL(path) : new URL('http://' + request.headers.get('Host') + '/');
     const pageNum = parseInt(url.searchParams.get('page') || "1", 10);
 
     const db = new Database(locals.runtime.env);
@@ -161,7 +160,7 @@ export const GET: APIRoute = async ({ params, request, locals, url, rewrite }) =
         context: {
             host: page.hostName,
             path: page.useReferer ? new URL(path).pathname : page.pagePath,
-            backpath: site + '/c/' + page.name,
+            backpath: pathUrl + 'c/' + page.name,
             page: pageNum,
             totalPages: comments.length,
             totalComments: page.comments.length,

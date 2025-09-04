@@ -2,6 +2,7 @@
 import Header from "../components/layout/Header.astro";
 import Footer from "../components/layout/Footer.astro";
 import "../styles/main.css";
+import { ClientRouter } from "astro:transitions";
 
 const { title = "Nekomment", user = null } = Astro.props;
 ---
@@ -47,7 +48,7 @@ const { title = "Nekomment", user = null } = Astro.props;
             content="Nekomment is a free comment host that adapts to your website's design."
         />
         <!-- Run script immediately so the color don't begin dark then flashes to light -->
-        <script async is:inline>
+        <script is:inline data-astro-rerun>
             (() => {
                 const body = document.querySelector("html");
                 const prefersLight = window.matchMedia(
@@ -74,13 +75,14 @@ const { title = "Nekomment", user = null } = Astro.props;
                 });
             })();
         </script>
+        <ClientRouter />
         <slot name="head" />
     </head>
-    <body>
-        <Header {user}>
+    <body transition:persist>
+        <Header {user} transition:persist>
             <slot name="nav-mobile" />
         </Header>
-        <main>
+        <main transition:animate="fade">
             <noscript>
                 <div class="field-warning">
                     <b>JavaScript is required</b> to use Nekomment Dashboard. Please enable JavaScript.
@@ -88,6 +90,6 @@ const { title = "Nekomment", user = null } = Astro.props;
             </noscript>
             <slot />
         </main>
-        <Footer />
+        <Footer transition:persist />
     </body>
 </html>

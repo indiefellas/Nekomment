@@ -11,7 +11,7 @@ import LinkButton from "../buttons/LinkButton.svelte";
             <div class="top">
                 <Signature />
                 <p>
-                    &copy; nkko.link, 2025.<br/>
+                    &copy; nkko.link, 2025.<br />
                     Nekomment is under the MIT License.
                 </p>
                 <p class="b88x31-holder">
@@ -24,36 +24,41 @@ import LinkButton from "../buttons/LinkButton.svelte";
             </div>
         </div>
         <nav class="links">
-            <li>
-                <h5>Site navigation</h5>
-                <nav>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/about">About</a></li>
-                    <li><a href="/faqs">FAQs</a></li>
-                    <li><a href="/docs">API Docs</a></li>
-                </nav>
-            </li>
-            <li>
-                <h5>Contribute!</h5>
-                <nav>
-                    <li><a href="/gold">Nekomment Gold&trade;</a></li>
-                    <li><a href="https://github.com/indiefellas/Nekomment/">Source Code</a></li>
-                </nav>
-            </li>
-            <li>
-                <h5>Obligatory legal stuff</h5>
-                <nav>
-                    <li><a href="/terms">Terms of Use</a></li>
-                    <li><a href="/privacy">Privacy Policy</a></li>
-                </nav>
-            </li>
-            <li>
-                <h5>Goodies</h5>
-                <nav>
-                    <li><a href="/wallpaper">Animated Wallpaper</a></li>
-                    <li><a href="/jswidget">Nekomment JS Widget</a></li>
-                </nav>
-            </li>
+            <ul>
+                <li>
+                    <h5>Site navigation</h5>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/faqs">FAQs</a></li>
+                        <li><a href="/docs">API Docs</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <h5>Contribute!</h5>
+                    <ul>
+                        <li><a href="/gold">Nekomment Gold&trade;</a></li>
+                        <li>
+                            <a href="https://github.com/indiefellas/Nekomment/"
+                                >Source Code</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <h5>Obligatory legal stuff</h5>
+                    <ul>
+                        <li><a href="/terms">Terms of Use</a></li>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <h5>Goodies</h5>
+                    <ul>
+                        <li><a href="/wallpaper">Animated Wallpaper</a></li>
+                        <li><a href="/jswidget">Nekomment JS Widget</a></li>
+                    </ul>
+                </li>
+            </ul>
         </nav>
     </div>
 </footer>
@@ -92,7 +97,8 @@ import LinkButton from "../buttons/LinkButton.svelte";
                 gap: 0.5ch;
                 margin-top: 0.5em;
 
-                button, .button {
+                button,
+                .button {
                     display: flex;
                     padding: 0;
                     border-radius: 0;
@@ -107,7 +113,7 @@ import LinkButton from "../buttons/LinkButton.svelte";
             }
         }
 
-        .links {
+        .links > ul {
             display: flex;
             flex-flow: row wrap;
             gap: 2em;
@@ -127,7 +133,7 @@ import LinkButton from "../buttons/LinkButton.svelte";
                 text-transform: uppercase;
             }
 
-            nav {
+            nav, ul {
                 margin: 0;
             }
 
@@ -142,7 +148,7 @@ import LinkButton from "../buttons/LinkButton.svelte";
             flex-direction: column;
             gap: 20px;
         }
-        footer .links {
+        footer .links > ul {
             gap: 20px 2em;
         }
     }

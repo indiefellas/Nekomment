@@ -9,7 +9,7 @@
     let commentHolder: HTMLElement;
     let lastMobileMode;
 
-    let delta, time = performance.now();
+    let delta, stop = false, time = performance.now();
     let offset = 0, xOffset = 0, yOffset = 0;
 
     let comments: HTMLElement[] = [];
@@ -42,6 +42,8 @@
     }
 
     function bgLoop() {
+        if (stop) return;
+
         delta = performance.now() - time;
         time += delta;
 
@@ -77,10 +79,18 @@
         setTimeout(bgLoop, 50);
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("astro:page-load", () => {
+        stop = false;
         commentHolder = document.querySelector(".comment-holder")!;
         bgLoop();
     });
+
+    document.addEventListener("astro:before-swap", () => {
+        stop = true;
+        offset = 0;
+        yOffset = 0;
+        xOffset = 0;
+    })
 </script>
 
 <div class="background" aria-hidden="true">

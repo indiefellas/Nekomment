@@ -1,0 +1,55 @@
+---
+import { User } from "../../db/schema"
+
+interface Props {
+    user: User;
+}
+
+const { user }: { user: User } = Astro.props;
+---
+
+<h4>User Settings</h4>
+<p>{user.name}</p>
+<nav>
+    <a href="/settings/">General</a>
+    <a href="/settings/security/">Security</a>
+    <a href="/settings/sessions/">Active Sessions</a>
+    <a href="/settings/danger/">Danger Zone</a>
+</nav>
+
+<style scoped>
+    h4 {
+        text-transform: uppercase;
+        font-size: 0.75em;
+    }
+
+    nav {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid var(--color-1);
+        margin-bottom: 30px;
+
+        a {
+            font-size: 1.10em;
+            text-decoration: none;
+        }
+    }
+
+    div {
+        margin-top: 24px;
+    }
+
+    @media screen and (width <= 640px) {
+        .host-name {
+            font-size: 1.4em;
+        }
+
+        nav {
+            gap: 0;
+            width: 100%;
+        }
+    }
+</style>

@@ -5,7 +5,7 @@ import { Database } from "../lib/databaseInterface";
 
 const { env } = Astro.locals.runtime;
 const db = new Database(env);
-let user = await db.checkUser(Astro.cookies.get('token')?.value ?? '')
+let user = await db.checkUser(Astro.cookies.get('token')?.value ?? '');
 
 ---
 

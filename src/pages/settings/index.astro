@@ -1,0 +1,14 @@
+---
+import SettingsLayout from "../../layouts/SettingsLayout.astro";
+import { Database } from "../../lib/databaseInterface";
+
+export const prerender = false; 
+const { env } = Astro.locals.runtime;
+const db = new Database(env);
+let user = await db.checkUser(Astro.cookies.get('token')?.value ?? '');
+if (!user.success) return Astro.redirect('/login?redirect=/settings');
+---
+
+<SettingsLayout user={user.data}>
+    
+</SettingsLayout>

@@ -51,7 +51,7 @@ export const POST: APIRoute = async ({ params, request, locals, redirect }) => {
     const content = formData.get('content')?.toString();
     const website = formData.get('website')?.toString();
     const parentId = formData.get('parentId')?.toString();
-    const backPath = formData.get('backPath')?.toString();
+    const backPath = formData.get('backPath')?.toString() || request.headers.get('Origin');
     const cfTurnstileKey = formData.get('cfTurnstileKey')?.toString();
     if (!name || !content || !host || !path) {
         return text('name and content are required', 400)

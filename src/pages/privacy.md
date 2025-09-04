@@ -22,6 +22,6 @@ We do not collect these to send targeted advertisements or to sell your informat
 - Nekomment does not sell your information to a third-party.
 - Nekomment does not look at your comments unless in case of suspected abuse or a legal order.
 
-## Changes to these policy
+## Changes to this policy
 
 We reserve the right to change our policy at any time. By using this Service, you agree to be bound by the terms of this policy.

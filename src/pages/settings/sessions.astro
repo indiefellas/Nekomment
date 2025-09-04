@@ -1,0 +1,37 @@
+---
+import { User } from "../../db/schema";
+import SettingsLayout from "../../layouts/SettingsLayout.astro";
+import { Database, Response } from "../../lib/databaseInterface";
+import { UAParser } from "ua-parser-js";
+import Icon from "@iconify/svelte";
+export const prerender = false; 
+const { env } = Astro.locals.runtime;
+const db = new Database(env);
+const user = await db.checkUser(Astro.cookies.get('token')?.value ?? '');
+if (!user.success) return Astro.redirect('/login?redirect=/settings/sessions');
+let sessions = await db.getSessionsFromUser(user.data);
+sessions.data = sessions.data.map((s) => {
+    let userAgentInfo = UAParser(s.userAgent);
+    return {
+        ...s,
+        userAgentInfo
+    }
+}).reverse();
+const currentSession = sessions.data.find((s) => s.sessionToken === (Astro.cookies.get('token')?.value ?? ''));
+---
+
+<SettingsLayout user={user.data}>
+    <h1>Sessions</h1>
+    <section class="sessions">
+        {sessions.data.map((s) => <div class="card session">
+            <div class="icon">
+                {s.userAgentInfo.device.is('mobile') ? <Icon client:load icon="mynaui:mobile" inline /> : <Icon client:load icon="mynaui:desktop" inline />}
+            </div>
+            <article class="session-info">
+                <p>{s.userAgentInfo.browser.name} {s.userAgentInfo.browser.version} in {s.userAgentInfo.os.name} {s.userAgentInfo.os.version} {s.userAgentInfo.device.model && <span>({s.userAgentInfo.device.vendor} {s.userAgentInfo.device.model})</span>}</p>
+                <p>{s.address}</p>
+                {s === currentSession && <p>Your current session</p>}
+            </article>
+        </div>)}
+    </section>
+</SettingsLayout>
