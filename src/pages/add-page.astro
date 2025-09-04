@@ -1,5 +1,5 @@
 ---
-import AddDomainForm from "../components/forms/AddDomainForm.svelte";
+import AddPageForm from "../components/forms/AddPageForm.svelte";
 import MainLayout from "../layouts/MainLayout.astro";
 import { Database } from "../lib/databaseInterface";
 export const prerender = false;
@@ -8,9 +8,7 @@ const { env } = Astro.locals.runtime;
 if (!Astro.cookies.get("token")?.value) return Astro.redirect('/login?redirect=/add-host');
 
 const db = new Database(env);
-let token = (await db.initializeAddHostToken(
-    Astro.cookies.get("token")?.value || "",
-)).data;
+const hosts = await db.getHosts(Astro.cookies.get("token")?.value ?? '');
 
 let err = "";
 
@@ -19,16 +17,17 @@ let args = {}
 if (Astro.request.method === "POST") {
     try {
         const data = await Astro.request.formData();
+        const name = data.get("name")?.toString() || "";
         const domain = data.get("domain")?.toString() || "";
-        const method = data.get("method")?.toString() || "";
-        let session = await db.addHost(
+        const theme = data.get("theme")?.toString() || "";
+        let session = await db.createPage(
             Astro.cookies.get("token")?.value || "",
+            name,
             domain,
-            method,
+            theme,
         );
-        Astro.cookies.delete("host-token");
         if (session.success) {
-            return Astro.redirect("/" + domain, 302);
+            return Astro.redirect("/" + domain + "/pages/" + name, 302);
         } else {
             err = "An error occurred. Please try again. " + session.message;
         }
@@ -36,7 +35,8 @@ if (Astro.request.method === "POST") {
         args = {
             step: 2,
             domain,
-            method,
+            theme,
+            name,
             err,
         }
     } catch {
@@ -46,5 +46,5 @@ if (Astro.request.method === "POST") {
 ---
 
 <MainLayout>
-    <AddDomainForm verificationToken={token} {...args} client:load />
+    <AddPageForm hosts={hosts.data} {...args} client:load />
 </MainLayout>

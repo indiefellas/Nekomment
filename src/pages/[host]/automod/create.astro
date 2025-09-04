@@ -1,0 +1,109 @@
+---
+import { AutoModBehavior, AutoModType } from "../../../db/enums";
+import HostNav from "../../../components/dashboard/HostNav.astro";
+import MainLayout from "../../../layouts/MainLayout.astro";
+import { Database } from "../../../lib/databaseInterface";
+import HostLayout from "../../../layouts/HostLayout.astro";
+
+const { env } = Astro.locals.runtime;
+const { host } = Astro.params;
+const db = new Database(env);
+
+const hostData = await db.getHost(
+    Astro.cookies.get("token")?.value ?? "",
+    host ?? ""
+)
+
+if (!hostData.success) return Astro.rewrite('/' + hostData.status || 0)
+
+const rules = await db.getRules(
+    Astro.cookies.get("token")?.value ?? "",
+    host ?? "",
+)
+
+if (!rules.success && rules.status == 401)
+    return Astro.redirect("/login?redirect=" + Astro.url.pathname, 302);
+else if (!rules.success) return Astro.redirect("/dash", 302);
+
+let err = "";
+if (Astro.request.method === "POST") {
+    try {
+        const data = await Astro.request.formData();
+        const name = data.get("name")?.toString() || "";
+        const rule = data.get("rule")?.toString() || "";
+        const type = parseInt(data.get("type")?.toString() || '0', 10);
+        const action = parseInt(data.get("action")?.toString() || '0', 10);
+        
+        let session = await db.createRule(
+            Astro.cookies.get("token")?.value || "",
+            host || '',
+            name,
+            rule,
+            type,
+            action
+        );
+
+        if (!session.success) {
+            err = "An error occurred. Please try again.";
+        }
+    } catch {
+        err = "An error occurred. Please try again.";
+    }
+}
+---
+
+<HostLayout title={'Auto Moderation: ' + host + ' - Nekomment'} {hostData}>
+    <div class="heading">
+        <h1>Create Auto Moderation rule</h1>
+    </div>
+    <div class="rules-container">
+        <h2>Pre-made Rules</h2>
+        <div class="rules-list">
+            <button class="card rule">
+                <h3>Detect profanity</h3>
+                <p>Flag or remove comments that contains profane words. (Only supports English for now)</p>
+            </button>
+            <button class="card rule">
+                <h3>Detect profanity</h3>
+                <p>Flag or remove comments that contains profane words.</p>
+            </button>
+        </div>
+    </div>
+    <div>
+        <form>
+            <p>Form name</p>
+        </form>
+    </div>
+</MainLayout>
+    
+<style scoped>
+
+    .rules-container {
+        margin-top: 12px;
+
+        .rules-list {
+            margin-top: 12px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(100px, 1fr));
+            gap: 12px;
+
+            .rule {
+                text-align: left;
+                display: flex;
+                text-decoration: none;
+                padding: 10px;
+                flex-direction: column;
+                gap: 0;
+
+                .heading {
+                    align-items: start;
+                }
+
+                blockquote {
+                    flex-direction: column;
+                    margin-left: 24px;
+                }
+            }
+        }
+    }
+</style>

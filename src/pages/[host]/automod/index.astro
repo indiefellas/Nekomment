@@ -1,9 +1,9 @@
 ---
-import { AutoModBehavior, AutoModType } from "../../db/enums";
-import HostNav from "../../components/dashboard/HostNav.astro";
-import MainLayout from "../../layouts/MainLayout.astro";
-import { Database } from "../../lib/databaseInterface";
-import HostLayout from "../../layouts/HostLayout.astro";
+import { AutoModBehavior, AutoModType } from "../../../db/enums";
+import HostNav from "../../../components/dashboard/HostNav.astro";
+import MainLayout from "../../../layouts/MainLayout.astro";
+import { Database } from "../../../lib/databaseInterface";
+import HostLayout from "../../../layouts/HostLayout.astro";
 
 const { env } = Astro.locals.runtime;
 const { host } = Astro.params;
@@ -55,7 +55,7 @@ if (Astro.request.method === "POST") {
 <HostLayout title={'Auto Moderation: ' + host + ' - Nekomment'} {hostData}>
     <div class="heading">
         <h1>Auto Moderation</h1>
-        <button class="primary">Create new rule</button>
+        <a href={Astro.url.pathname + "/create"} class="button primary">Create new rule</a>
     </div>
     <div class="rules-container">
         <div class="rules-list">
@@ -78,8 +78,7 @@ if (Astro.request.method === "POST") {
     .heading {
         display: flex;
         flex-flow: row wrap;
-        justify-content: start;
-        align-items: center;
+        align-items: end;
         gap: 10px 2em;
         width: 100%;
 
