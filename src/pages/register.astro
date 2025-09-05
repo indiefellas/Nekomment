@@ -3,10 +3,12 @@ import MainLayout from "../layouts/MainLayout.astro";
 import LoginForm from "../components/forms/LoginForm.svelte";
 import CommentBg from "../components/about/CommentBg.astro";
 import { Database } from "../lib/databaseInterface";
+import { SendEmail } from "../components/email/SendEmail";
 
 export const prerender = false; 
 const { env } = Astro.locals.runtime;
 const db = new Database(env);
+const sendEmail = new SendEmail(env);
 
 if (Astro.cookies.get("token")?.value) return Astro.redirect('/');
 
@@ -23,6 +25,7 @@ if (Astro.request.method === 'POST') {
         console.log('a')
         if (session.success && session.data) {
             console.log('a')
+            await sendEmail.sendEmail(username, email);
             Astro.cookies.set('token', session.data.token, {
                 httpOnly: true,
                 sameSite: 'lax'

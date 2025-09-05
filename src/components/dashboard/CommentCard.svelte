@@ -38,6 +38,7 @@
             {/if}
         </div>
         <p>
+            <span>{comment.pagePath}</span> -
             <span>{comment.address}</span> -
             <span>{comment.createdAt?.toLocaleDateString()}</span>
         </p>

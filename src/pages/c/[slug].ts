@@ -68,11 +68,11 @@ function genBoilerplate(output: string, name: string, id: string, turnstileKey: 
 }
 
 export const GET: APIRoute = async ({ params, request, locals, url, rewrite }) => {
-    try {
+
         let id = genId(24);
 
     if (!params.slug) return rewrite('/404');
-    const path = request.headers.get('Referer') || '';
+    let path = request.headers.get('Referer') || '';
     const pathUrl = path ? new URL(path) : new URL('http://' + request.headers.get('Host') + '/');
     const pageNum = parseInt(url.searchParams.get('page') || "1", 10);
 
@@ -82,6 +82,12 @@ export const GET: APIRoute = async ({ params, request, locals, url, rewrite }) =
     if (!page || !pageRes.success) {
         return rewrite('/404');
     }
+
+    let pathName = '';
+    try {
+        pathName = new URL(path).pathname;
+    } catch {}
+    if (!pathName) pathName = page.pagePath ?? '/';
     
     const cache = await locals.runtime.caches.open(`nkm-cache:pages`);
     const cacheRes = await cache.match(request);
@@ -150,10 +156,16 @@ export const GET: APIRoute = async ({ params, request, locals, url, rewrite }) =
         },
     })
     const template = hbs.compile(sanitized);
-    const comments = chunk(page.comments.reverse().map(c => ({
+    const comments = chunk(page.comments.filter(c => c.pagePath === (page.useReferer ? new URL(path).pathname : page.pagePath)).reverse().map(c => ({
         ...c,
-        replies: c.replies.reverse()
-    })), 10);
+        replies: c.replies?.sort((a, b) => {
+            //@ts-ignore
+            return b.createdAt - a.createdAt
+        })
+    })).sort((a, b) => {
+        //@ts-ignore
+        return b.createdAt - a.createdAt
+    }), 10);
     let context = {
         name: page.name,
         comments: comments[pageNum - 1],
@@ -182,7 +194,4 @@ export const GET: APIRoute = async ({ params, request, locals, url, rewrite }) =
     await cache.put(request, res.clone());
     res.headers.set('Cache-Control', 'no-cache');
     return res;
-    } catch (e) {
-        return new Response(`${e}`, { status: 500 })
-    }
 }

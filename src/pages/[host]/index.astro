@@ -27,8 +27,11 @@ const comments = await db.getComments(
     <h1>Comments</h1>
     <div class="comments-container">
         <div class="comments-list">
-            <CommentCard client:load comments={comments.data?.reverse()} />
-            {comments.data?.length === 0 && <p>No comments yet!</p>}
+            <CommentCard client:load comments={comments.data?.sort((a, b) => b.createdAt - a.createdAt)} />
+            {comments.data?.length === 0 && <Fragment>
+                <p>No comments yet!</p>
+                <p>You might want to <a href={Astro.url.pathname + "/import"}>import from your old comment service</a>?</p>
+            </Fragment>}
         </div>
     </div>
 </HostLayout>

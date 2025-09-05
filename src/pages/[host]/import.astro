@@ -1,0 +1,46 @@
+---
+import ImportCommentsForm from "../../components/forms/ImportCommentsForm.svelte";
+import MainLayout from "../../layouts/MainLayout.astro";
+import { Database } from "../../lib/databaseInterface";
+import { importComments } from "../../lib/importComments";
+export const prerender = false;
+const { env } = Astro.locals.runtime;
+const { host } = Astro.params;
+
+if (!Astro.cookies.get("token")?.value) return Astro.redirect('/login?redirect=/add-host');
+
+const db = new Database(env);
+let err = "";
+
+let args = {}
+
+if (Astro.request.method === "POST") {
+    try {
+        const data = await Astro.request.formData();
+        const from = data.get("from")?.toString() || "";
+        const sheetsUrl = data.get("sheetsUrl")?.toString() || "";
+        const file = data.get("fileUploaded") as File | null;
+        try {
+            await importComments(
+                db, Astro.cookies.get("token")?.value ?? '', host, 
+                from, sheetsUrl, file
+            );
+
+            return Astro.redirect("/" + host, 302);
+        } catch (e) {
+            err = "An error occurred. Please try again. " + e;
+            args = {
+                step: 2,
+                from,
+                err,
+            }
+        }
+    } catch {
+        err = "An error occurred. Please try again.";
+    }
+}
+---
+
+<MainLayout>
+    <ImportCommentsForm {...args} client:load />
+</MainLayout>

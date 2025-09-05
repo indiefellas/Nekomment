@@ -1,0 +1,39 @@
+---
+import '../../styles/email.css';
+import '../../styles/main.css';
+import Signature from '../branding/Signature.svelte';
+
+interface Props {
+  name: string;
+};
+
+const { name } = Astro.props;
+---
+
+<main data-theme="light">
+    <Signature />
+    <h1>Welcome to Nekomment, {name}!</h1>
+    <p>Here's some things to help you get started:</p>
+    <a class="button big-button" href="https://cmt.nkko.link/add-host/">
+        <h2>Add your first site</h2>
+        <p>To see how you can add sites into Nekomment!</p>
+    </a>
+    <a class="button big-button" href="https://cmt.nkko.link/add-page/">
+        <h2>Add your first page</h2>
+        <p>If you want to embed this into your free Neocities website <i>(but first, add that site!)</i></p>
+    </a>
+    <a class="button big-button" disabled href="https://cmt.nkko.link/add-page/">
+        <h2>Read the manual</h2>
+        <p>To learn how you can use Nekomment to it's fullest potential (soon)</p>
+    </a>
+    <p>You can do it now, or later, I can't force you.</p>
+    <p>Cheers,<br />nkko.link team</p>
+    <hr />
+    <p>
+        <a href="https://cmt.nkko.link/terms">Terms of Use</a> - 
+        <a href="https://cmt.nkko.link/privacy">Privacy Policy</a>
+    </p>
+    <p>
+        &copy; nkko.link team, 2025; licensed under MIT license
+    </p>
+</main>

@@ -6,6 +6,8 @@ import { eq, and } from "drizzle-orm";
 import { resolveTxt } from "node:dns/promises";
 import { genDefaultTemplate, genId } from "./generators";
 import { PostBehavior } from "../db/enums";
+import lodash from "lodash";
+const { chunk } = lodash;
 
 export interface Response<T = any> {
     success: boolean;
@@ -271,6 +273,50 @@ export class Database {
             success: true,
             message: 'User found',
             data: userSession[0].users
+        }
+    }
+
+    async importComments(sessionToken: string, host: string, comments: schema.Comment[]): Promise<Response> {
+        if (!sessionToken) {
+            return {
+                success: false,
+                message: 'User not logged in or session expired',
+                status: 401
+            }
+        }
+        let userSession = await this.#db.select()
+            .from(schema.sessions)
+            .leftJoin(schema.users, eq(schema.users.id, schema.sessions.userId))
+            .where(eq(schema.sessions.sessionToken, sessionToken));
+        if (userSession.length < 1 || !userSession[0].users) {
+            return {
+                success: false,
+                message: 'User not logged in or session expired',
+                status: 401
+            }
+        }
+        let hosts = await this.#db.select()
+            .from(schema.hosts)
+            .where(
+                and(
+                    eq(schema.hosts.ownerId, userSession[0].users.id),
+                    eq(schema.hosts.host, host)
+                )
+            );
+        if (hosts.length < 1) {
+            return {
+                success: false,
+                message: 'Host not found',
+                status: 404
+            }
+        }
+        const commentChunks = chunk(comments, 5);
+        for (let i = 0; i < commentChunks.length; i++) {
+            await this.#db.insert(schema.comments).values(commentChunks[i]);
+        }
+        return {
+            success: true,
+            status: 200
         }
     }
 
