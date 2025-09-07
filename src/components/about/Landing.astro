@@ -1,6 +1,7 @@
 ---
 import Signature from "../branding/Signature.svelte";
 import CommentBg from "./CommentBg.astro";
+import Indev from "./Indev.astro";
 
 const {
     user
@@ -8,6 +9,7 @@ const {
 
 ---
 
+<Indev />
 <CommentBg />
 <div class="landing-hero fill-screen">
     <div class="introduction fill-screen">
@@ -32,7 +34,119 @@ const {
     </div>
 </div>
 
+<div class="notjust">
+    <h1>Not just a regular comments solution</h1>
+    <div class="cards">
+        <div class="card">
+            <h2>Nekomment Pages</h2>
+            <p>Allows you to embed Nekomment in any situation where JS can't work</p>
+        </div>
+        <div class="card">
+            <h2>No lock-in</h2>
+            <p>We will not hold your comments hostage! Export your data at anytime, and import your existing data!</p>
+        </div>
+        <div class="card">
+            <h2>No log in required</h2>
+            <p>Let users write comments without logging in</p>
+        </div>
+        <div class="card">
+            <h2>Advanced Moderation Tools</h2>
+            <p>Mark comments for review if they reach a certain condition, regular expressions included!</p>
+        </div>
+        <div class="card">
+            <h2>Customize everything!</h2>
+            <p>Customize your comment page using basic HTML with Handlebars templating and style it with CSS!</p>
+        </div>
+        <div class="card">
+            <h2>No ads</h2>
+            <p>Ads for comments? What is that?</p>
+        </div>
+        <div class="card">
+            <h2>Extensive API</h2>
+            <p>Don't want iframes? Use our extensive API, for free! We even provide a pre-made widget for anyone!</p>
+        </div>
+    </div>
+
+    <h1>Easy as 1-2-3!</h1>
+    <div class="cards c2">
+        <div class="card">
+            <h2>Sign up for Nekomment</h2>
+            <p>to get your Nekomment account, you'll need it</p>
+        </div>
+        <div class="card">
+            <h2>Link your domain</h2>
+            <p>to verify it's yours</p>
+        </div>
+        <div class="card">
+            <h2>Copy and paste</h2>
+            <p>either the embed or the JS widget!</p>
+        </div>
+    </div>
+
+    <h1>Don't wait, just do it!</h1>
+    <p class="actions">
+        {user?.data ? (
+            <a class="button primary" href="/">
+                Enter the Dashboard<i>!</i>
+            </a>
+        ) : (
+            <a class="button primary" href="/register">
+                Sign me up<i>!</i>
+            </a>
+            <a class="button" href="/login">I already registered</a>
+        )}
+    </p>
+</div>
+
 <style scoped>
+    .notjust {
+        margin-inline: calc(var(--main-margin) + 12px);
+        margin-bottom: 64px;
+        margin-top: 36px;
+
+        h1 {
+            padding-top: 48px;
+            font-size: min(calc(2vw + 2em), 6em);
+            line-height: 0.85;
+            letter-spacing: -0.06ch;
+            transform: skewY(-3deg);
+            transform-origin: bottom left;
+            width: fit-content;
+            margin-block: 20px 0.5em;
+            --blocky-bg: var(--background-4);
+            text-shadow: 
+                1px 1px var(--blocky-bg), 2px 2px var(--blocky-bg), 
+                3px 3px var(--blocky-bg), 4px 4px var(--blocky-bg), 
+                5px 5px var(--blocky-bg), 6px 6px var(--blocky-bg), 
+                7px 7px var(--blocky-bg), 8px 8px var(--blocky-bg), 
+                9px 9px var(--blocky-bg), 10px 10px 10px #0007;
+            position: relative;
+            z-index: -3;
+            line-height: 1.1em;
+            margin-bottom: -12px;
+            margin-left: -16px;
+            z-index: 1;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 500px));
+            gap: 12px;
+
+            &.c2 {
+                grid-template-columns: repeat(3, minmax(0, 420px));
+            }
+
+            .card {
+                padding: 10px;
+            }
+        }
+
+        .actions {
+            padding-top: 12px;
+        }
+    }
+
     .landing-hero {
         position: relative;
 

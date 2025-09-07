@@ -1,0 +1,38 @@
+<div class="indev">
+    <div class="indev-img" style="z-index: -2; padding-top: 100px; --t: 50vw;"><div></div></div>
+    <div class="indev-img" style="z-index: -1; padding-top: 100px; --l: -25vw; --r: -25deg;"><div></div></div>
+</div>
+
+<style scoped>
+    .indev {
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        top: -75px;
+        width: 100dvw;
+        height: calc(120dvh + 20px);
+        overflow: hidden;
+        opacity: 0.5;
+        pointer-events: none;
+
+        .indev-img {
+            position: absolute;
+            top: var(--t, 0);
+            left: var(--l, 0);
+            bottom: var(--b, 0);
+            transform: rotate(var(--r, 25deg));
+            height: 54px;
+            width: 300vw;
+
+            &>div {
+                background-image: url(/in-development.png);    
+                width: 200vw;
+                height: 54px;
+                background-repeat: repeat-x space;
+                background-size: 600px;
+                background-position: center;
+                box-shadow: 0 6px 2px -2px #000000AA;
+            }
+        }
+    }
+</style>

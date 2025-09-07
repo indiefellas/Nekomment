@@ -3,6 +3,7 @@ import Header from "../components/layout/Header.astro";
 import Footer from "../components/layout/Footer.astro";
 import "../styles/main.css";
 import { ClientRouter } from "astro:transitions";
+import FpsMeter from '../components/debug/FpsMeter.svelte';
 
 const { title = "Nekomment" } = Astro.props;
 ---
@@ -60,6 +61,7 @@ const { title = "Nekomment" } = Astro.props;
         <slot name="head" />
     </head>
     <body>
+        <FpsMeter client:only="svelte" />
         <main transition:animate="fade" class="content-only">
             <slot />
         </main>

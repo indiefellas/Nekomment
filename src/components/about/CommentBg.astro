@@ -9,6 +9,12 @@
     let commentHolder: HTMLElement;
     let lastMobileMode;
 
+    let disableAnimating = false;
+
+    document.addEventListener("astro:after-swap", () => {
+        disableAnimating = false;
+    })
+
     let delta, stop = false, time = performance.now();
     let offset = 0, xOffset = 0, yOffset = 0;
 
@@ -56,7 +62,19 @@
             window.innerHeight || 0,
         );
 
-        if (!reducedMotion.matches) {
+        try {
+            //@ts-ignore
+            if (window.fps.filter(f => f < 30 && f > 5).length > Math.max(Math.round((window.fps.length * 0.8)), 50)) {
+                disableAnimating = true;
+                const noanim = document.querySelector('.noanim') as HTMLElement;
+                if (noanim) {
+                    noanim.style.display = 'block';
+                    setTimeout(() => noanim.remove(), 5500)
+                }
+            }
+        } catch {}
+
+        if (!reducedMotion.matches && !disableAnimating) {
             offset += delta / 25;
             commentHolder.style.setProperty("--offset", offset + "px");
         }
@@ -76,7 +94,9 @@
             comments.push(comment);
         }
 
-        setTimeout(bgLoop, 50);
+        requestAnimationFrame(() => {
+            setTimeout(bgLoop, 50);
+        });
     }
 
     document.addEventListener("astro:page-load", () => {
@@ -93,6 +113,10 @@
     })
 </script>
 
+<div class="noanim" style="display: none">
+    <p>FPS too low (avg &lt; 30), disabling animations...</p>
+</div>
+
 <div class="background" aria-hidden="true">
     <div class="comment-holder"></div>
     {!noGradient && <div class="bg-gradient"></div>}
@@ -105,10 +129,35 @@
         font-display: block;
     }
 
+    .noanim {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background-color: var(--background-1);
+        z-index: 50000;
+        opacity: 0.75;
+        padding: 10px;
+        border-radius: 5px;
+        animation: fadeout 250ms forwards 5s linear;
+        pointer-events: none;
+        * {
+            font-weight: normal;
+        }
+    }
+
+    @keyframes fadeout {
+        from {
+            opacity: 0.75;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+
     .background {
         position: absolute;
         inset: 0;
-        z-index: -1;
+        z-index: -5;
         opacity: 0.25;
         overflow: hidden;
         height: calc(100dvh + 24px);
@@ -139,7 +188,7 @@
         width: 60%;
         display: flex;
         flex-direction: column;
-        z-index: -2;
+        z-index: -6;
         gap: 12px;
         min-width: 200px;
         max-width: 500px;
@@ -170,13 +219,13 @@
             }
         }
 
-        p {
-            opacity: 0.5;
-        }
-
         * {
             overflow-wrap: normal;
             text-overflow: clip;
+        }
+
+        p {
+            opacity: 0.5;
         }
 
         &:not([data-light])[data-variant="1"] {
@@ -227,6 +276,46 @@
                 background: #080808;
                 border: 1px solid #00f705;
                 border-radius: 0;
+            }
+        }
+
+        &:not([data-light])[data-variant="5"] {
+            background: #4A4A4A;
+            --blocky-bg: #080808;
+            color: #ccc;
+            border: 10px solid #080808;
+
+            blockquote {
+                background: #080808;
+                border: none;
+                border-radius: 0;
+
+                h3 {
+                    color: #9f0;
+                }
+            }
+
+            h2 {
+                width: 100%;
+                color: #9f0;
+            }
+        }
+
+        &:not([data-light])[data-variant="6"] {
+            background: #00000055;
+            --blocky-bg: #7133AB;
+            color: #eee;
+            border: 5px solid #7133AB;
+            border-radius: 0;
+
+            blockquote {
+                background: #00000055;
+                border: 5px solid #7133AB;
+                border-radius: 0;
+            }
+
+            h1, h2 {
+                color: #B876D6;
             }
         }
 

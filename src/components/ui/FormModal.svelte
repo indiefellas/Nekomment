@@ -1,19 +1,34 @@
 <script lang="ts">
     import { onMount } from "svelte";
 
-    const { children, title, event = 'form-modal-clicked', ...args } = $props();
-    let form: HTMLFormElement;
+    let { children, title, event = 'form-modal-clicked', visible = $bindable(false), ...args } = $props();
+    let form: HTMLFormElement | undefined;
     let modal: HTMLDivElement;
 
     onMount(()=>{
-        form.addEventListener(event, ()=>{
-            modal.classList.toggle('visible');
+        if (visible) {
+            modal.classList.add('visible');
+        }
+        form?.addEventListener(event, ()=>{
+            toggleVisible();
         })
     })
+
+    function toggleVisible() {
+        if (!visible) {
+            modal.classList.add('visible');
+            visible = true;
+        } else {
+            modal.classList.remove('visible');
+            visible = false;
+        }
+    }
 </script>
 
 <div class="form-modal" bind:this={modal}>
-    <div class="form-bg"></div>
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="form-bg" onclick={() => toggleVisible()}></div>
     <form class="center-form" method="post" {...args} bind:this={form}>
         <div class="title">
             <h2>{title}</h2>
@@ -58,6 +73,7 @@
             display: flex;
             flex-direction: column;
             z-index: 1002;
+            width: auto;
 
             .title {
                 display: flex;

@@ -17,6 +17,7 @@
             from = host;
             oldStep = step;
             step++;
+            console.log(step, host);
         }
     }
     function setparam(value: string) {
@@ -118,29 +119,7 @@
                         </button>
                         <span class="flex-fill"></span>
                         <button class="primary" type="submit">
-                            Create page
-                        </button>
-                    </div>
-                </section>
-            {:else if step == 2}
-                <section in:f={{ step: 2 }} out:f={{ step: 2, out: true }}>
-                    <h2>Here's the important part:</h2>
-                    <p>What would be the name of your comment page?</p>
-                    <div class="special-text">
-                        <p>https://cmt.nkko.link/c/</p>
-                        <input type="text" name="name" aria-label="The name of your comment page" placeholder="Comment page name" bind:value={name} />
-                    </div>
-                    {#if err}
-                        <div class="field-error">{err}</div>
-                    {/if}
-                    <hr>
-                    <div class="field-actions">
-                        <button type="button" on:click={() => {oldStep = step; step--}}>
-                            Back
-                        </button>
-                        <span class="flex-fill"></span>
-                        <button class="primary" type="submit">
-                            Create page
+                            Import comment
                         </button>
                     </div>
                 </section>
