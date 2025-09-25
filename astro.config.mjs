@@ -12,6 +12,10 @@ export default defineConfig({
   output: 'server',
   site: 'https://cmt.nkko.link',
 
+  security: {
+    checkOrigin: false
+  },
+
   adapter: cloudflare({
     platformProxy: {
       enabled: true
