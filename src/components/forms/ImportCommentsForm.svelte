@@ -92,6 +92,9 @@
                     <h2>Here's the important part:</h2>
 
                     <div class="field-group">
+                        {#if err}
+                            <div class="field-error">{err}</div>
+                        {/if}
                         {#if from === 'ayano'}
                             <label for="sheetsUrl">What is your Google Sheets URL for your comments?</label>
                             <blockquote>

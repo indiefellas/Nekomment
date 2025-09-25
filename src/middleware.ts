@@ -8,8 +8,8 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     if (context.url.pathname.startsWith('/api/')) {
       response.headers.append('Access-Control-Allow-Origin', '*');
     }
-    if (response.status === 404 && response.headers.get('Content-Type') !== 'text/html') {
-      return context.rewrite("/404");
+    if (response.status > 399 && response.headers.get('Content-Type') !== 'text/html') {
+      return context.rewrite(`/${response.status}`);
     }
     response.headers.append('X-Powered-By', 'Nekomment');
     response.headers.append('X-Content-Type-Options', 'nosniff');

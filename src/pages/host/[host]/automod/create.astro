@@ -1,13 +1,16 @@
 ---
-import { AutoModBehavior, AutoModType } from "../../../db/enums";
-import HostNav from "../../../components/dashboard/HostNav.astro";
-import MainLayout from "../../../layouts/MainLayout.astro";
-import { Database } from "../../../lib/databaseInterface";
-import HostLayout from "../../../layouts/HostLayout.astro";
+import { AutoModBehavior, AutoModType } from "../../../../db/enums";
+import HostNav from "../../../../components/dashboard/HostNav.astro";
+import MainLayout from "../../../../layouts/MainLayout.astro";
+import { Database } from "../../../../lib/databaseInterface";
+import HostLayout from "../../../../layouts/HostLayout.astro";
 
 const { env } = Astro.locals.runtime;
 const { host } = Astro.params;
 const db = new Database(env);
+
+if (!Astro.cookies.get("token")?.value)
+    return Astro.redirect(`/login?redirect=${Astro.url.pathname}`);
 
 const hostData = await db.getHost(
     Astro.cookies.get("token")?.value ?? "",

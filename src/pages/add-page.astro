@@ -27,7 +27,7 @@ if (Astro.request.method === "POST") {
             theme,
         );
         if (session.success) {
-            return Astro.redirect("/" + domain + "/pages/" + name, 302);
+            return Astro.redirect("/host/" + domain + "/pages/" + name, 302);
         } else {
             err = "An error occurred. Please try again. " + session.message;
         }

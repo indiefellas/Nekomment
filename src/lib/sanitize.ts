@@ -1,4 +1,4 @@
-import type { User } from "../../../api/db/schema";
+import type { User } from "../../../../api/db/schema";
 import * as vm from "vm";
 
 export type SafeUser = {

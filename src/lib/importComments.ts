@@ -11,7 +11,7 @@ export async function getAyanoComments(sheetUrl: string): Promise<any[]> {
     const split = sheetUrl.split('/');
     const splitRemoved = split.slice(0, 6);
     const url = `${splitRemoved.join('/')}/gviz/tq?`;
-    console.log(url);
+    console.trace(url);
     const result = await getSheet(url);
     const json = JSON.parse(result.split('\n')[1].replace(/google.visualization.Query.setResponse\(|\);/g, ''));
     const isPage = (col: any) => col.label == 'Page';
@@ -36,8 +36,7 @@ export async function getAyanoComments(sheetUrl: string): Promise<any[]> {
     if (comments.length == 0 || Object.keys(comments[0]).length < 2) { // Once again, Google Sheets can be weird
         return [];
     } else {
-        console.log(comments);
-        return comments;
+        return comments.filter(c => !!c);
     }
 }
 
@@ -83,11 +82,11 @@ export async function importComments(db: Database, sessionToken: string, host: s
             const comments = cmts.filter(c => !c.Reply).map(c => ({...c, id: genId(6)}));
             const replies = cmts.filter(c => !!c.Reply).map(c => ({...c, id: genId(6)}));
 
-            const convertedComments: Comment[] = comments.map<Comment>(c => {
-                console.log(c);
+            const convertedComments: Comment[] = comments.map<Comment>((c, i) => {
+                console.trace("converting comment", c, i);
                 if (!c) return ({})
                 return ({
-                    id: c.id,
+                    id: c.id ?? genId(6),
                     author: c.Name,
                     content: c.Text,
                     website: c.Website,
@@ -103,11 +102,12 @@ export async function importComments(db: Database, sessionToken: string, host: s
 
             const convertedReplies: Comment[] = replies.map<Comment>(c => {
                 const parent = comments.find(cm => c.Reply === `${cm.Name}|--|${cm.Timestamp2}`)
-                console.log(parent)
+                console.trace("parent:", parent)
+                if (!c || !parent) return ({})
                 return ({
-                    id: c.id,
+                    id: c.id ?? genId(6),
                     author: c.Name,
-                    content: c.Text,
+                    content: c.Text ?? 'No content',
                     website: c.Website,
                     createdAt: convertTimestamp(c.Timestamp),
                     address: '0.0.0.0 (imported)',

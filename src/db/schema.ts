@@ -1,15 +1,16 @@
 import { type InferInsertModel, type InferSelectModel, relations, sql } from "drizzle-orm";
-import { blob, int, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { blob, check, int, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { genId } from "../lib/generators";
-import { AutoModBehavior, AutoModType, PostBehavior } from "./enums";
+import { AutoModBehavior, AutoModScopeType, AutoModType, Permissions, PostBehavior } from "./enums";
 
 export const users = sqliteTable("users", {
 	id: int().primaryKey({ autoIncrement: true }),
 	name: text().notNull(),
 	email: text().notNull().unique(),
+	// TODO: change host token whether user adds new domain
 	hostToken: text(),
 	type: int().notNull(),
-	passwordHash: text().notNull()
+	passwordHash: text().notNull(),
 });
 
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -76,7 +77,8 @@ export const paths = sqliteTable("paths", {
 	locked: integer({ mode: 'boolean' }).default(false),
 	// 0: publish comments
 	// 1: mark them as review by default
-	postBehavior: int().notNull().$type<PostBehavior>().default(PostBehavior.AutoPublish)
+	postBehavior: int().notNull().$type<PostBehavior>().default(PostBehavior.AutoPublish),
+
 })
 
 export const pathsRelations = relations(paths, ({ one, many }) => ({
@@ -84,7 +86,8 @@ export const pathsRelations = relations(paths, ({ one, many }) => ({
 		fields: [paths.host],
 		references: [hosts.host]
 	}),
-	comments: many(comments)
+	comments: many(comments),
+	autoModRules: many(autoModRules),
 }))
 
 export const comments = sqliteTable("comments", {
@@ -132,7 +135,22 @@ export const hostSettingsRelations = relations(hostSettings, ({ one, many }) => 
 		references: [hosts.host]
 	}),
 	blockedAddresses: many(blockedAddresses),
-	autoModRules: many(autoModRules)
+	autoModRules: many(autoModRules),
+	hostAccess: many(hostAccess)
+}))
+
+export const hostAccess = sqliteTable("host_access", {
+	id: int().primaryKey({ autoIncrement: true }),
+	userId: int().notNull(),
+	permissions: int().notNull().$type<Permissions>().default(Permissions.ReadWriteComments),
+	settingsId: int().notNull()
+});
+
+export const hostAccessRelations = relations(hostAccess, ({ one }) => ({
+	settings: one(hostSettings, {
+		fields: [hostAccess.settingsId],
+		references: [hostSettings.id]
+	})
 }))
 
 export const blockedAddresses = sqliteTable("blocked_addresses", {
@@ -154,15 +172,23 @@ export const autoModRules = sqliteTable("automod_rules", {
 	name: text().notNull(),
 	rule: text().notNull(),
 	type: int().notNull().$type<AutoModType>().default(AutoModType.KeywordList),
+	internalType: int(),
 	behavior: int().notNull().$type<AutoModBehavior>().default(AutoModBehavior.Block),
-	settingsId: int().notNull(),
+	scopeType: int().notNull().$type<AutoModScopeType>().default(AutoModScopeType.Host),
+	hostSettingsId: int(),
+	customModMessage: text(),
+	pathName: text(),
 	enabled: integer({ mode: 'boolean' }).default(true)
 })
 
 export const autoModRulesRelations = relations(autoModRules, ({ one }) => ({
-	settings: one(hostSettings, {
-		fields: [autoModRules.settingsId],
+	hostSettings: one(hostSettings, {
+		fields: [autoModRules.hostSettingsId],
 		references: [hostSettings.id]
+	}),
+	pathSettings: one(paths, {
+		fields: [autoModRules.pathName],
+		references: [paths.path]
 	})
 }))
 
@@ -180,6 +206,8 @@ export type Comment = InferSelectModel<typeof comments>;
 export type NewComment = InferInsertModel<typeof comments>;
 export type HostSettings = InferSelectModel<typeof hostSettings>;
 export type NewHostSettings = InferInsertModel<typeof hostSettings>;
+export type HostAccess = InferSelectModel<typeof hostAccess>;
+export type NewHostAccess = InferInsertModel<typeof hostAccess>;
 export type BlockedAddress = InferSelectModel<typeof blockedAddresses>;
 export type NewBlockedAddress = InferInsertModel<typeof blockedAddresses>;
 export type AutoModRule = InferSelectModel<typeof autoModRules>;

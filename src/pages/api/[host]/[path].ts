@@ -5,38 +5,14 @@ import { text } from "../../../lib/responses";
 import { AutoModBehavior, AutoModType, PostBehavior } from "../../../db/enums";
 import { safeRegexMatch } from "../../../lib/sanitize";
 import { eq, and } from "drizzle-orm";
+import { Database } from "../../../lib/databaseInterface";
 
 export const GET: APIRoute = async ({ params, request, locals }) => {
-    const db = createDb(locals.runtime.env);
+    const db = new Database(locals.runtime.env);
     const { host, path } = params;
-    console.log(host, path)
-    const comments = await db.query.comments.findMany({
-        with: {
-            replies: true
-        },
-        where: (comments, { and, eq, isNull }) => and(
-            path ?
-                and(
-                    eq(comments.host, host ?? ''),
-                    eq(comments.pagePath, decodeURIComponent(path))
-                ) :
-                eq(comments.host, host ?? ''),
-            isNull(comments.parentId)
-        )
-    })
-    console.log(comments);
-    const cmts = comments.map(c => {
-        const { address, parentId, moderatedBy, replies, ...rest } = c;
-        const repl = replies.map(r => {
-            const { address, parentId, moderatedBy, ...rest } = r;
-            return rest;
-        }).reverse();
-        return {
-            ...rest,
-            replies: repl
-        };
-    })
-    return new Response(JSON.stringify(cmts.reverse()), {
+    console.log(host, decodeURIComponent(path))
+    const comments = await db.getComments('', host, decodeURIComponent(path));
+    return new Response(JSON.stringify(comments.data), {
         headers: {
             'Content-Type': 'application/json'
         }

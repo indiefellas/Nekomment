@@ -7,13 +7,8 @@
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
     
     let commentHolder: HTMLElement;
-    let lastMobileMode;
 
     let disableAnimating = false;
-
-    document.addEventListener("astro:after-swap", () => {
-        disableAnimating = false;
-    })
 
     let delta, stop = false, time = performance.now();
     let offset = 0, xOffset = 0, yOffset = 0;
@@ -99,18 +94,11 @@
         });
     }
 
-    document.addEventListener("astro:page-load", () => {
+    document.addEventListener("DOMContentLoaded", () => {
         stop = false;
         commentHolder = document.querySelector(".comment-holder")!;
         bgLoop();
     });
-
-    document.addEventListener("astro:before-swap", () => {
-        stop = true;
-        offset = 0;
-        yOffset = 0;
-        xOffset = 0;
-    })
 </script>
 
 <div class="noanim" style="display: none">
@@ -119,7 +107,10 @@
 
 <div class="background" aria-hidden="true">
     <div class="comment-holder"></div>
-    {!noGradient && <div class="bg-gradient"></div>}
+    {!noGradient && <Fragment>
+         <div class="bg-gradient"></div>
+         <div class="bg-gradient bg-gradient2"></div>
+    </Fragment>}
 </div>
 
 <style scoped>
@@ -163,13 +154,24 @@
         height: calc(100dvh + 24px);
         
         .bg-gradient {
-            position: relative;
+            position: absolute;
             top: 0;
             left: 0;
             width: 50dvw;
             height: calc(100dvh + 24px);
             background-image: linear-gradient(
                 to left,
+                transparent,
+                var(--background-0)
+            );
+        }
+
+        .bg-gradient2 {
+            top: 50%;
+            width: 100dvw;
+            height: calc(50dvh + 24px);
+            background-image: linear-gradient(
+                to bottom,
                 transparent,
                 var(--background-0)
             );
@@ -398,12 +400,16 @@
     @media screen and (width <= 640px) {
         .background .bg-gradient {
             width: 100dvw;
-            height: 100dvh;
+            height: calc(100dvh + 24px);
             background-image: linear-gradient(
                 to bottom,
                 transparent,
-                var(--background-1)
+                var(--background-0)
             );
+        }
+
+        .background .bg-gradient2 {
+            display: none;
         }
     }
 </style>

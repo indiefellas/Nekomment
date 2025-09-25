@@ -1,0 +1,92 @@
+---
+import { Database, type Response } from "../../../lib/databaseInterface";
+import HostLayout from "../../../layouts/HostLayout.astro";
+import CommentCard from "../../../components/dashboard/CommentCard.svelte";
+import CommandBar from "../../../components/dashboard/CommandBar.svelte";
+import type { User } from "../../../db/schema";
+import { parseMarkdown } from "../../../lib/markdownRenderer";
+
+const { env } = Astro.locals.runtime;
+const { host } = Astro.params;
+const db = new Database(env);
+let user: Response<User> = Astro.props.user ?? (await db.checkUser(Astro.cookies.get('token')?.value ?? ''));
+
+if (!Astro.cookies.get("token")?.value)
+    return Astro.redirect(`/login?redirect=${Astro.url.pathname}`);
+
+const hostData = await db.getHost(
+    Astro.cookies.get("token")?.value ?? "",
+    host ?? "",
+);
+
+if (!hostData.success) return new Response("403 Forbidden", { status: 403 });
+
+let comments = await db.getComments(
+    Astro.cookies.get("token")?.value ?? "",
+    host ?? "",
+);
+
+if (Astro.request.method === "POST") {
+    try {
+        const data = await Astro.request.formData();
+        const action = data.get('type')?.toString() || "";
+        const id = data.get('id')?.toString() || "";
+
+        if (action && id) {
+            switch (action) {
+                case "reply": {
+                    const content = data.get('content')?.toString() || "";
+                    const c = await db.createComment(host ?? '', path, user.data.name, content, Astro.request.headers.get('CF-Connecting-IP') || '0.0.0.0', host ? `https://${host}` : undefined, id, undefined, Astro.cookies.get('token')?.value ?? '');
+                    break;
+                }
+                case "delete": {
+                    await db.deleteComment(Astro.cookies.get('token')?.value ?? '', host ?? '', id);
+                    break;
+                }
+                case "ip-ban": {
+                    const deleteComments = data.get('delete') === "true";
+                    console.log(deleteComments);
+                    await db.ipBanUser(Astro.cookies.get('token')?.value ?? '', host ?? '', id, deleteComments);
+                    break;
+                }
+            }
+
+            return Astro.redirect(Astro.url.pathname, 303); // to prevent 'refresh with form'
+        }
+    } catch (e) { console.error(e) }
+}
+
+let allComments = await Promise.all(comments.data.map(
+    async m => ({
+        ...m,
+        content: await parseMarkdown(m.content),
+        replies: await Promise.all(m.replies.map(async r => ({
+            ...r,
+            content: await parseMarkdown(r.content),
+        })))
+    })
+).sort((a, b) => b.createdAt?.getTime() - a.createdAt?.getTime()));
+---
+
+<HostLayout title={host + " - Nekomment"} {hostData}>
+    <CommandBar client:load pathname={Astro.url.pathname} />
+    <div class="comments-container">
+        {comments.data?.length === 0 ? <Fragment>
+            <p>No comments yet!</p>
+            <p>You might want to <a href={Astro.url.pathname + "/import"}>import from your old comment service</a>?</p>
+        </Fragment> : <CommentCard client:load username={user.data.name} comments={allComments} />}
+    </div>
+</HostLayout>
+
+<style scoped>
+    .comments-container {
+        margin-top: 12px;
+
+        .actions {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            gap: 5px;
+        }
+    }
+</style>

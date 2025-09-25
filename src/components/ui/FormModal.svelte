@@ -1,7 +1,15 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import type { HTMLAttributes } from "svelte/elements";
 
-    let { children, title, event = 'form-modal-clicked', visible = $bindable(false), ...args } = $props();
+    type Props = HTMLAttributes<HTMLFormElement> & {
+        disabled?: boolean,
+        title: string,
+        event: string,
+        visible: boolean,
+    };
+
+    let { children, title, event = 'form-modal-clicked', visible = $bindable(false), ...args }: Props = $props();
     let form: HTMLFormElement | undefined;
     let modal: HTMLDivElement;
 

@@ -1,13 +1,14 @@
 ---
-import ImportCommentsForm from "../../components/forms/ImportCommentsForm.svelte";
-import MainLayout from "../../layouts/MainLayout.astro";
-import { Database } from "../../lib/databaseInterface";
-import { importComments } from "../../lib/importComments";
+import ImportCommentsForm from "../../../components/forms/ImportCommentsForm.svelte";
+import MainLayout from "../../../layouts/MainLayout.astro";
+import { Database } from "../../../lib/databaseInterface";
+import { importComments } from "../../../lib/importComments";
 export const prerender = false;
 const { env } = Astro.locals.runtime;
 const { host } = Astro.params;
 
-if (!Astro.cookies.get("token")?.value) return Astro.redirect('/login?redirect=/add-host');
+if (!Astro.cookies.get("token")?.value)
+    return Astro.redirect(`/login?redirect=${Astro.url.pathname}`);
 
 const db = new Database(env);
 let err = "";
@@ -26,11 +27,12 @@ if (Astro.request.method === "POST") {
                 from, sheetsUrl, file
             );
 
-            return Astro.redirect("/" + host, 302);
+            return Astro.redirect("/host/" + host, 302);
         } catch (e) {
+            console.error(e);
             err = "An error occurred. Please try again. " + e;
             args = {
-                step: 2,
+                step: 1,
                 from,
                 err,
             }

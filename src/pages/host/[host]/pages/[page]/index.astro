@@ -1,12 +1,15 @@
 ---
-import HostNav from "../../../../components/dashboard/HostNav.astro";
-import MainLayout from "../../../../layouts/MainLayout.astro";
-import FormModal from "../../../../components/ui/FormModal.svelte";
-import { Database } from "../../../../lib/databaseInterface";
+import HostNav from "../../../../../components/dashboard/HostNav.astro";
+import MainLayout from "../../../../../layouts/MainLayout.astro";
+import FormModal from "../../../../../components/ui/FormModal.svelte";
+import { Database } from "../../../../../lib/databaseInterface";
 
 const { env } = Astro.locals.runtime;
 const { host, page } = Astro.params;
 const db = new Database(env);
+
+if (!Astro.cookies.get("token")?.value)
+    return Astro.redirect(`/login?redirect=${Astro.url.pathname}`);
 
 const hostData = await db.getHost(
     Astro.cookies.get("token")?.value ?? "",

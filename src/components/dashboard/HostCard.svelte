@@ -3,7 +3,7 @@
     const { host, comments, inReview } = $props();
 </script>
 
-<a class="button" href={"/" + host}>
+<a class="button" href={"/host/" + host}>
     <h3>{host}</h3>
     <div class="host-stats">
         <p aria-description="total comments">

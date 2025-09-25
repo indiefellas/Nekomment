@@ -28,7 +28,7 @@ if (Astro.request.method === "POST") {
         );
         Astro.cookies.delete("host-token");
         if (session.success) {
-            return Astro.redirect("/" + domain, 302);
+            return Astro.redirect("/host/" + domain, 302);
         } else {
             err = "An error occurred. Please try again. " + session.message;
         }

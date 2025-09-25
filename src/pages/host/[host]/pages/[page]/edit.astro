@@ -1,15 +1,18 @@
 ---
-import HostNav from "../../../../components/dashboard/HostNav.astro";
-import MainLayout from "../../../../layouts/MainLayout.astro";
-import { Database } from "../../../../lib/databaseInterface";
-import CodeEditor from "../../../../components/code/CodeEditor.svelte";
+import HostNav from "../../../../../components/dashboard/HostNav.astro";
+import MainLayout from "../../../../../layouts/MainLayout.astro";
+import { Database } from "../../../../../lib/databaseInterface";
+import CodeEditor from "../../../../../components/code/CodeEditor.svelte";
 import jsb from "js-beautify"
-import { convertToTags, convertToTemplate } from "../../../../lib/generators";
+import { convertToTags, convertToTemplate } from "../../../../../lib/generators";
 const { html } = jsb;
 
 const { env } = Astro.locals.runtime;
 const { host, page } = Astro.params;
 const db = new Database(env);
+
+if (!Astro.cookies.get("token")?.value)
+    return Astro.redirect(`/login?redirect=${Astro.url.pathname}`);
 
 const hostData = await db.getHost(
     Astro.cookies.get("token")?.value ?? "",

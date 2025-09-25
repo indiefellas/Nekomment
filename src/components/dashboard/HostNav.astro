@@ -17,9 +17,9 @@ const pages = pagesRes.data;
 <h4>Host</h4>
 <p class="host-name">{host?.host}</p>
 <nav>
-    <a href={hostRoot}>Comments</a>
-    <a href={hostRoot + '/automod'}>Auto Moderation</a>
-    <a href={hostRoot + '/settings'}>Host Settings</a>
+    <a href={'/host' + hostRoot}>Comments</a>
+    <a href={'/host' + hostRoot + '/automod'}>Auto Moderation</a>
+    <a href={'/host' + hostRoot + '/settings'}>Host Settings</a>
 </nav>
 
 <div>
@@ -28,7 +28,7 @@ const pages = pagesRes.data;
         <Fragment>
             <h4 class="host-name">Linked Pages</h4>
             <nav>
-                {pages.map(p => <a href={hostRoot + '/pages/' + p.name}>{p.name} ({p.pagePath})</a>)}
+                {pages.map(p => <a href={'/host' + hostRoot + '/pages/' + p.name}>{p.name} ({p.pagePath})</a>)}
             </nav>
         </Fragment>
     }
