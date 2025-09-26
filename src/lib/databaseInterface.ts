@@ -895,7 +895,8 @@ export class Database {
                 status: 404
             }
         }
-        let comments = await this.#db.delete(schema.comments).where(inArray(schema.comments.id, id.split(','))).returning();
+        let idChunks = chunk(id.split(','), 25);
+        let comments = [...idChunks.map(async c => await this.#db.delete(schema.comments).where(inArray(schema.comments.id, c)).returning())]
         if (comments.length === 0) {
             return {
                 success: false,

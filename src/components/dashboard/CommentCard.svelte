@@ -177,15 +177,18 @@
         };
     }
 
-    const batchComments = chunk(comments, 15);
+    const batchComments = chunk(comments, 25);
     let page = 0;
     let commentShown = $state(batchComments[0]);
+    commentShown = [];
 
     // @ts-ignore
     function infiniteHandler({ detail: { loaded, complete } }) {
+        const loading = document.querySelector('.loading');
+        if (loading) loading.remove();
         try {
-            page++;
             commentShown = [...commentShown, ...batchComments[page]];
+            page++;
             loaded();
         } catch {
             complete();

@@ -1,12 +1,13 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import lodash from "lodash";
+    import FilterButton from "../buttons/FilterButton.svelte";
     const { uniq } = lodash;
 
     let commentsSelected: string[] = $state([]);
     let requiresReview = $state(0);
 
-    let { pathname } = $props();
+    let { pathname, commentCount, filteredCommentsCount } = $props();
     let header: Element | undefined = $state();
 
     $effect.pre(() => {
@@ -39,6 +40,28 @@
     function dev(event: string) {
         const ev = new CustomEvent("nkm:bev", { detail: { type: event, ids: commentsSelected } })
         document.dispatchEvent(ev);
+    }
+
+    function selectAll() {
+        document.querySelectorAll('.select-cmts-checkbox input').forEach(e => {
+            const elm = e as HTMLInputElement;
+            const parent = elm.parentElement?.parentElement?.parentElement?.parentElement;
+            if (!elm.checked) {
+                elm.checked = true;
+                commentsSelected.push(parent?.dataset.nkmId ?? '');
+                if (elm.dataset.nkmApproved==="false") requiresReview++;
+            }
+
+            if (parent?.querySelector('blockquote')) {
+                parent?.querySelectorAll('blockquote').forEach(r => {
+                    if (!(e as HTMLInputElement).checked) {
+                        (e as HTMLInputElement).checked = true;
+                        commentsSelected.push(r.dataset.nkmId ?? '');
+                        if (r.dataset.nkmApproved==="false") requiresReview++;
+                    }
+                });
+            }
+        });
     }
 
     function initCheckboxes() {
@@ -81,7 +104,7 @@
     <h1>Comments</h1>
     <div>
         <a href={pathname + "/import"} class="button primary">Import...</a>
-        <button>Filter...</button>
+        <FilterButton {commentCount} {filteredCommentsCount} />
     </div>
 </div>
 
@@ -91,6 +114,7 @@
             <p>{commentsSelected.length} selected</p>
         </div>
         <div>
+            <button onclick={()=>selectAll()}>Select all</button>
             <button onclick={()=>commentsSelected = []}>Remove selection</button>
             {#if requiresReview > 0}
                 <button>Approve</button>

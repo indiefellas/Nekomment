@@ -56,6 +56,12 @@ if (Astro.request.method === "POST") {
     } catch (e) { console.error(e) }
 }
 
+let qa, qc, qip;
+let params = Astro.url.searchParams;
+qa = params.get('qa')
+qc = params.get('qc')
+qip = params.get('qip')
+
 let allComments = await Promise.all(comments.data.map(
     async m => ({
         ...m,
@@ -66,22 +72,38 @@ let allComments = await Promise.all(comments.data.map(
         })))
     })
 ).sort((a, b) => b.createdAt?.getTime() - a.createdAt?.getTime()));
+
+allComments = allComments.filter(f => {
+    let c = true;
+    if (!!qa) c = c && (f.author.toLowerCase().includes(qa.toLowerCase()) || !!f.replies.find(r => r.author.toLowerCase().includes(qa.toLowerCase())));
+    if (!!qc) c = c && (f.content.toLowerCase().includes(qc.toLowerCase()) || !!f.replies.find(r => r.content.toLowerCase().includes(qc.toLowerCase())));
+    if (!!qip) c = c && (f.address.includes(qip) || !!f.replies.find(r => r.address.includes(qip)));
+    return c;
+})
 ---
 
 <HostLayout title={host + " - Nekomment"} {hostData}>
-    <CommandBar client:load pathname={Astro.url.pathname} />
+    <CommandBar client:load pathname={Astro.url.pathname} commentCount={comments.data?.length} filteredCommentsCount={allComments.length} />
     <div class="comments-container">
-        {comments.data?.length === 0 ? <Fragment>
-            <p>No comments yet!</p>
-            <p>You might want to <a href={Astro.url.pathname + "/import"}>import from your old comment service</a>?</p>
-        </Fragment> : <CommentCard client:load username={user.data.name} comments={allComments} />}
+        
+        {allComments.length === 0 ? <Fragment>
+            {!!qa || !!qc || !!qip ? <Fragment>
+                <p>No comments found!</p>
+                <p>You might want to <a href={Astro.url.pathname}>reset your filters</a>?</p>
+            </Fragment> : <Fragment>
+                <p>No comments yet!</p>
+                <p>You might want to <a href={Astro.url.pathname + "/import"}>import from your old comment service</a>?</p>    
+            </Fragment>}
+        </Fragment> : <Fragment>
+            <p class="loading">Loading comments...</p>
+            <CommentCard client:load username={user.data.name} comments={allComments} />
+        </Fragment>}
     </div>
 </HostLayout>
 
 <style scoped>
     .comments-container {
         margin-top: 12px;
-
         .actions {
             margin-top: 10px;
             display: flex;
