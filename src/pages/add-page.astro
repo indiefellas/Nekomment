@@ -10,37 +10,41 @@ if (!Astro.cookies.get("token")?.value) return Astro.redirect('/login?redirect=/
 const db = new Database(env);
 const hosts = await db.getHosts(Astro.cookies.get("token")?.value ?? '');
 
-let err = "";
-
-let args = {}
+let args = {
+    step: 0,
+    domain: "",
+    theme: "",
+    name: "",
+    err: null,
+}
 
 if (Astro.request.method === "POST") {
     try {
         const data = await Astro.request.formData();
-        const name = data.get("name")?.toString() || "";
-        const domain = data.get("domain")?.toString() || "";
-        const theme = data.get("theme")?.toString() || "";
+        const displayName = args.name = data.get("name")?.toString() || "";
+        const domain = args.domain = data.get("domain")?.toString() || "";
+        const theme = args.theme = data.get("theme")?.toString() || "";
+        const name = crypto.randomUUID();
         let session = await db.createPage(
             Astro.cookies.get("token")?.value || "",
+            displayName,
             name,
             domain,
             theme,
         );
         if (session.success) {
-            return Astro.redirect("/host/" + domain + "/pages/" + name, 302);
+            return Astro.redirect("/host/" + domain + "/page/" + name, 302);
         } else {
-            err = "An error occurred. Please try again. " + session.message;
+            args.step = 2;
+            args.err = session.message ?? "An error occurred. Please try again. ";
+            Astro.response.status = session.status ?? 400;
         }
 
-        args = {
-            step: 2,
-            domain,
-            theme,
-            name,
-            err,
-        }
-    } catch {
-        err = "An error occurred. Please try again.";
+    } catch (e) {
+        console.error(e);
+        args.step = 2;
+        args.err = "An error occurred. Please try again.";
+        Astro.response.status = 400;
     }
 }
 ---

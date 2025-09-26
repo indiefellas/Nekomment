@@ -16,6 +16,7 @@ export function genId(length: number) {
 }
 
 function genBoilerplate(output: string, name: string, id: string, turnstileKey: string) {
+    name = name.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
     return /*html*/`
 <!DOCTYPE html>
 <html lang="en">
@@ -99,9 +100,35 @@ export const GET: APIRoute = async ({ params, request, locals, url, rewrite }) =
         res.headers.append('Cache-Control', 'no-cache');
         return res;
     }
+    
+    const comments = chunk(page.comments.filter(c => c.pagePath === (page.useReferer ? new URL(path).pathname : page.pagePath)).reverse().map(c => ({
+        ...c,
+        replies: c.replies?.sort((a, b) => {
+            //@ts-ignore
+            return b.createdAt - a.createdAt
+        })
+    })).sort((a, b) => {
+        //@ts-ignore
+        return b.createdAt - a.createdAt
+    }), 10);
+    let context = {
+        name: page.displayName,
+        comments: comments[pageNum - 1],
+    };
+
+    let contextData = {
+        host: page.hostName,
+        path: page.useReferer ? new URL(path).pathname : page.pagePath,
+        backpath: pathUrl + 'c/' + page.name,
+        page: pageNum,
+        totalPages: comments.length,
+        totalComments: page.comments.length,
+        apiUrl: locals.runtime.env.API_URL,
+        turnstileSiteKey: locals.runtime.env.TURNSTILE_SITEKEY
+    }
 
     const hbs = new Handlebars({ interpreted: true });
-    hbs.engine.addMethod('Editor', function (value) {
+    hbs.engine.addMethod('Editor', function () {
         return (/*html*/`
             <noscript>
                 <style>
@@ -113,7 +140,7 @@ export const GET: APIRoute = async ({ params, request, locals, url, rewrite }) =
                     <p>To comment, you need to have JavaScript enabled.</p>
                 </div>
             </noscript>
-            <form class="nkm-editor" method="POST" action="/api/${value[0].host}/${encodeURIComponent(value[0].path)}">
+            <form class="nkm-editor" method="POST" action="/api/${contextData.host}/${contextData.path}">
                 <div class="nkm-topInput">
                     <input type="text" maxlength="64" name="name" placeholder="Display name" aria-label="Display name" required />
                     <input type="url" maxlength="64" name="website" placeholder="Website (optional)" aria-label="Website (optional)" />
@@ -121,7 +148,7 @@ export const GET: APIRoute = async ({ params, request, locals, url, rewrite }) =
                 <textarea name="content" maxlength="1024" placeholder="Your comment..." aria-label="Your comment" required></textarea>
                 
                 <input type="hidden" id="parentid" name="parentId" value="">
-                <input type="hidden" name="backPath" value="${value[0].backpath}">
+                <input type="hidden" name="backPath" value="${contextData.backpath}">
                 <input type="hidden" id="cf-turnstile" name="cfTurnstileKey">
                 <div class="nkm-buttons">
                     <div>
@@ -137,12 +164,12 @@ export const GET: APIRoute = async ({ params, request, locals, url, rewrite }) =
         return (/*html*/`<button class="nkm-button nkm-reply" data-nkm-id="${value[0].id}" data-nkm-author="${value[0].author}" disabled>Reply</button>`)
     })
 
-    hbs.engine.addMethod('PageButtons', (value) => {
+    hbs.engine.addMethod('PageButtons', () => {
         return (/*html*/`
             <div class="nkm-pages">
-                <a class="nkm-link" href="${"?page=" + (value[0].page - 1)}">${value[0].totalPages > 1 && value[0].page > 1 ? `Previous page` : ''}</a>
-                <p>Pages ${value[0].page} of ${value[0].totalPages} (${value[0].totalComments} total comments)</p>
-                <a class="nkm-link" href="${"?page=" + (value[0].page + 1)}"">${value[0].totalPages > 1 && value[0].page < value[0].totalPages ? `Next page` : ''}</a>
+                <a class="nkm-link" href="${"?page=" + (contextData.page - 1)}">${contextData.totalPages > 1 && contextData.page > 1 ? `Previous page` : ''}</a>
+                <p>Pages ${contextData.page} of ${contextData.totalPages} (${contextData.totalComments} total comments)</p>
+                <a class="nkm-link" href="${"?page=" + (contextData.page + 1)}"">${contextData.totalPages > 1 && contextData.page < contextData.totalPages ? `Next page` : ''}</a>
             </div>
         `)
     })
@@ -156,30 +183,6 @@ export const GET: APIRoute = async ({ params, request, locals, url, rewrite }) =
         },
     })
     const template = hbs.compile(sanitized);
-    const comments = chunk(page.comments.filter(c => c.pagePath === (page.useReferer ? new URL(path).pathname : page.pagePath)).reverse().map(c => ({
-        ...c,
-        replies: c.replies?.sort((a, b) => {
-            //@ts-ignore
-            return b.createdAt - a.createdAt
-        })
-    })).sort((a, b) => {
-        //@ts-ignore
-        return b.createdAt - a.createdAt
-    }), 10);
-    let context = {
-        name: page.name,
-        comments: comments[pageNum - 1],
-        context: {
-            host: page.hostName,
-            path: page.useReferer ? new URL(path).pathname : page.pagePath,
-            backpath: pathUrl + 'c/' + page.name,
-            page: pageNum,
-            totalPages: comments.length,
-            totalComments: page.comments.length,
-            apiUrl: locals.runtime.env.API_URL,
-            turnstileSiteKey: locals.runtime.env.TURNSTILE_SITEKEY
-        }
-    };
     let out = genBoilerplate(template(context), params.slug || 'Nekomment Pages', id, locals.runtime.env.TURNSTILE_SITEKEY);
     let res = new Response(
         out,

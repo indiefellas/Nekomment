@@ -35,7 +35,7 @@ if (!pageData.success) return Astro.rewrite("/" + hostData.status || 0);
         <div class="editor">
             <div class="left">
                 <div class="bar">
-                    <p>Editing Page '{page}'</p>
+                    <p>Editing Page '{pageData.data!.displayName}'</p>
                     <div class="controls">
                         <button>Save</button>
                     </div>

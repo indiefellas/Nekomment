@@ -34,6 +34,7 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 
 export const pages = sqliteTable("pages", {
 	name: text().primaryKey(),
+	displayName: text().notNull(),
 	userId: int().notNull(),
 	hostName: text().notNull(),
 	template: text().notNull(),

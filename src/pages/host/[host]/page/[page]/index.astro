@@ -37,7 +37,7 @@ if (Astro.request.method === "POST") {
                 page ?? "",
             )
         }
-        return Astro.redirect('/' + host);
+        return Astro.redirect('/hosts/' + host);
     } catch {
 
     }
@@ -76,7 +76,7 @@ if (Astro.request.method === "POST") {
 
     <FormModal client:load title="Do you wanna delete this Page?" event="delete-button-clicked" id="delete-modal">
         <p>
-            This will delete your page '{page}'. Are you sure you want to continue?
+            This will delete your page '{pageData.data!.displayName}'. Are you sure you want to continue?
         </p>
         <p>
             <b>This can't be undone!</b>
@@ -96,7 +96,7 @@ if (Astro.request.method === "POST") {
                 </div>
             </div>
             <div class="right">
-                <h1 class="sep">Page '{page}'</h1>
+                <h1 class="sep">Page '{pageData.data!.displayName}'</h1>
 
                 <div class="settings">
                     <section class="setting">
@@ -223,7 +223,7 @@ if (Astro.request.method === "POST") {
                             </div>
                             <div class="controls">
                                 <h3>Delete this page</h3>
-                                <button class="warning" id="delete-button">Delete page '{page}'</button>
+                                <button class="warning" id="delete-button">Delete page '{pageData.data!.displayName}'</button>
                             </div>
                     </section>
                 </div>

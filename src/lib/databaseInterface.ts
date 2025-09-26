@@ -31,6 +31,8 @@ export class Database {
     }
 
     async getPage(name: string, path: string): Promise<Response<{
+        // TODO abstract this type
+        displayName: string;
         name: string;
         userId: number;
         hostName: string;
@@ -94,6 +96,8 @@ export class Database {
                 status: 400
             }
         }
+        // TODO we need to load comments separately to prevent this running for too long
+        // on pages with many comments
         const comments = await this.#db.query.comments.findMany({
             with: {
                 replies: true
@@ -618,7 +622,7 @@ export class Database {
         }
     }
 
-    async createPage(sessionToken: string, name: string, host: string, theme: string, pagePath?: string): Promise<Response> {
+    async createPage(sessionToken: string, displayName: string, name: string, host: string, theme: string, pagePath?: string): Promise<Response> {
         if (!sessionToken) {
             return {
                 success: false,
@@ -648,6 +652,7 @@ export class Database {
             }
         }
         await this.#db.insert(schema.pages).values({
+            displayName: displayName,
             name: name,
             hostName: host,
             userId: userSession[0].users.id,
@@ -662,6 +667,7 @@ export class Database {
     }
 
     async getPages(sessionToken: string): Promise<Response<{
+        displayName: string;
         name: string;
         userId: number;
         hostName: string;

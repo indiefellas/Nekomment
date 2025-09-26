@@ -117,7 +117,6 @@
                     <h2>Here's the important part:</h2>
                     <p>What would be the name of your comment page?</p>
                     <div class="special-text">
-                        <p>https://cmt.nkko.link/c/</p>
                         <input type="text" name="name" aria-label="The name of your comment page" placeholder="Comment page name" bind:value={name} />
                     </div>
                     {#if err}
@@ -175,11 +174,12 @@
             opacity: 0.8;
         }
         input[type='text'] {
+            font: inherit;
             background-color: transparent;
             width: 100%;
             flex-grow: 1;
             flex-basis: 0;
-            padding: 2px;
+            padding: 0;
             border-radius: 0;
         }
 

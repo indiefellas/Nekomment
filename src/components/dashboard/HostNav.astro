@@ -28,7 +28,7 @@ const pages = pagesRes.data;
         <Fragment>
             <h4 class="host-name">Linked Pages</h4>
             <nav>
-                {pages.map(p => <a href={'/host' + hostRoot + '/pages/' + p.name}>{p.name} ({p.pagePath})</a>)}
+                {pages.map(p => <a href={'/host' + hostRoot + '/page/' + p.name}>{p.displayName} ({p.pagePath})</a>)}
             </nav>
         </Fragment>
     }

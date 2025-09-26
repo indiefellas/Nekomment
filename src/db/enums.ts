@@ -11,9 +11,9 @@ export enum AutoModType {
 }
 
 export enum AutoModInternalType {
-    DetectSpam = 0,
-    DetectVpnProxyTor = 1,
-    DetectProfanity = 2
+    DetectSpam = 1 << 0,
+    DetectVpnProxyTor = 1 << 1,
+    DetectProfanity = 1 << 2
 }
 
 export enum AutoModBehavior {
