@@ -96,7 +96,7 @@ allComments = allComments.filter(f => {
             </Fragment>}
         </Fragment> : <Fragment>
             <p class="loading">Loading comments...</p>
-            <CommentCard client:load username={user.data.name} comments={allComments} />
+            <CommentCard client:load username={user.data.name} comments={allComments.sort((a, b) => { return (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0) })} />
         </Fragment>}
     </div>
 </HostLayout>
