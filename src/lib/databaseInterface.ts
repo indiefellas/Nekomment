@@ -1,7 +1,7 @@
 import { createDb } from "../db";
 import * as schema from '../db/schema';
 import bcrypt from "bcryptjs";
-import { eq, and, inArray } from "drizzle-orm";
+import { eq, and, inArray, or } from "drizzle-orm";
 // @ts-ignore
 import { resolveTxt } from "node:dns/promises";
 import { genDefaultTemplate, genId } from "./generators";
@@ -734,7 +734,7 @@ export class Database {
             },
             where: (comments, { and, eq, isNull }) => and(
                 eq(comments.host, host || ''),
-                isNull(comments.parentId)
+                or(isNull(comments.parentId), eq(comments.parentId, ''))
             )
         })
         if (!!path) {
