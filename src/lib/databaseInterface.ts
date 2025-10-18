@@ -748,7 +748,7 @@ export class Database {
             .where(eq(schema.sessions.sessionToken, sessionToken));
         let cmts: any = comments;
         if (userSession.length === 0) {
-            cmts = comments.map(c => {
+            cmts = comments.sort((a, b) => { return (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0) }).map(c => {
                 const { address, parentId, moderatedBy, replies, ...rest } = c;
                 const repl = replies.map(r => {
                     const { address, parentId, moderatedBy, ...rest } = r;
