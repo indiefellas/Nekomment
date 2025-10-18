@@ -244,6 +244,7 @@
         <div slot="buttons">
             <input type="hidden" name="id" value={selectedComment.map(m => m.id).join(",")} />
             <input type="hidden" name="type" value={formAction} />
+            <input type="hidden" name="path" value={selectedComment[0].pagePath} />
             <button
                 id="cancel"
                 onclick={preventDefault(() => (formAction = false))}

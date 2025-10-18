@@ -896,8 +896,13 @@ export class Database {
             }
         }
         let idChunks = chunk(id.split(','), 25);
-        let comments = [...idChunks.map(async c => await this.#db.delete(schema.comments).where(inArray(schema.comments.id, c)).returning())]
-        if (comments.length === 0) {
+        let comments: any[] = new Array();
+        for (let i = 0; i < idChunks.length; i++) {
+            let c = idChunks[i];
+            comments.push(...await this.#db.delete(schema.comments).where(inArray(schema.comments.id, c)).returning());
+        }
+        console.log(comments)
+        if (comments.length === 0 || !comments.length) {
             return {
                 success: false,
                 message: 'Comment not found',

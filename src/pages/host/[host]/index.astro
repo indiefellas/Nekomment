@@ -36,6 +36,7 @@ if (Astro.request.method === "POST") {
             switch (action) {
                 case "reply": {
                     const content = data.get('content')?.toString() || "";
+                    const path = data.get('path')?.toString() || "";
                     const c = await db.createComment(host ?? '', path, user.data.name, content, Astro.request.headers.get('CF-Connecting-IP') || '0.0.0.0', host ? `https://${host}` : undefined, id, undefined, Astro.cookies.get('token')?.value ?? '');
                     break;
                 }
